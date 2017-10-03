@@ -10,3 +10,5 @@ node_modules/
 .idea/
 .yarnclean
 coverage/
+.DS_Store
+/.nyc_output
