@@ -4,7 +4,7 @@
 import {IInsightFacade, InsightResponse} from "./IInsightFacade";
 
 import Log from "../Util";
-import * as JSZip from "jszip";
+let JSZip = require('jszip');
 
 export default class InsightFacade implements IInsightFacade {
 
@@ -18,7 +18,7 @@ export default class InsightFacade implements IInsightFacade {
             // 1. parse content with JSZip
             let zip = new JSZip();
 
-            zip.loadAsync (content, {base64:true}).then(function (zipContents) {
+            zip.loadAsync (content, {base64:true}).then(function (zipContents: JSZip) {
                 zipContents.forEach(function (relativePath, file) {
                     // iterating in here: this is where the helper will be called
                     file.async('string').then(function (str) {
@@ -41,9 +41,9 @@ export default class InsightFacade implements IInsightFacade {
                     body: 'assume successfully parsed; remove when helper implemented'
                 })
 
-            }).catch( function (err) {
+            }).catch( function (err: Error) {
                 // assumed error on decoding base64
-                Log.info('err from JSZip promise to decode .zip');
+                Log.info('err from JSZip promise to decode .zip: ' + err.message);
                 reject({
                     code: 400,
                     body: '.zip failed to decode into base64'
