@@ -21,7 +21,19 @@ export default class InsightFacade implements IInsightFacade {
             zip.loadAsync (content, {base64:true}).then(function (zipContents) {
                 zipContents.forEach(function (relativePath, file) {
                     // iterating in here: this is where the helper will be called
-                    Log.info('iterate over: ' + file.name)
+                    file.async('string').then(function (str) {
+                        // str here is the contents of each file; uncomment below to see (massive) log output
+                        // Log.info(str);
+
+                    }).catch(function (err) {
+                        // currently unreachable; will be called when helper above rejects
+                        Log.info('err from getting file content');
+                        reject({
+                            code: 400,
+                            body: 'no valid JSON'
+                        })
+
+                    })
                 });
 
                 fulfill({
@@ -31,6 +43,7 @@ export default class InsightFacade implements IInsightFacade {
 
             }).catch( function (err) {
                 // assumed error on decoding base64
+                Log.info('err from JSZip promise to decode .zip');
                 reject({
                     code: 400,
                     body: '.zip failed to decode into base64'
