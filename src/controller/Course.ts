@@ -1,11 +1,16 @@
+/**
+ * This is the course object that all courses will be represented as
+ */
 
 import {ICourse} from "./ICourse";
 import JSON = Mocha.reporters.JSON;
 
-export class Course implements ICourse{
+class Course {
 
     dept: string;
     id: string;
+    title: string;
+    instructor: string;
     avg: number;
     instructor: string;
     title: string;
@@ -14,20 +19,28 @@ export class Course implements ICourse{
     audit: number;
     uuid: string;
 
-    constructor(){
-        this.dept = null;
-        this.id = null;
-        this.avg = null;
-        this.instructor = null;
-        this.title = null;
-        this.pass = null;
-        this.fail = null;
-        this.audit = null;
-        this.uuid = null;
+    constructor(
+        dept: string,
+        id: string,
+        title: string,
+        instructor: string,
+        avg: number,
+        pass: number,
+        fail: number,
+        audit: number,
+        uuid: number
     }
 
-    write(dep:string, cid:string, av:number, instruct:string, tit:string, pas:number, fai:number, aud:number, uu:string){
-
+    ) {
+        this.dept = dept;
+        this.id = id;
+        this.title = title;
+        this.instructor = instructor;
+        this.avg = avg;
+        this.pass = pass;
+        this.fail = fail;
+        this.audit= audit;
+        this.uuid = uuid;
 
         console.log("in write");
         this.dept = dep;
