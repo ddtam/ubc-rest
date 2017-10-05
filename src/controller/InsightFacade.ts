@@ -4,8 +4,8 @@
 import {IInsightFacade, InsightResponse} from "./IInsightFacade";
 
 import Log from "../Util";
-import {ICourse} from "./ICourse";
-import {Course} from "./Course";
+import {Database} from "./Database";
+import {CourseJSON} from "./Section";
 let JSZip = require('jszip');
 
 export default class InsightFacade implements IInsightFacade {
@@ -15,63 +15,120 @@ export default class InsightFacade implements IInsightFacade {
     }
 
     addDataset(id: string, content: string): Promise<InsightResponse> {
-        let returnPromise: Promise<InsightResponse> = new Promise(function (fulfill, reject) {
+        let that = this;
+        return new Promise(function (fulfill, reject) {
 
-            // 1. parse content with JSZip
             let zip = new JSZip();
 
-            zip.loadAsync(content, {base64: true}).then(function (zipContents: JSZip) {
-                zipContents.forEach(function (relativePath, file) {
-                    // iterating in here: this is where the helper will be called
-                    file.async('string').then(function (str) {
-                        let parsedJSON = JSON.parse(str);
+            // load serialized zip into JSZip object
+            zip.loadAsync(content, {base64: true})
+                .then(function (zipContents: JSZip) {
 
-                        //console.log(parsedJSON.result);
+                    // process the zip
+                    that.handleZip(zipContents)
+                        .then(function () {
 
-                        for(var i: number = 0; i<2; i++){
-                            let aCourse = new Course();
-                            let result = parsedJSON.result[i];
-                            let bigD = result.Subject;
-                            let bigID = result.Course.toString();
-                            let bigAvg = result.Avg;
-                            let bigInst = result.Professor;
-                            let bigT = result.Title;
-                            let bigP = result.Pass;
-                            let bigF = result.Fail;
-                            let bigAud = result.Audit;
-                            let bigU = result.id.toString();
-                            aCourse.write(bigD, bigID, bigAvg, bigInst, bigT, bigP, bigF, bigAud, bigU);
-                        }
-                        // str here is the contents of each file; uncomment below to see (massive) log output
-                        //Log.info(str);
-
-                    }).catch(function (err) {
-                        // currently unreachable; will be called when helper above rejects
-                        Log.info('err from getting file content');
-                        reject({
-                            code: 400,
-                            body: 'no valid JSON'
+                            // completely processed zip; return promise
+                            fulfill({
+                                code: 204,
+                                body: '.zip successfully parsed'
+                            })
                         })
+                })
 
+                .catch(function (err: Error) {
+                    // error on decoding base64 representation of zip
+                    Log.info('err from JSZip promise to decode .zip: ' + err.message);
+                    reject({
+                        code: 400,
+                        body: '.zip failed to decode into base64'
                     })
-                });
-
-                fulfill({
-                    code: 204,
-                    body: 'assume successfully parsed; remove when helper implemented'
                 })
 
-            }).catch(function (err: Error) {
-                // assumed error on decoding base64
-                Log.info('err from JSZip promise to decode .zip: ' + err.message);
-                reject({
-                    code: 400,
-                    body: '.zip failed to decode into base64'
-                })
-            })
+        });
+    }
+
+    /**
+     * Helper iterates over .zip file contents to add each containing file to Database
+     * @param {JSZip} zipContents is .zip file represented as JSZip object
+     * @returns {Promise<void>} when all files are handled
+     */
+    private async handleZip(zipContents: JSZip) {
+        // load up Database singleton
+        let db = new Database;
+
+        // store all the promises in this array
+        let coursePromiseCollection: Array<Promise<null>> = [];
+        let counter: number = 0;
+
+        let that = this;
+
+        zipContents.forEach(function (relativePath, file) {
+            if (!file.dir) { // process only files, NOT directories
+
+                let p: Promise<null> = that.handleFile(file, counter);
+
+                // add promise to iterable
+                coursePromiseCollection.push(p);
+                counter++;
+            }
         });
 
-        return returnPromise;
+        // wait for all promises for file processing to settle
+        await Promise.all(coursePromiseCollection).then(function () {
+            // complete contents of zip added to database
+            Log.info('.zip completely processed!');
+            Log.info('processed ' + counter + ' files');
+            Log.info('database contains ' + db.countEntries().toString() + ' entries')
+
+        }).catch(function (err) {
+            // something went wrong...
+            Log.info('failed to process all files in .zip');
+            throw err;
+        })
+    }
+
+    /**
+     * Helper handles addition of individual files within zip to Database
+     * @param {JSZipObject} file is the file to be processed
+     * @param {number} counter uniquely identifies sequence of this file within zip
+     * @returns {Promise<any>} queuing entry of this file into Database
+     */
+    private handleFile(file: JSZipObject, counter: number): Promise<null> {
+        return new Promise(function (fulfill, reject) {
+
+            let db = new Database();
+
+            file.async('string').then(function (fileContents: string) {
+                // successfully got file as string
+                let parsedJSON: CourseJSON = JSON.parse(fileContents);
+                db.add(parsedJSON);
+
+                // successfully added a complete course to database
+                // UNCOMMENT BELOW for very verbose logging of each file
+
+                // if (parsedJSON.result.length > 0) {
+                //     Log.info('file ' + counter +
+                //         ' successfully added ' +
+                //         parsedJSON.result[0].Subject + " " +
+                //         parsedJSON.result[0].Course
+                //     );
+                //
+                // } else {
+                //     Log.info('file ' + counter +
+                //         ' is a course without no recorded sections'
+                //     )
+                // }
+
+                fulfill();
+
+            }).catch(function (err) {
+                // file.async could not read file
+                Log.error('error reading file: ' + err);
+                reject();
+
+            })
+        });
     }
 
     removeDataset(id: string): Promise<InsightResponse> {
@@ -81,5 +138,6 @@ export default class InsightFacade implements IInsightFacade {
     performQuery(query: any): Promise<InsightResponse> {
         return null;
     }
+
 
 }

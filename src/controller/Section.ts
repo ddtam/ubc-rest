@@ -2,22 +2,33 @@
  * This is the course object that all courses will be represented as
  */
 
-import {ICourse} from "./ICourse";
-import JSON = Mocha.reporters.JSON;
+export interface CourseJSON {
+    result: Array<SectionJSON>
+}
 
-class Course {
+export interface SectionJSON {
+    Audit: number; // audit
+    Avg: number; // avg
+    Course: string; // id
+    Fail: number // fail
+    id: number // uuid
+    Pass: number // pass
+    Professor: string // instructor
+    Subject: string; // dept
+    Title: string; // title
+}
+
+export class Section {
 
     dept: string;
     id: string;
     title: string;
     instructor: string;
     avg: number;
-    instructor: string;
-    title: string;
     pass: number;
     fail: number;
     audit: number;
-    uuid: string;
+    uuid: number;
 
     constructor(
         dept: string,
@@ -29,8 +40,6 @@ class Course {
         fail: number,
         audit: number,
         uuid: number
-    }
-
     ) {
         this.dept = dept;
         this.id = id;
@@ -41,19 +50,6 @@ class Course {
         this.fail = fail;
         this.audit= audit;
         this.uuid = uuid;
-
-        console.log("in write");
-        this.dept = dep;
-        this.id = cid;
-        this.avg = av;
-        this.instructor = instruct;
-        this.title = tit;
-        this.pass = pas;
-        this.fail = fai;
-        this.audit = aud;
-        this.uuid = uu;
-        console.log("end write");
-
         //this.dept = str.dept;
 
         //uuid = jA.uuid;

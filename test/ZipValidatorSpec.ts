@@ -9,7 +9,29 @@ import Log from "../src/Util";
 
 describe("ZipValidatorSpec", function () {
 
-    it("Should iterate through every file in the zip", function (done) {
+    it("Should iterate through the 3 files in the test zip", function (done) {
+        let inFac = new InsightFacade();
+        let content: string;
+
+        content = new Buffer(fs.readFileSync('courses_3test.zip'))
+            .toString('base64');
+
+        inFac.addDataset('courses', content).then(function (obj) {
+            Log.test('Return code: ' + obj.code);
+            expect(obj.code).to.deep.equal(204);
+            done();
+
+        }).catch(function (err) {
+            Log.test(err);
+            expect.fail();
+            done();
+        });
+    });
+
+    it("Should iterate through ALL files in the zip", function (done) {
+        // because my machine is slow or something ._.
+        this.timeout(5000);
+
         let inFac = new InsightFacade();
         let content: string;
 
