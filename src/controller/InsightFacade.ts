@@ -59,7 +59,7 @@ export default class InsightFacade implements IInsightFacade {
 
         // store all the promises in this array
         let coursePromiseCollection: Array<Promise<null>> = [];
-        let counter: number = 0;
+        let counter: number = 1;
 
         let that = this;
 

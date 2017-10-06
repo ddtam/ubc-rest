@@ -5,9 +5,17 @@ import Log from "../Util";
 import {CourseJSON, DatabaseJSON, SectionJSON} from "./IJSON";
 import * as fs from "fs";
 import {Section} from "./Section";
+import {isNullOrUndefined} from "util";
 
-interface IQuestion {
+export interface Criteria {
+    [index: string]: any;
 
+    // field represents one of the 9 properties of a Section
+    property: string,
+    // value is value of the field we wish to query
+    value: any,
+    // equality is one of gt, lt, or eq for numerical fields
+    equality: string
 }
 
 export class Database {
@@ -57,6 +65,93 @@ export class Database {
         }
     }
 
+
+    query(questions: Array<Criteria>): Array<Section> {
+        let result: Array<Section>;
+        let originalDB: Array<Section>;
+
+        for (let q of questions) {
+            // check if first query
+            if (questions[0] === q) {
+                // hold onto the current database
+                originalDB = this.sectionCollection.slice(0);
+
+            }
+
+            if (
+                q.property === "dept" ||
+                q.property === "id" ||
+                q.property === "title" ||
+                q.property === "instructor" ||
+                q.property === "uuid"
+            ) {
+                // is a string query
+                result = this.handleStrQuery(q.property, q.value)
+
+            } else if (
+                q.property === "avg" ||
+                q.property === "pass" ||
+                q.property === "fail" ||
+                q.property === "audit"
+            ) {
+                // is a numerical query with some equality comparison
+                result = this.handleNumQuery(q.property, q.value, q.equality)
+
+            } else {
+                // query is poorly formed; throw error
+                throw new Error('query is poorly formed; property "' + q.property + '" does not exist')
+
+            }
+            // set result of this sub-query as the new database for the next query
+            this.reset();
+
+            // if nothing was returned, no sections match the search criteria; break out
+            if (result.length === 0) {
+                break;
+            }
+
+            // write in results as working database for next sub-query
+            for (let s of result) {
+                this.sectionCollection.push(s);
+            }
+
+        }
+        // done all queries; restore original database
+        this.reset();
+        for (let s of originalDB) {
+            this.sectionCollection.push(s);
+        }
+
+        // return query results
+        return result;
+
+    }
+
+    // helper to pass into the correct case of the 5 possible string-match queries
+    private handleStrQuery(property: string, value: any): Array<Section> {
+        switch (property) {
+            case 'dept': return this.getDept(value);
+            case 'id': return this.getID(value);
+            case 'title': return this.getTitle(value);
+            case 'instructor': return this.getInstructor(value);
+            case 'uuid': return this.getUUID(value);
+        }
+    }
+
+    // helper to pass into the correct case of the 4 possible numerical queries
+    private handleNumQuery(property: string, value: any, equality: string): Array<Section> {
+        switch (property) {
+            case 'avg': return this.getAvg(value, equality);
+            case 'pass': return this.getPass(value, equality);
+            case 'fail': return this.getFail(value, equality);
+            case 'audit': return this.getAudit(value, equality);
+        }
+    }
+
+    /**
+     * BEGIN: The 9 basic query methods are below
+     */
+
     getDept(dept: string): Array<Section> {
         return this.sectionCollection.filter(s => s.dept === dept)
     }
@@ -89,6 +184,11 @@ export class Database {
         return this.meetEqualityCriteria('audit', audit, equality);
     }
 
+    getUUID(uuid: number) {
+        // expects ONE result b/c UUID is unique by definition
+        return this.sectionCollection.filter(s => s.uuid === uuid);
+    }
+
     /**
      * Abstracted helper function to process inequality queries of relevant numerical fields
      * @param {string} property is the Section property that is being queried
@@ -115,17 +215,12 @@ export class Database {
         }
     }
 
-    getUUID(uuid: number) {
-        // expects ONE result b/c UUID is unique by definition
-        return this.sectionCollection.filter(s => s.uuid === uuid);
-    }
-
     // returns number of entries loaded in current database
     countEntries(): number {
         return this.sectionCollection.length;
     }
 
-    // may be used to blank the database before loading a queryDB or restoring the mainDB
+    // may be used to blank the database before loading a query DB or restoring the main DB
     reset() {
         this.sectionCollection.length = 0;
 

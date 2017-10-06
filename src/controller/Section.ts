@@ -2,7 +2,7 @@
  * This is the course section object that all sections will be represented as
  */
 export class Section {
-    [index: string] : any;
+    [index: string]: any;
 
     dept: string;
     id: string;
