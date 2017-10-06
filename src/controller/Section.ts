@@ -1,27 +1,6 @@
 /**
- * This is the course object that all courses will be represented as
+ * This is the course section object that all sections will be represented as
  */
-
-export interface CourseJSON {
-    result: Array<SectionJSON>
-}
-
-export interface DatabaseJSON {
-    contents: Array<SectionJSON>
-}
-
-export interface SectionJSON {
-    Audit: number; // audit
-    Avg: number; // avg
-    Course: string; // id
-    Fail: number // fail
-    id: number // uuid
-    Pass: number // pass
-    Professor: string // instructor
-    Subject: string; // dept
-    Title: string; // title
-}
-
 export class Section {
 
     dept: string;

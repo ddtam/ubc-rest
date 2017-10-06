@@ -2,8 +2,9 @@
  * This is the singleton database in which all course information will be stored
  */
 import Log from "../Util";
-import {CourseJSON, DatabaseJSON, Section, SectionJSON} from "./Section";
+import {CourseJSON, DatabaseJSON, SectionJSON} from "./IJSON";
 import * as fs from "fs";
+import {Section} from "./Section";
 
 export class Database {
     private sectionCollection: Array<Section>;
