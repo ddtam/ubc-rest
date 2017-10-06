@@ -6,6 +6,10 @@ export interface CourseJSON {
     result: Array<SectionJSON>
 }
 
+export interface DatabaseJSON {
+    contents: Array<SectionJSON>
+}
+
 export interface SectionJSON {
     Audit: number; // audit
     Avg: number; // avg

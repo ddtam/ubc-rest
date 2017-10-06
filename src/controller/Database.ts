@@ -2,7 +2,8 @@
  * This is the singleton database in which all course information will be stored
  */
 import Log from "../Util";
-import {CourseJSON, Section, SectionJSON} from "./Section";
+import {CourseJSON, DatabaseJSON, Section, SectionJSON} from "./Section";
+import * as fs from "fs";
 
 export class Database {
     private sectionCollection: Array<Section>;
@@ -37,6 +38,17 @@ export class Database {
             );
 
             this.sectionCollection.push(s);
+
+            // TODO also need to write to file
+        }
+    }
+
+    addDB(dbName: string, dbPath: string) {
+        var content = fs.readFileSync(dbPath).toString('string');
+        var dbJSON: DatabaseJSON = JSON.parse(content);
+
+        for (let i = 0; i < dbJSON.contents.length; i++) {
+            // TODO
         }
     }
 
