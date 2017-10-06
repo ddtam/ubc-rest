@@ -5,7 +5,7 @@ import {IInsightFacade, InsightResponse} from "./IInsightFacade";
 
 import Log from "../Util";
 import {Database} from "./Database";
-import {CourseJSON} from "./Section";
+import {CourseJSON} from "./IJSON";
 let JSZip = require('jszip');
 
 export default class InsightFacade implements IInsightFacade {

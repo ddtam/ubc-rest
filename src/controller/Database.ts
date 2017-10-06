@@ -6,6 +6,10 @@ import {CourseJSON, DatabaseJSON, SectionJSON} from "./IJSON";
 import * as fs from "fs";
 import {Section} from "./Section";
 
+interface IQuestion {
+
+}
+
 export class Database {
     private sectionCollection: Array<Section>;
     private static instance: Database;
@@ -53,17 +57,75 @@ export class Database {
         }
     }
 
+    getDept(dept: string): Array<Section> {
+        return this.sectionCollection.filter(s => s.dept === dept)
+    }
+
+    getID(id: string): Array<Section> {
+        return this.sectionCollection.filter(s => s.id === id)
+    }
+
+    getTitle(title: string): Array<Section> {
+        return this.sectionCollection.filter(s => s.title === title)
+    }
+
+    getInstructor(instructor: string): Array<Section> {
+        return this.sectionCollection.filter(s => s.instructor === instructor)
+    }
+
+    getAvg(avg: number, equality: string): Array<Section> {
+        return this.meetEqualityCriteria('avg', avg, equality);
+    }
+
+    getPass(pass: number, equality: string): Array<Section> {
+        return this.meetEqualityCriteria('pass', pass, equality);
+    }
+
+    getFail(fail: number, equality: string): Array<Section> {
+        return this.meetEqualityCriteria('fail', fail, equality);
+    }
+
+    getAudit(audit: number, equality: string): Array<Section> {
+        return this.meetEqualityCriteria('audit', audit, equality);
+    }
+
+    /**
+     * Abstracted helper function to process inequality queries of relevant numerical fields
+     * @param {string} property is the Section property that is being queried
+     * @param {number} threshold is the value that the inequality will be checked against
+     * @param {string} equality is one of eq = equals, lt = less than, or gt = greater than
+     * @returns {Section[]} an array of sections
+     */
+    private meetEqualityCriteria(property: string, threshold: number, equality: string) {
+        if (equality === "gt") {
+            return this.sectionCollection.filter(function (section: Section) {
+                return section[property] > threshold;
+            })
+        } else if (equality === "lt") {
+            return this.sectionCollection.filter(function (section) {
+                return section[property] < threshold;
+            })
+        } else if (equality === "eq") {
+            return this.sectionCollection.filter(function (section) {
+                return section[property] === threshold;
+            })
+        } else {
+            // equality did not match gt, lt, or eq; throw error
+            throw new Error('equality query expected "gt", "lt", or "eq"')
+        }
+    }
+
+    getUUID(uuid: number) {
+        // expects ONE result b/c UUID is unique by definition
+        return this.sectionCollection.filter(s => s.uuid === uuid);
+    }
+
+    // returns number of entries loaded in current database
     countEntries(): number {
         return this.sectionCollection.length;
     }
 
-    getUUID(uuid: number) {
-        // this is just one example method; we can implement something like this for all the other fields
-        //  if this works out well...
-        return this.sectionCollection.find(c => c.uuid === uuid)
-    }
-
-    // THIS SHOULD ONLY EVER BE USED IN TESTING; resets singleton by emptying collection
+    // may be used to blank the database before loading a queryDB or restoring the mainDB
     reset() {
         this.sectionCollection.length = 0;
 
