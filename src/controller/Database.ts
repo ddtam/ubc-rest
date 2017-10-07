@@ -72,8 +72,12 @@ export class Database {
         Log.info("The file was saved!");
     }
 
-    addDB(dbName: string, dbPath: string) {
-        var content = fs.readFileSync(dbPath).toString('string');
+    /**
+     * Loads a database from file by name
+     * @param {string} dbName is the name of the database to be loaded into memory
+     */
+    loadDB(dbName: string) {
+        var content = fs.readFileSync('./dbFiles/' + dbName).toString('string');
         var dbJSON: DatabaseJSON = JSON.parse(content);
 
         for (let i = 0; i < dbJSON.content.length; i++) {
