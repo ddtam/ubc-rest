@@ -160,11 +160,12 @@ describe("DatabaseSpec", function () {
 
             expect(results.length).to.equal(12);
 
-        }).then(done, done).catch(function (err) {
+        }).catch(function (err) {
             Log.test(err);
             expect.fail();
             done();
-        });
+
+        }).then(done, done);
     });
 
     it("Should query averages correctly", function (done) {
@@ -280,6 +281,7 @@ describe("DatabaseSpec", function () {
         }).catch(function (err) {
             expect(err.toString()).to.deep.equal('Error: equality query expected "gt", "lt", or "eq"');
             done();
+
         }).then(done, done);
     });
 
@@ -314,11 +316,12 @@ describe("DatabaseSpec", function () {
 
             expect(db.countEntries()).to.equal(64612);
 
-        }).then(done, done).catch(function (err) {
+        }).catch(function (err) {
             Log.test(err);
             expect.fail();
             done();
-        });
+
+        }).then(done, done);
     });
 
     it("Should be able to handle a query for which no results exist", function (done) {
