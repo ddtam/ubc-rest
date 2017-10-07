@@ -30,7 +30,7 @@ export default class InsightFacade implements IInsightFacade {
 
                             // Call to database to store whole database into file
                             let db = new Database();
-                            db.writeDB();
+                            db.saveDB(id);
 
                             // completely processed zip; return promise
                             fulfill({

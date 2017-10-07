@@ -44,24 +44,32 @@ export class Database {
         }
     }
 
-    writeDB(){
-        // TODO
-        console.log("in writeDB");
-        //write in as json
-        let asJSON = "{content: ";
+    /**
+     * Converts entire array collection into JSON format and returns as string
+     *   Should really be diagnostic use only...
+     * @returns {string}
+     */
+    pukeMemory(): string {
+        let asJSON = "{\"content\": ";
         let withCollection = asJSON.concat(JSON.stringify(this.sectionCollection));
         let finalBracket = withCollection.concat("}");
-        console.log(finalBracket);
 
+        return finalBracket;
+    }
 
+    /**
+     * Saves the current state of the database to a single file formatted in JSON
+     * @param {string} dbName is the file name on disk
+     */
+    saveDB(dbName: string){
+        Log.trace("in writeDB");
+        // write in as json
+        let cacheContents = this.pukeMemory();
+        // console.log(finalBracket);
 
-        fs.writeFile("./dbFiles/test", finalBracket, function(err: any) {
-            if(err) {
-                console.log(err);
-            }
+        fs.writeFileSync("./dbFiles/" + dbName, cacheContents);
 
-            console.log("The file was saved!");
-        });
+        Log.info("The file was saved!");
     }
 
     addDB(dbName: string, dbPath: string) {
