@@ -44,11 +44,31 @@ export class Database {
         }
     }
 
+    writeDB(){
+        // TODO
+        console.log("in writeDB");
+        //write in as json
+        let asJSON = "{content: ";
+        let withCollection = asJSON.concat(JSON.stringify(this.sectionCollection));
+        let finalBracket = withCollection.concat("}");
+        console.log(finalBracket);
+
+
+
+        fs.writeFile("./dbFiles/test", finalBracket, function(err: any) {
+            if(err) {
+                console.log(err);
+            }
+
+            console.log("The file was saved!");
+        });
+    }
+
     addDB(dbName: string, dbPath: string) {
         var content = fs.readFileSync(dbPath).toString('string');
         var dbJSON: DatabaseJSON = JSON.parse(content);
 
-        for (let i = 0; i < dbJSON.contents.length; i++) {
+        for (let i = 0; i < dbJSON.content.length; i++) {
             // TODO
         }
     }
