@@ -20,6 +20,7 @@ export interface Criteria {
 
 export class Database {
     private sectionCollection: Array<Section>;
+    private loadedDB: string;
     private static instance: Database;
 
     constructor() {
@@ -97,7 +98,12 @@ export class Database {
         }
     }
 
-
+    /**
+     * Query takes an array of Criteria and queries the database to return an array of sections that fulfill
+     *  all the criteria
+     * @param {Array<Criteria>} questions
+     * @returns {Array<Section>}
+     */
     query(questions: Array<Criteria>): Array<Section> {
         let result: Array<Section>;
         let originalDB: Array<Section>;
@@ -250,6 +256,16 @@ export class Database {
     // returns number of entries loaded in current database
     countEntries(): number {
         return this.sectionCollection.length;
+    }
+
+    // returns the database that is currently loaded
+    whichDB(): string {
+        return this.loadedDB;
+    }
+
+    // returns a list of the databases stored in memory
+    listDB(): Array<string> {
+        return fs.readdirSync('./dbFiles');
     }
 
     // may be used to blank the database before loading a query DB or restoring the main DB

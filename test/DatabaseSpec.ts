@@ -8,6 +8,7 @@ import {expect} from 'chai';
 import Log from "../src/Util";
 import {Criteria, Database} from "../src/controller/Database";
 import {Section} from "../src/controller/Section";
+import * as path from "path";
 
 describe("DatabaseSpec", function () {
 
@@ -19,7 +20,16 @@ describe("DatabaseSpec", function () {
        Log.warn('database is being reset...');
        db.reset();
 
-        inFac = new InsightFacade();
+       inFac = new InsightFacade();
+
+        // clear databases that are cached
+        Log.warn('deleting cached databases...');
+        let directory: string = './dbFiles';
+        let databaseList = fs.readdirSync(directory);
+
+        for (const file of databaseList) {
+            fs.unlinkSync(path.join(directory, file))
+        }
     });
 
     it("should write 9 fields correctly", function (done) {
