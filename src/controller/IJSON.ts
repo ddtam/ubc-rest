@@ -7,7 +7,7 @@ export interface CourseJSON {
 }
 
 export interface DatabaseJSON {
-    contents: Array<SectionJSON>
+    content: Array<SectionJSON>
 }
 
 export interface SectionJSON {

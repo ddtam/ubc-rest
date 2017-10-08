@@ -56,11 +56,43 @@ export class Database {
         }
     }
 
-    addDB(dbName: string, dbPath: string) {
-        var content = fs.readFileSync(dbPath).toString('string');
+    /**
+     * Converts entire array collection into JSON format and returns as string
+     *   Should really be diagnostic use only...
+     * @returns {string}
+     */
+    pukeMemory(): string {
+        let asJSON = "{\"content\": ";
+        let withCollection = asJSON.concat(JSON.stringify(this.sectionCollection));
+        let finalBracket = withCollection.concat("}");
+
+        return finalBracket;
+    }
+
+    /**
+     * Saves the current state of the database to a single file formatted in JSON
+     * @param {string} dbName is the file name on disk
+     */
+    saveDB(dbName: string){
+        Log.trace("in writeDB");
+        // write in as json
+        let cacheContents = this.pukeMemory();
+        // console.log(finalBracket);
+
+        fs.writeFileSync("./dbFiles/" + dbName, cacheContents);
+
+        Log.info("The file was saved!");
+    }
+
+    /**
+     * Loads a database from file by name
+     * @param {string} dbName is the name of the database to be loaded into memory
+     */
+    loadDB(dbName: string) {
+        var content = fs.readFileSync('./dbFiles/' + dbName).toString('string');
         var dbJSON: DatabaseJSON = JSON.parse(content);
 
-        for (let i = 0; i < dbJSON.contents.length; i++) {
+        for (let i = 0; i < dbJSON.content.length; i++) {
             // TODO
         }
     }

@@ -28,6 +28,10 @@ export default class InsightFacade implements IInsightFacade {
                     that.handleZip(zipContents)
                         .then(function () {
 
+                            // Call to database to store whole database into file
+                            let db = new Database();
+                            db.saveDB(id);
+
                             // completely processed zip; return promise
                             fulfill({
                                 code: 204,

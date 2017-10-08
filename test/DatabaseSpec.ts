@@ -15,8 +15,8 @@ describe("DatabaseSpec", function () {
     let inFac: InsightFacade;
     let content: string;
 
-    beforeEach(function () {;
-       Log.warn('database is being reset...')
+    beforeEach(function () {
+       Log.warn('database is being reset...');
        db.reset();
 
         inFac = new InsightFacade();
@@ -70,6 +70,31 @@ describe("DatabaseSpec", function () {
             done();
 
         }).then(done, done);
+    });
+
+    it("Write to dbFiles should match sectionCollection", function (done) {
+        let inFac = new InsightFacade();
+        let content: string;
+        let db = new Database();
+
+        content = new Buffer(fs.readFileSync('courses_3test.zip'))
+            .toString('base64');
+
+        let fileID = 'courses';
+        inFac.addDataset(fileID, content).then(function (obj) {
+
+            Log.info('return code: ' + obj.code);
+
+            let diskContent = new Buffer(fs.readFileSync('./dbFiles/' + fileID))
+                .toString('utf8');
+
+            expect(diskContent).to.deep.equal(db.pukeMemory());
+
+        }).then(done, done).catch(function (err) {
+            Log.test(err);
+            expect.fail();
+            done();
+        });
     });
 
     it("Should query all courses in department correctly", function (done) {
