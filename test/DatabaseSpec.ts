@@ -2,13 +2,13 @@
  * Created by sprecious on 2017-10-04.
  */
 
-import * as fs from "fs";
+let fs = require('fs');
 import InsightFacade from "../src/controller/InsightFacade";
 import {expect} from 'chai';
 import Log from "../src/Util";
 import {Criteria, Database} from "../src/controller/Database";
 import {Section} from "../src/controller/Section";
-import * as path from "path";
+let path = require('path');
 
 describe("DatabaseSpec", function () {
 
@@ -312,10 +312,10 @@ describe("DatabaseSpec", function () {
 
             // if it gets here, did not throw error
             expect.fail();
+            done();
 
         }).catch(function (err) {
             expect(err.toString()).to.deep.equal('Error: equality query expected "gt", "lt", or "eq"');
-            done();
 
         }).then(done, done);
     });

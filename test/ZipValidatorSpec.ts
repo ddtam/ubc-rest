@@ -2,12 +2,12 @@
  * Created by dtam on 2017-10-03.
  */
 
-import * as fs from "fs";
+let fs = require('fs');
 import InsightFacade from "../src/controller/InsightFacade";
 import {expect} from 'chai';
 import Log from "../src/Util";
 import {Database} from "../src/controller/Database";
-import * as path from "path";
+let path = require('path');
 
 describe("ZipValidatorSpec", function () {
 
@@ -157,7 +157,7 @@ describe("ZipValidatorSpec", function () {
     it("Should give 201 response when adding a database with the same ID", function (done) {
         this.timeout(10000);
 
-        content = new Buffer(fs.readFileSync('courses.zip'))
+        content = new Buffer(fs.readFileSync('courses_3test.zip'))
             .toString('base64');
 
         // add first time
