@@ -154,6 +154,23 @@ describe("ZipValidatorSpec", function () {
 
     });
 
+    it("Should give 400 response when given something that is not a zip", function (done) {
+        content = new Buffer(fs.readFileSync('coursesNotZip.rar'))
+            .toString('base64');
+
+        inFac.addDataset('courses', content).then(function (obj) {
+            Log.test('Return code: ' + obj.code + '; DID NOT FAIL');
+            expect.fail();
+            done();
+
+        }).catch(function (obj) {
+            Log.test('Return code: ' + obj.code);
+            expect(obj.code).to.deep.equal(400);
+
+        }).then(done, done);
+
+    });
+
     it("Should give 201 response when adding a database with the same ID", function (done) {
         this.timeout(10000);
 

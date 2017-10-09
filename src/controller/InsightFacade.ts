@@ -198,11 +198,21 @@ export default class InsightFacade implements IInsightFacade {
     }
 
     removeDataset(id: string): Promise<InsightResponse> {
-        return null;
+        return new Promise(function (fulfill, reject) {
+            reject({
+                code: 400,
+                body: 'placeholder fail' // TODO
+            })
+        })
     }
 
     performQuery(query: any): Promise<InsightResponse> {
-        return null;
+        return new Promise(function (fulfill, reject) {
+            reject({
+                code: 400,
+                body: 'placeholder fail' // TODO
+            })
+        })
     }
 
 
