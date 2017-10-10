@@ -54,7 +54,6 @@ export class Database {
 
             this.sectionCollection.push(s);
 
-            // TODO also need to write to file
         }
     }
 
