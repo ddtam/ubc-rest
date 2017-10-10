@@ -40,8 +40,8 @@ export default class InputHandler {
 
                             })
 
-                            .catch(function (err: InsightResponse) {
-                                if (!err.body.toString().includes('SyntaxError')) {
+                            .catch(function (err) {
+                                if (!err.body.error.includes('SyntaxError')) {
                                     // was not syntax error (bad JSON); pass upwards
                                     reject(err);
                                 } // else, catch and continue...
@@ -60,7 +60,7 @@ export default class InputHandler {
             // there were no files processed
             return Promise.reject({
                 code: 400,
-                body: 'zip is empty'
+                body: {error: 'zip is empty'}
             })
         }
 
@@ -75,18 +75,15 @@ export default class InputHandler {
                 // there were no valid JSON files in the zip
                 return Promise.reject({
                     code: 400,
-                    body: 'zip contained no valid JSON files'
+                    body: {error: 'zip contained no valid JSON files'}
                 })
             }
 
-        }).catch(function (err: Error) {
+        }).catch(function (err: InsightResponse) {
             // something went wrong...
             Log.info('failed to process all files in .zip');
 
-            return Promise.reject({
-                code: 400,
-                body: 'failed to process all files in .zip - ' + err.message
-            });
+            return Promise.reject(err);
         })
     }
 
@@ -113,10 +110,10 @@ export default class InputHandler {
                     });
 
                 } catch (err) {
-                    Log.error('JSON in file ' + counter + ' is invalid: ' + err.toString());
+                    Log.error('JSON in file ' + counter + ' is invalid - ' + err.toString());
                     reject({
                         code: 400,
-                        body: 'JSON in file ' + counter + ' is invalid: ' + err.toString()
+                        body: {error: 'JSON in file ' + counter + ' is invalid - ' + err.toString()}
                     });
 
                 }
@@ -141,7 +138,7 @@ export default class InputHandler {
                 Log.error('async error reading file: ' + err);
                 reject({
                     code: 400,
-                    body: 'file.async failing to read file ' + counter
+                    body: {error: 'file.async failing to read file ' + counter}
                 })
 
             })

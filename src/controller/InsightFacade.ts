@@ -58,11 +58,8 @@ export default class InsightFacade implements IInsightFacade {
 
                         .catch(function (err: InsightResponse) {
                         // there was an error processing zip contents
-                        Log.error('zip content error - ' + err.body);
-                        reject({
-                            code: 400,
-                            body: err.body
-                        });
+                        Log.error('zip content error');
+                        reject(err);
                     })
                 })
 
@@ -71,7 +68,7 @@ export default class InsightFacade implements IInsightFacade {
                     Log.error('JSZip err - ' + err.message);
                     reject({
                         code: 400,
-                        body: err.message
+                        body: {error: err.message}
                     })
                 })
 
@@ -87,7 +84,7 @@ export default class InsightFacade implements IInsightFacade {
                 // this database was not previously cached or loaded
                 reject({
                     code: 404,
-                    body: 'resource does not exist; database "' + id + '" was never cached'
+                    body: {error: 'resource does not exist; database "' + id + '" was never cached'}
                 })
             } else {
                 db.deleteDB(id);
@@ -103,7 +100,7 @@ export default class InsightFacade implements IInsightFacade {
         return new Promise(function (fulfill, reject) {
             reject({
                 code: 400,
-                body: 'placeholder fail' // TODO
+                body: {error: 'placeholder fail'} // TODO
             })
         })
     }

@@ -87,7 +87,7 @@ describe("AddDatasetSpec", function () {
         }).catch(function (err) {
             Log.test('Return code: ' + err.code);
             expect(err.code).to.deep.equal(400);
-            expect(err.body).to.deep.equal('zip is empty')
+            expect(err.body.error).to.deep.equal('zip is empty')
 
         }).then(done, done);
 

@@ -46,10 +46,10 @@ describe("RemoveDatasetSpec", function () {
             expect.fail();
             done();
 
-        }).catch(function (err: InsightResponse) {
+        }).catch(function (err) {
             Log.info('Return code: ' + err.code);
             expect(err.code).to.equal(404);
-            expect(err.body).to.include('resource does not exist');
+            expect(err.body.error).to.include('resource does not exist');
 
         }).then(done, done);
 
