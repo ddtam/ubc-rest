@@ -79,11 +79,14 @@ export default class InputHandler {
                 })
             }
 
-        }).catch(function (err: InsightResponse) {
+        }).catch(function (err: Error) {
             // something went wrong...
             Log.info('failed to process all files in .zip');
 
-            return Promise.reject(err);
+            return Promise.reject({
+                code: 400,
+                body: 'failed to process all files in .zip - ' + err.message
+            });
         })
     }
 

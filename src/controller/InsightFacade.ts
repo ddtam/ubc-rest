@@ -5,7 +5,6 @@ import {IInsightFacade, InsightResponse} from "./IInsightFacade";
 
 import Log from "../Util";
 import {Database} from "./Database";
-import {CourseJSON} from "./IJSON";
 import InputHandler from "./InputHandler";
 let JSZip = require('jszip');
 
@@ -45,6 +44,7 @@ export default class InsightFacade implements IInsightFacade {
                                     code: 201,
                                     body: 'dataset successfully added; id already exists'
                                 })
+
                             } else {
                                 // is a new database id
                                 db.saveDB(id, true);
