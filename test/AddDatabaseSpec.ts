@@ -7,9 +7,8 @@ import InsightFacade from "../src/controller/InsightFacade";
 import {expect} from 'chai';
 import Log from "../src/Util";
 import {Database} from "../src/controller/Database";
-let path = require('path');
 
-describe("ZipValidatorSpec", function () {
+describe("AddDatasetSpec", function () {
 
     let db: Database = new Database;
     let inFac: InsightFacade;
@@ -23,13 +22,22 @@ describe("ZipValidatorSpec", function () {
 
         // clear databases that are cached
         Log.warn('deleting cached databases...');
-        let directory: string = './dbFiles';
-        let databaseList = fs.readdirSync(directory);
 
+        let databaseList = fs.readdirSync('./dbFiles/');
         for (const file of databaseList) {
-            fs.unlinkSync(path.join(directory, file))
+            fs.unlinkSync('./dbFiles/' + file)
         }
 
+    });
+
+    after(function () {
+        // clear databases at end
+        Log.warn('CLEAN UP: deleting cached databases...');
+
+        let databaseList = fs.readdirSync('./dbFiles/');
+        for (const file of databaseList) {
+            fs.unlinkSync('./dbFiles/' + file)
+        }
     });
 
     it("Should iterate through the 3 files in the test zip", function (done) {

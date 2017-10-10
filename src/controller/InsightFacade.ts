@@ -34,18 +34,20 @@ export default class InsightFacade implements IInsightFacade {
                     // process the zip
                     that.handleZip(zipContents)
                         .then(function () {
-                            // call to database to store whole database into file
-                            db.saveDB(id);
 
-                            // completely processed zip; fulfill promise
+                            // completely processed zip; save database and fulfill promise
                             if (dbList.includes(id)) {
                                 // this database has been loaded before
+                                db.saveDB(id, false);
+
                                 fulfill({
                                     code: 201,
                                     body: 'dataset successfully added; id already exists'
                                 })
                             } else {
                                 // is a new database id
+                                db.saveDB(id, true);
+
                                 fulfill({
                                     code: 204,
                                     body: 'dataset successfully added'
@@ -198,11 +200,23 @@ export default class InsightFacade implements IInsightFacade {
     }
 
     removeDataset(id: string): Promise<InsightResponse> {
+        // check if database contains this id
+        let db = new Database();
+
         return new Promise(function (fulfill, reject) {
-            reject({
-                code: 400,
-                body: 'placeholder fail' // TODO
-            })
+            if (!db.hasDB(id)) {
+                // this database was not previously cached or loaded
+                reject({
+                    code: 404,
+                    body: 'resource does not exist; database "' + id + '" was never cached'
+                })
+            } else {
+                db.deleteDB(id);
+                fulfill({
+                    code: 204,
+                    body: 'database ' + id + ' deleted'
+                })
+            }
         })
     }
 

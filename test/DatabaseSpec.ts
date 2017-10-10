@@ -8,7 +8,6 @@ import {expect} from 'chai';
 import Log from "../src/Util";
 import {Criteria, Database} from "../src/controller/Database";
 import {Section} from "../src/controller/Section";
-let path = require('path');
 
 describe("DatabaseSpec", function () {
 
@@ -24,11 +23,20 @@ describe("DatabaseSpec", function () {
 
         // clear databases that are cached
         Log.warn('deleting cached databases...');
-        let directory: string = './dbFiles';
-        let databaseList = fs.readdirSync(directory);
 
+        let databaseList = fs.readdirSync('./dbFiles');
         for (const file of databaseList) {
-            fs.unlinkSync(path.join(directory, file))
+            fs.unlinkSync('./dbFiles/' + file)
+        }
+    });
+
+    after(function () {
+        // clear databases at end
+        Log.warn('CLEAN UP: deleting cached databases...');
+
+        let databaseList = fs.readdirSync('./dbFiles/');
+        for (const file of databaseList) {
+            fs.unlinkSync('./dbFiles/' + file)
         }
     });
 

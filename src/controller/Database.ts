@@ -20,12 +20,13 @@ export interface Criteria {
 
 export class Database {
     private sectionCollection: Array<Section>;
-    private loadedDB: string;
+    private loadedDB: Array<string>;
     private static instance: Database;
 
     constructor() {
         if (! Database.instance) {
             this.sectionCollection = [];
+            this.loadedDB = [];
             Database.instance = this;
         }
         return Database.instance;
@@ -73,12 +74,19 @@ export class Database {
     /**
      * Saves the current state of the database to a single file formatted in JSON
      * @param {string} dbName is the file name on disk
+     * @param firstTime is true if this is the first time this database is being saved
+     *  (usually only after populating from zip)
      */
-    saveDB(dbName: string){
+    saveDB(dbName: string, firstTime?: boolean){
         Log.trace("in writeDB");
         // write in as json
         let cacheContents = this.pukeMemory();
         // console.log(finalBracket);
+
+        if (firstTime) {
+            // change which databases are loaded
+            this.loadedDB.push(dbName);
+        }
 
         fs.writeFileSync("./dbFiles/" + dbName, cacheContents);
 
@@ -95,7 +103,34 @@ export class Database {
 
         for (let i = 0; i < dbJSON.content.length; i++) {
             // TODO
+            // for each Section information, create a new Section and add it to the sectionCollection
+            // should check for duplicates probably?
         }
+    }
+
+    /**
+     * Deletes a database from memory and
+     * @param {string} dbName
+     */
+    deleteDB(dbName: string) {
+
+        if (this.loadedDB.includes(dbName)) {
+            // remove from list of loaded
+            let pos = this.loadedDB.indexOf(dbName);
+            this.loadedDB.splice(pos, 1);
+
+            // blank memory and reload remaining databases
+            this.reset();
+            if (this.loadedDB.length !== 0) {
+                for (let db of this.loadedDB) {
+                    // this.loadDB(db); TODO: change when implemented
+                }
+            }
+        }
+
+        // delete from disk
+        fs.unlinkSync('./dbFiles/' + dbName)
+
     }
 
     /**
@@ -259,13 +294,17 @@ export class Database {
     }
 
     // returns the database that is currently loaded
-    whichDB(): string {
+    listLoaded(): Array<string> {
         return this.loadedDB;
     }
 
     // returns a list of the databases stored in memory
     listDB(): Array<string> {
         return fs.readdirSync('./dbFiles');
+    }
+
+    hasDB(id: string): boolean {
+        return this.loadedDB.includes(id);
     }
 
     // may be used to blank the database before loading a query DB or restoring the main DB
@@ -276,6 +315,6 @@ export class Database {
 }
 
 const instance = new Database;
-Object.freeze(instance);
+// Object.freeze(instance);
 
 export default instance;
