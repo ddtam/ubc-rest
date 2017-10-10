@@ -15,7 +15,6 @@ export default class InsightFacade implements IInsightFacade {
     }
 
     addDataset(id: string, content: string): Promise<InsightResponse> {
-        let that = this;
 
         // get current list of databases
         let db = new Database();
@@ -42,7 +41,7 @@ export default class InsightFacade implements IInsightFacade {
 
                                 fulfill({
                                     code: 201,
-                                    body: 'dataset successfully added; id already exists'
+                                    body: {message: 'dataset successfully added; id already exists'}
                                 })
 
                             } else {
@@ -51,7 +50,7 @@ export default class InsightFacade implements IInsightFacade {
 
                                 fulfill({
                                     code: 204,
-                                    body: 'dataset successfully added'
+                                    body: {message: 'dataset successfully added'}
                                 })
                             }
                         })
@@ -90,7 +89,7 @@ export default class InsightFacade implements IInsightFacade {
                 db.deleteDB(id);
                 fulfill({
                     code: 204,
-                    body: 'database ' + id + ' deleted'
+                    body: {message: 'database ' + id + ' deleted'}
                 })
             }
         })

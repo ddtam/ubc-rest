@@ -106,7 +106,7 @@ export default class InputHandler {
                     db.add(parsedJSON);
                     fulfill({
                         code: 204,
-                        body: 'successfully added file ' + counter
+                        body: {message: 'successfully added file ' + counter}
                     });
 
                 } catch (err) {
