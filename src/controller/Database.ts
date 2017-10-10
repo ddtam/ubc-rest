@@ -3,7 +3,7 @@
  */
 import Log from "../Util";
 import {CourseJSON, DatabaseJSON, SectionJSON} from "./IJSON";
-import * as fs from "fs";
+let fs = require('fs');
 import {Section} from "./Section";
 import {isNullOrUndefined} from "util";
 
@@ -315,6 +315,6 @@ export class Database {
 }
 
 const instance = new Database;
-// Object.freeze(instance);
+Object.freeze(instance);
 
 export default instance;
