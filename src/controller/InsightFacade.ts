@@ -7,11 +7,23 @@ import Log from "../Util";
 import {Database} from "./Database";
 import InputHandler from "./InputHandler";
 let JSZip = require('jszip');
+let fs = require('fs');
 
 export default class InsightFacade implements IInsightFacade {
 
     constructor() {
         Log.trace('InsightFacadeImpl::init()');
+
+        try {
+            fs.mkdirSync('./dbFiles');
+
+        } catch (err) {
+            if ( err.code !== 'EEXIST') {
+                // some error other than "file exists" was thrown;
+                throw err;
+            }
+
+        }
     }
 
     addDataset(id: string, content: string): Promise<InsightResponse> {
