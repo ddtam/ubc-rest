@@ -22,7 +22,7 @@ export default class InputHandler {
         let coursePromiseCollection: Array<Promise<InsightResponse>> = [];
         let counter: number = 1;
 
-        // track existence of AT LEAST ONE valid JSON; assume true
+        // track existence of AT LEAST ONE valid JSON; assume false
         let containsValidJSON: boolean = false;
 
         let that = this;

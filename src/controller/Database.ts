@@ -82,7 +82,7 @@ export class Database {
         let cacheContents = this.pukeMemory();
         // console.log(finalBracket);
 
-        if (firstTime) {
+        if (!isNullOrUndefined(firstTime) && firstTime) {
             // change which databases are loaded
             this.loadedDB.push(dbName);
         }
