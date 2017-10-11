@@ -30,7 +30,7 @@ export default class InputHandler {
         zipContents.forEach(function (relativePath, file) {
             if (!file.dir) { // process only files, NOT directories
                 let p: Promise<InsightResponse> =
-                    new Promise(function (fulfill, reject) {
+                    new Promise(function (fulfill) {
                         that.handleFile(file, counter)
                             .then(function () {
                                 if (!containsValidJSON) {
@@ -41,10 +41,8 @@ export default class InputHandler {
                             })
 
                             .catch(function (err) {
-                                if (!err.body.error.includes('SyntaxError')) {
-                                    // was not syntax error (bad JSON); pass upwards
-                                    reject(err);
-                                } // else, catch and continue...
+                                // SyntaxError OR JSON is valid but empty
+                                Log.error('file failed to be processed - ' + err.body.error);
                                 fulfill();
 
                             });
@@ -103,11 +101,22 @@ export default class InputHandler {
                 // successfully got file as string
                 try {
                     parsedJSON = JSON.parse(fileContents);
-                    db.add(parsedJSON);
-                    fulfill({
-                        code: 204,
-                        body: {message: 'successfully added file ' + counter}
-                    });
+
+                    if (parsedJSON.result.length === 0) {
+                        // there is no real data
+                        reject({
+                            code: 400,
+                            body: {error: 'contains no section data'}
+                        })
+
+                    } else {
+                        db.add(parsedJSON);
+                        fulfill({
+                            code: 204,
+                            body: {message: 'successfully added file ' + counter}
+                        });
+
+                    }
 
                 } catch (err) {
                     Log.error('JSON in file ' + counter + ' is invalid - ' + err.toString());

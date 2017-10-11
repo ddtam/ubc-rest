@@ -48,6 +48,7 @@ describe("RemoveDatasetSpec", function () {
 
         }).catch(function (err) {
             Log.info('Return code: ' + err.code);
+            Log.error('Error Message: ' + err.body.error);
             expect(err.code).to.equal(404);
             expect(err.body.error).to.include('resource does not exist');
 
@@ -75,7 +76,7 @@ describe("RemoveDatasetSpec", function () {
                 expect(db.pukeMemory()).to.deep.equal('{"content": []}');
 
             }).then(done, done).catch(function (err) {
-                Log.warn('failed to delete a cached database - ' + err.body);
+                Log.warn('failed to delete a cached database - ' + err.body.error);
                 expect.fail();
                 done();
 
@@ -110,8 +111,8 @@ describe("RemoveDatasetSpec", function () {
                 // confirm database is empty
                 expect(db.pukeMemory()).to.deep.equal('{"content": []}');
 
-            }).then(done, done).catch(function (err: InsightResponse) {
-                Log.warn('failed to delete a cached database - ' + err.body);
+            }).then(done, done).catch(function (err) {
+                Log.warn('failed to delete a cached database - ' + err.body.error);
                 expect.fail();
                 done();
 
@@ -152,8 +153,8 @@ describe("RemoveDatasetSpec", function () {
                     // confirm database is empty
                     expect(db.pukeMemory()).to.deep.equal('{"content": []}');
 
-                }).then(done, done).catch(function (err: InsightResponse) {
-                    Log.warn('failed to delete a cached database - ' + err.body);
+                }).then(done, done).catch(function (err) {
+                    Log.warn('failed to delete a cached database - ' + err.body.error);
                     expect.fail();
                     done();
 

@@ -47,6 +47,7 @@ describe("AddDatasetSpec", function () {
         inFac.addDataset('courses', content).then(function (obj) {
             Log.test('Return code: ' + obj.code);
             expect(obj.code).to.deep.equal(204);
+            expect(db.countEntries()).to.equal(22)
 
         }).then(done, done).catch(function (err) {
             Log.test(err);
@@ -66,6 +67,7 @@ describe("AddDatasetSpec", function () {
         inFac.addDataset('courses', content).then(function (obj) {
             Log.test('Return code: ' + obj.code);
             expect(obj.code).to.deep.equal(204);
+            expect(db.countEntries()).to.equal(64612);
 
         }).then(done, done).catch(function (err) {
             Log.test(err);
@@ -164,6 +166,23 @@ describe("AddDatasetSpec", function () {
 
     it("Should give 400 response when given something that is not a zip", function (done) {
         content = new Buffer(fs.readFileSync('coursesNotZip.rar'))
+            .toString('base64');
+
+        inFac.addDataset('courses', content).then(function (obj) {
+            Log.test('Return code: ' + obj.code + '; DID NOT FAIL');
+            expect.fail();
+            done();
+
+        }).catch(function (obj) {
+            Log.test('Return code: ' + obj.code);
+            expect(obj.code).to.deep.equal(400);
+
+        }).then(done, done);
+
+    });
+
+    it("Should give 400 response when given JSON with no real section data", function (done) {
+        content = new Buffer(fs.readFileSync('coursesNoRealData.zip'))
             .toString('base64');
 
         inFac.addDataset('courses', content).then(function (obj) {
