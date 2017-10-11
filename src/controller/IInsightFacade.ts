@@ -18,7 +18,7 @@ export interface IInsightFacade {
      * @param content  The base64 content of the dataset. This content should be in the
      * form of a serialized zip file.
      *
-     * The promise should return an InsightResponse for both fulfill and reject.
+     * The promise should resolve with an InsightResponse for both fulfill and reject.
      *
      * Fulfill should be for 2XX codes and reject for everything else.
      *
@@ -26,6 +26,8 @@ export interface IInsightFacade {
      * your design. The processed data structure should be persisted to disk; your
      * system should be able to load this persisted value into memory for answering
      * queries.
+     * Adding a dataset under the same id as a previously added one should replace the
+     * old dataset with the new one
      *
      * Ultimately, a dataset must be added or loaded from disk before queries can
      * be successfully answered.
@@ -33,11 +35,12 @@ export interface IInsightFacade {
      * Response codes:
      *
      * 201: the operation was successful and the id already existed (was added in
-     * this session or was previously cached).
+     *      this session or was previously cached).
      * 204: the operation was successful and the id was new (not added in this
-     * session or was previously cached).
+     *      session or was previously cached).
      * 400: the operation failed. The body should contain {"error": "my text"}
-     * to explain what went wrong.
+     *      to explain what went wrong.
+     *      This should also be used if the provided dataset is invalid.
      *
      */
     addDataset(id: string, content: string): Promise<InsightResponse>;
@@ -57,8 +60,8 @@ export interface IInsightFacade {
      * Response codes:
      *
      * 204: the operation was successful.
-     * 404: the operation was unsuccessful because the delete was for a resource that
-     * was not previously added.
+     * 404: the operation was unsuccessful because the delete was
+     *      for a resource that was not previously added.
      *
      */
     removeDataset(id: string): Promise<InsightResponse>;
@@ -66,7 +69,10 @@ export interface IInsightFacade {
     /**
      * Perform a query on UBCInsight.
      *
-     * @param query  The query to be performed. This is the same as the body of the POST message.
+     * @param query  The query to be performed.
+     *               This will in later deliverables be the same as the body of the POST message.
+     *               A valid query conforms to the EBNF.
+     *               Invalid queries should be rejected.
      *
      * @return Promise <InsightResponse>
      *
@@ -76,9 +82,12 @@ export interface IInsightFacade {
      *
      * Return codes:
      *
-     * 200: the query was successfully answered. The result should be sent in JSON according in the response body.
-     * 400: the query failed; body should contain {"error": "my text"} providing extra detail.
-     * 424: the query failed because of a missing dataset; body should contain {"error": "my text"} providing extra detail.
+     * 200: the query was successfully answered.
+     *      The result should be sent in JSON according in the response body.
+     * 400: the query failed; body should contain {"error": "my text"}
+     *      providing extra detail.
+     * 424: the query failed because of a missing dataset;
+     *      body should contain {"error": "my text"} providing extra detail.
      *
      */
     performQuery(query: any): Promise<InsightResponse>;
