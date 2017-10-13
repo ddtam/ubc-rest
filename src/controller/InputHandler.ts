@@ -42,7 +42,7 @@ export default class InputHandler {
 
                             .catch(function (err) {
                                 // SyntaxError OR JSON is valid but empty
-                                Log.error('file failed to be processed - ' + err.body.error);
+                                // Log.error('file failed to be processed - ' + err.body.error);
                                 fulfill();
 
                             });

@@ -6,6 +6,9 @@ import {IInsightFacade, InsightResponse} from "./IInsightFacade";
 import Log from "../Util";
 import {Database} from "./Database";
 import InputHandler from "./InputHandler";
+import {stringify} from "querystring";
+import {QueryEngine} from "./QueryEngine";
+import {QueryJSON} from "./IJSON";
 let JSZip = require('jszip');
 let fs = require('fs');
 
@@ -108,12 +111,11 @@ export default class InsightFacade implements IInsightFacade {
     }
 
     performQuery(query: any): Promise<InsightResponse> {
-        return new Promise(function (fulfill, reject) {
-            reject({
-                code: 400,
-                body: {error: 'placeholder fail'} // TODO
-            })
-        })
+        let q: QueryJSON = JSON.parse(query);
+
+        let p: Promise<InsightResponse> = QueryEngine.prototype.parse(q);
+
+        return p;
     }
 
 
