@@ -219,7 +219,7 @@ describe("DatabaseSpec", function () {
             // Log.info('return code: ' + obj.code);
 
             let threshold = 74.3;
-            let results: Array<Section> = db.getAvg(threshold, "gt");
+            let results: Array<Section> = db.getAvg(threshold, "GT");
 
             for (let s of results) {
                 expect(s.avg > threshold);
@@ -244,7 +244,7 @@ describe("DatabaseSpec", function () {
             // Log.info('return code: ' + obj.code);
 
             let threshold = 230;
-            let results: Array<Section> = db.getPass(threshold, "lt");
+            let results: Array<Section> = db.getPass(threshold, "LT");
 
             for (let s of results) {
                 expect(s.pass < threshold);
@@ -268,7 +268,7 @@ describe("DatabaseSpec", function () {
             // Log.info('return code: ' + obj.code);
 
             let threshold = 11;
-            let results: Array<Section> = db.getFail(threshold, "eq");
+            let results: Array<Section> = db.getFail(threshold, "EQ");
 
             for (let s of results) {
                 expect(s.fail === threshold);
@@ -292,7 +292,7 @@ describe("DatabaseSpec", function () {
             // Log.info('return code: ' + obj.code);
 
             let threshold = 1;
-            let results: Array<Section> = db.getAudit(threshold, "gt");
+            let results: Array<Section> = db.getAudit(threshold, "GT");
 
             for (let s of results) {
                 expect(s.audit > threshold);
@@ -323,7 +323,7 @@ describe("DatabaseSpec", function () {
             done();
 
         }).catch(function (err) {
-            expect(err.toString()).to.deep.equal('Error: equality query expected "gt", "lt", or "eq"');
+            expect(err.toString()).to.deep.equal('Error: equality query expected "GT", "LT", or "EQ"');
 
         }).then(done, done);
     });
@@ -341,11 +341,10 @@ describe("DatabaseSpec", function () {
             let query: Array<Criteria> = [{
                 property: 'dept',
                 value: 'cpsc',
-                equality: 'n/a'
             }, {
                 property: 'avg',
                 value: 75,
-                equality: 'lt'
+                equality: 'LT'
             }];
 
             let results: Array<Section> = db.query(query);
@@ -380,7 +379,7 @@ describe("DatabaseSpec", function () {
             let query: Array<Criteria> = [{
                 property: 'avg',
                 value: 0,
-                equality: 'lt'
+                equality: 'LT'
             }];
 
             let results: Array<Section> = db.query(query);
@@ -408,7 +407,6 @@ describe("DatabaseSpec", function () {
             let query: Array<Criteria> = [{
                 property: 'DNE',
                 value: 'cpsc',
-                equality: ''
             }];
 
             db.query(query);
@@ -436,39 +434,35 @@ describe("DatabaseSpec", function () {
             let query: Array<Criteria> = [{
                 property: 'dept',
                 value: 'phar',
-                equality: ''
             }, {
                 property: 'id',
                 value: '460',
-                equality: ''
             }, {
                 property: 'title',
                 value: 'nat hlth prodcts',
-                equality: ''
             }, {
                 property: 'instructor',
                 value: 'cadario, barbara',
-                equality: 'lt'
+                equality: 'LT'
             }, {
                 property: 'avg',
                 value: 82,
-                equality: 'gt'
+                equality: 'GT'
             }, {
                 property: 'pass',
                 value: 148,
-                equality: 'lt'
+                equality: 'LT'
             }, {
                 property: 'fail',
                 value: 1,
-                equality: 'eq'
+                equality: 'EQ'
             }, {
                 property: 'audit',
                 value: 0,
-                equality: 'eq'
+                equality: 'EQ'
             }, {
                 property: 'uuid',
                 value: 4754,
-                equality: ''
             }];
 
             let results: Array<Section> = db.query(query);

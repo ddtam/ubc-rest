@@ -2,6 +2,7 @@ import {ANode} from "./ANode";
 import {SCompJSON} from "../IJSON";
 import {Section} from "../Section";
 import {error} from "util";
+import {Database} from "../Database";
 
 export class SCnode extends ANode {
 
@@ -21,10 +22,19 @@ export class SCnode extends ANode {
         }
 
         this.inputstring = sc[this.s_key]
+        // TODO? do we need to check if this is a string? or just cast as one
+
     }
 
     evaluate(): Array<Section> {
-        return undefined;
+        let db = new Database();
+
+        let accumulatingResult: Array<Section> = db.query([{
+            property: this.s_key,
+            value: this.inputstring, // TODO: need to handle regex
+        }]);
+
+        return accumulatingResult;
     }
 
 }

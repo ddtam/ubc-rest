@@ -10,9 +10,10 @@ export class QueryEngine {
         // check fundamental syntax structure for WHERE and OPTIONS in the root
         let objKeys: Array<string> = Object.keys(query);
 
-        if (!objKeys.includes('WHERE') ||
-            !objKeys.includes('OPTIONS') ||
-            !(objKeys.length === 2)) {
+        if (!objKeys.includes('WHERE') || // doesn't include .WHERE
+            !objKeys.includes('OPTIONS') || // doesn't include .OPTIONS
+            !(objKeys.length === 2) // some other keys beyond .WHERE and .OPTIONS
+        ) {
             // query does not contain WHERE and OPTIONS information
             return new Promise(function (fulfill, reject) {
                 reject({
@@ -66,10 +67,15 @@ export class QueryEngine {
     }
 
     private formatMatch(OPTIONS: any, results: Array<Section>): Array<Section> {
-        return null;
+        return results; // TODO actually implement this
     }
 
     private static encapsulate(fResults: Array<Section> ): Promise<InsightResponse> {
-        return null;
+        // turn fResults into the JSON return format
+        let asJSON = "{\"result\": ";
+        let withCollection = asJSON.concat(JSON.stringify(fResults));
+        let finalBracket = withCollection.concat("}");
+
+        return ;
     }
 }

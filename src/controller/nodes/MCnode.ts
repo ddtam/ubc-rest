@@ -1,7 +1,8 @@
 import {ANode} from "./ANode";
 import {MCompJSON} from "../IJSON";
 import {Section} from "../Section";
-import {error} from "util";
+import {error, isNumber} from "util";
+import {Database} from "../Database";
 
 export class MCnode extends ANode {
 
@@ -24,11 +25,23 @@ export class MCnode extends ANode {
             throw error('SYNTAXERR - some m_key is poorly formed')
         }
 
-        this.num = mc[this.m_key]
+        this.num = mc[this.m_key];
+
+        if (!isNumber(this.num)) {
+            throw error('SYNTAXERR - m_keys must be filtered on numbers')
+        }
     }
 
     evaluate(): Array<Section> {
-        return undefined;
+        let db = new Database();
+
+        let accumulatingResult: Array<Section> = db.query([{
+            property: this.m_key,
+            value: this.num,
+            equality: this.equality
+        }]);
+
+        return accumulatingResult;
     }
 
 }

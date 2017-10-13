@@ -9,7 +9,7 @@ describe("QueryEngineSpec", function () {
     let db: Database = new Database;
     let inFac: InsightFacade;
 
-    beforeEach(function () {
+    beforeEach(function (done) {
 
         Log.warn('database is being reset...');
         db.reset();
@@ -28,11 +28,13 @@ describe("QueryEngineSpec", function () {
         let content: string = new Buffer(fs.readFileSync('courses.zip'))
             .toString('base64');
 
-        inFac.addDataset('courses', content).catch(function (err) {
+        inFac.addDataset('courses', content).then(function () {
+            done();
+
+        }).catch(function (err) {
             Log.warn('FAILED IN SET UP -  ' + err.body.error)
+
         })
-
-
 
     });
 

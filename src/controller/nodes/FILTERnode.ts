@@ -45,7 +45,10 @@ export class FILTERnode extends ANode {
     }
 
     evaluate(): Array<Section> {
-        return undefined;
+        let result: Array<Section> = this.criteria.evaluate();
+
+        return result
+
     }
 
 }

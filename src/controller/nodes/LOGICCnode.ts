@@ -2,6 +2,7 @@ import {FILTERnode} from "./FILTERnode";
 import {ANode} from "./ANode";
 import {FilterJSON} from "../IJSON";
 import {Section} from "../Section";
+import ArrayUtil from "../../ArrayUtil";
 
 export class LOGICCnode extends ANode {
 
@@ -23,7 +24,45 @@ export class LOGICCnode extends ANode {
     }
 
     evaluate(): Array<Section> {
-        return undefined;
+        let accumulatingResult: Array<Section> = [];
+        let first: boolean = true; // flag to indicate if this is the first query
+
+        if (this.logic === 'AND') {
+            // looking for AND result from the filters
+            for (let f of this.filters) {
+                let iteratingResult: Array<Section> = f.evaluate();
+
+                if (first) { // then just set accumulating result to these first results
+                    accumulatingResult = iteratingResult;
+                    first = false;
+
+                } else { // perform the intersection
+                    accumulatingResult = ArrayUtil.intersection(accumulatingResult, iteratingResult);
+
+                }
+            }
+
+        }
+
+        if (this.logic === 'OR') {
+            // looking for OR result from the filters
+            for (let f of this.filters) {
+                let iteratingResult: Array<Section> = f.evaluate();
+
+                if (first) { // then just set accumulating result to these first results
+                    accumulatingResult = iteratingResult;
+                    first = false;
+
+                } else { // perform the union
+                    accumulatingResult = ArrayUtil.union(accumulatingResult, iteratingResult);
+
+                }
+            }
+
+        }
+
+        return accumulatingResult;
+
     }
 
 }

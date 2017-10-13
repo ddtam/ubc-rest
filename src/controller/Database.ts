@@ -15,7 +15,7 @@ export interface Criteria {
     // value is value of the field we wish to query
     value: any,
     // equality is one of gt, lt, or eq for numerical fields
-    equality: string
+    equality?: string
 }
 
 export class Database {
@@ -145,20 +145,20 @@ export class Database {
             }
 
             if (
-                q.property === "dept" ||
-                q.property === "id" ||
-                q.property === "title" ||
-                q.property === "instructor" ||
-                q.property === "uuid"
+                q.property === "courses_dept" ||
+                q.property === "courses_id" ||
+                q.property === "courses_title" ||
+                q.property === "courses_instructor" ||
+                q.property === "courses_uuid"
             ) {
                 // is a string query
                 result = this.handleStrQuery(q.property, q.value)
 
             } else if (
-                q.property === "avg" ||
-                q.property === "pass" ||
-                q.property === "fail" ||
-                q.property === "audit"
+                q.property === "courses_avg" ||
+                q.property === "courses_pass" ||
+                q.property === "courses_fail" ||
+                q.property === "courses_audit"
             ) {
                 // is a numerical query with some equality comparison
                 result = this.handleNumQuery(q.property, q.value, q.equality)
@@ -196,21 +196,21 @@ export class Database {
     // helper to pass into the correct case of the 5 possible string-match queries
     private handleStrQuery(property: string, value: any): Array<Section> {
         switch (property) {
-            case 'dept': return this.getDept(value);
-            case 'id': return this.getID(value);
-            case 'title': return this.getTitle(value);
-            case 'instructor': return this.getInstructor(value);
-            case 'uuid': return this.getUUID(value);
+            case 'courses_dept': return this.getDept(value);
+            case 'courses_id': return this.getID(value);
+            case 'courses_title': return this.getTitle(value);
+            case 'courses_instructor': return this.getInstructor(value);
+            case 'courses_uuid': return this.getUUID(value);
         }
     }
 
     // helper to pass into the correct case of the 4 possible numerical queries
     private handleNumQuery(property: string, value: any, equality: string): Array<Section> {
         switch (property) {
-            case 'avg': return this.getAvg(value, equality);
-            case 'pass': return this.getPass(value, equality);
-            case 'fail': return this.getFail(value, equality);
-            case 'audit': return this.getAudit(value, equality);
+            case 'courses_avg': return this.getAvg(value, equality);
+            case 'courses_pass': return this.getPass(value, equality);
+            case 'courses_fail': return this.getFail(value, equality);
+            case 'courses_audit': return this.getAudit(value, equality);
         }
     }
 
@@ -263,21 +263,21 @@ export class Database {
      * @returns {Section[]} an array of sections
      */
     private meetEqualityCriteria(property: string, threshold: number, equality: string) {
-        if (equality === "gt") {
+        if (equality === "GT") {
             return this.sectionCollection.filter(function (section: Section) {
                 return section[property] > threshold;
             })
-        } else if (equality === "lt") {
+        } else if (equality === "LT") {
             return this.sectionCollection.filter(function (section) {
                 return section[property] < threshold;
             })
-        } else if (equality === "eq") {
+        } else if (equality === "EQ") {
             return this.sectionCollection.filter(function (section) {
                 return section[property] === threshold;
             })
         } else {
             // equality did not match gt, lt, or eq; throw error
-            throw new Error('equality query expected "gt", "lt", or "eq"')
+            throw new Error('equality query expected "GT", "LT", or "EQ"')
         }
     }
 
