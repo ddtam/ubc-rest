@@ -58,16 +58,10 @@ export class Database {
     }
 
     /**
-     * Converts entire array collection into JSON format and returns as string
-     *   Should really be diagnostic use only...
-     * @returns {string}
+     * Delete a section from the database
      */
-    pukeMemory(): string {
-        let asJSON = "{\"content\": ";
-        let withCollection = asJSON.concat(JSON.stringify(this.sectionCollection));
-        let finalBracket = withCollection.concat("}");
-
-        return finalBracket;
+    deleteEntry(s: Section) {
+        // TODO delete entry from inside the database
     }
 
     /**
@@ -108,7 +102,7 @@ export class Database {
     }
 
     /**
-     * Deletes a database from memory and
+     * Deletes a database from disk and clears its entries from memory
      * @param {string} dbName
      */
     deleteDB(dbName: string) {
@@ -285,6 +279,19 @@ export class Database {
             // equality did not match gt, lt, or eq; throw error
             throw new Error('equality query expected "gt", "lt", or "eq"')
         }
+    }
+
+    /**
+     * Converts entire array collection into JSON format and returns as string
+     *   Should really be diagnostic use only...
+     * @returns {string}
+     */
+    pukeMemory(): string {
+        let asJSON = "{\"content\": ";
+        let withCollection = asJSON.concat(JSON.stringify(this.sectionCollection));
+        let finalBracket = withCollection.concat("}");
+
+        return finalBracket;
     }
 
     // returns number of entries loaded in current database
