@@ -11,15 +11,15 @@ export interface DatabaseJSON {
 }
 
 export interface SectionJSON {
-    Audit: number; // audit
-    Avg: number; // avg
-    Course: string; // id
-    Fail: number // fail
-    id: number // uuid
-    Pass: number // pass
-    Professor: string // instructor
-    Subject: string; // dept
-    Title: string; // title
+    Audit: number; // courses_audit
+    Avg: number; // courses_avg
+    Course: string; // courses_id
+    Fail: number // courses_fail
+    id: number // courses_uuid
+    Pass: number // courses_pass
+    Professor: string // courses_instructor
+    Subject: string; // courses_dept
+    Title: string; // courses_title
 }
 
 

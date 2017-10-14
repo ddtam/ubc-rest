@@ -196,7 +196,7 @@ export class Database {
 
     }
 
-    // helper to pass into the correct case of the 5 possible string-match queries
+    // helper to courses_pass into the correct case of the 5 possible string-match queries
     private handleStrQuery(property: string, value: any): Array<Section> {
         switch (property) {
             case 'courses_dept': return this.getDept(value);
@@ -207,7 +207,7 @@ export class Database {
         }
     }
 
-    // helper to pass into the correct case of the 4 possible numerical queries
+    // helper to courses_pass into the correct case of the 4 possible numerical queries
     private handleNumQuery(property: string, value: any, equality: string): Array<Section> {
         switch (property) {
             case 'courses_avg': return this.getAvg(value, equality);
@@ -222,40 +222,40 @@ export class Database {
      */
 
     getDept(dept: string): Array<Section> {
-        return this.sectionCollection.filter(s => s.dept === dept)
+        return this.sectionCollection.filter(s => s.courses_dept === dept)
     }
 
     getID(id: string): Array<Section> {
-        return this.sectionCollection.filter(s => s.id === id)
+        return this.sectionCollection.filter(s => s.courses_id === id)
     }
 
     getTitle(title: string): Array<Section> {
-        return this.sectionCollection.filter(s => s.title === title)
+        return this.sectionCollection.filter(s => s.courses_title === title)
     }
 
     getInstructor(instructor: string): Array<Section> {
-        return this.sectionCollection.filter(s => s.instructor === instructor)
+        return this.sectionCollection.filter(s => s.courses_instructor === instructor)
     }
 
     getAvg(avg: number, equality: string): Array<Section> {
-        return this.meetEqualityCriteria('avg', avg, equality);
+        return this.meetEqualityCriteria('courses_avg', avg, equality);
     }
 
     getPass(pass: number, equality: string): Array<Section> {
-        return this.meetEqualityCriteria('pass', pass, equality);
+        return this.meetEqualityCriteria('courses_pass', pass, equality);
     }
 
     getFail(fail: number, equality: string): Array<Section> {
-        return this.meetEqualityCriteria('fail', fail, equality);
+        return this.meetEqualityCriteria('courses_fail', fail, equality);
     }
 
     getAudit(audit: number, equality: string): Array<Section> {
-        return this.meetEqualityCriteria('audit', audit, equality);
+        return this.meetEqualityCriteria('courses_audit', audit, equality);
     }
 
     getUUID(uuid: number) {
         // expects ONE result b/c UUID is unique by definition
-        return this.sectionCollection.filter(s => s.uuid === uuid);
+        return this.sectionCollection.filter(s => s.courses_uuid === uuid);
     }
 
     /**
