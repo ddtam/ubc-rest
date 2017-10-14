@@ -8,7 +8,7 @@ import {Database} from "./Database";
 
 export class QueryEngine {
 
-    parse(query: QueryJSON): Promise<InsightResponse> {
+    parse(query: QueryJSON): string {
 
         // check fundamental syntax structure for WHERE and OPTIONS in the root
         let objKeys: Array<string> = Object.keys(query);
@@ -18,72 +18,50 @@ export class QueryEngine {
             !(objKeys.length === 2) // some other keys beyond .WHERE and .OPTIONS
         ) {
             // query does not contain WHERE and OPTIONS information
-            return new Promise(function (fulfill, reject) {
-                reject({
-                    code: 400,
-                    body: {error: 'query fundamentally malformed: no WHERE/OPTIONS information'}
-                })
-            })
+            throw new Error('SYNTAXERR - query fundamentally malformed: no WHERE/OPTIONS information')
         }
 
-        try {
-            // get the results that match the query based on FILTER
-            let results: Array<Section> = this.getMatch(query.WHERE);
+        // get the results that match the query based on FILTER
+        let results: Array<Section> = this.getMatch(query.WHERE);
 
-            // format the results based on OPTIONS
-            let fResults: Array<ResultSection> = this.formatMatch(query.OPTIONS, results);
+        // format the results based on OPTIONS
+        let fResults: Array<ResultSection> = this.formatMatch(query.OPTIONS, results);
 
-            // return the results in the form of an InsightResponse
-            return QueryEngine.encapsulate(fResults);
-
-        } catch (err) {
-            return new Promise(function (fulfill, reject) {
-                reject(err)
-            })
-        }
+        // return the results in the form of an InsightResponse
+        return QueryEngine.encapsulate(fResults);
 
     }
 
+    /**
+     * Parses the query by building an AST and evaluates with recursion
+     * @param {FilterJSON} criteria is a JSON object that specifies the filters by which
+     *  sections should be selected
+     * @returns {Array<Section>} as an array of Section objects which pass all filter specifications
+     */
     private getMatch(criteria: FilterJSON): Array<Section> {
         // build the filters AST rooted on a FILTERnode
 
         let db = new Database();
         if (db.countEntries() === 0){
-            throw {
-                code: 424,
-                body: {error: 'Missing dataset'}
-            }
+            throw new Error('DATASETERR - missing dataset')
         }
 
         let root: FILTERnode;
         let result: Array<Section>;
 
-        try {
-            root = new FILTERnode(criteria);
-            result = root.evaluate();
+        root = new FILTERnode(criteria);
+        result = root.evaluate();
 
-        } catch (err) {
-            // something went wrong in building or evaluating AST
-
-            if (err.message.includes('SYNTAXERR')) {
-                throw {
-                    code: 400,
-                    body: {error: err.message}
-                }
-
-            } else if (err.message.includes('DATASETERR')) {
-                throw {
-                    code: 424,
-                    body: {error: err.message}
-                }
-
-            }
-
-        }
         return result;
 
     }
 
+    /**
+     * Format helper to extract relevant columns from course sections that passed filters
+     * @param OPTIONS is JSON object from input that specifies columns and sort-order of results
+     * @param {Array<Section>} results is output of getMatch helper
+     * @returns {Array<ResultSection>} as an array of sections conforming to OPTIONS specifications
+     */
     private formatMatch(OPTIONS: any, results: Array<Section>): Array<ResultSection> {
         let optKeys: Array<string>;
         let colKeys: Array<string>;
@@ -92,16 +70,15 @@ export class QueryEngine {
         let hasStringOrder: boolean = false; // flag for if OPTIONS has alphabetical ORDER
         let hasNumberOrder: boolean = false; // flag for if OPTIONS has numerical ORDER
 
+        // extract the keys out of OPTIONS (which should only only contain COLUMNS and ORDER)
         optKeys = Object.keys(OPTIONS);
 
         // syntax check for COLUMNS
         if (!optKeys.includes('COLUMNS')) {
-            throw {
-                code: 400,
-                body: {error: 'SYNTAXERR - no COLUMNS field found'}
-            }
+            throw new Error('SYNTAXERR - no COLUMNS field found')
         }
 
+        // extract the columns for result output
         colKeys = OPTIONS.COLUMNS;
 
         // check syntax for KEYS in COLUMN
@@ -118,10 +95,7 @@ export class QueryEngine {
                 case 'courses_uuid':
                     break;
                 default:
-                    throw {
-                        code: 400,
-                        body: {error: 'SYNTAXERR - some key in COLUMNS dne'}
-                    }
+                    throw new Error('key "' + key + '" does not exist')
             }
         }
 
@@ -189,19 +163,17 @@ export class QueryEngine {
         return fResults;
     }
 
-    private static encapsulate(fResults: Array<ResultSection> ): Promise<InsightResponse> {
+    /**
+     * Encapsulation helper to convert array result into a JSON-formatted body for InsightResponse
+     * @param {Array<ResultSection>} fResults are formatted results from formatMatch helper
+     * @returns {string} as stringified JSON
+     */
+    private static encapsulate(fResults: Array<ResultSection> ): string {
         // turn fResults into the JSON return format
-        let asJSON = "{\"result\": ";
+        let asJSON = "{\"result\":";
         let withCollection = asJSON.concat(JSON.stringify(fResults));
         let finalBracket = withCollection.concat("}");
 
-        let output = new Promise(function (fulfill) {
-            fulfill({
-                code: 200,
-                body: finalBracket
-            })
-        });
-
-        return output;
+        return finalBracket;
     }
 }

@@ -74,7 +74,6 @@ export class Database {
      *  (usually only after populating from zip)
      */
     saveDB(dbName: string, firstTime?: boolean){
-        Log.trace("in writeDB");
         // write in as json
         let cacheContents = this.pukeMemory();
         // console.log(finalBracket);
@@ -86,7 +85,6 @@ export class Database {
 
         fs.writeFileSync("./dbFiles/" + dbName, cacheContents);
 
-        Log.info("The file was saved!");
     }
 
     /**

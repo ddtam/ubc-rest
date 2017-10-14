@@ -22,13 +22,13 @@ export class MCnode extends ANode {
         if (!this.m_key.match(
                 /^(courses_avg|courses_pass|courses_fail|courses_audit)/
             )) {
-            throw error('SYNTAXERR - some m_key is poorly formed')
+            throw new Error('SYNTAXERR - some m_key is poorly formed')
         }
 
         this.num = mc[this.m_key];
 
         if (!isNumber(this.num)) {
-            throw error('SYNTAXERR - m_keys must be filtered on numbers')
+            throw new Error('SYNTAXERR - m_keys must be filtered on numbers')
         }
     }
 

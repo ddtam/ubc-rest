@@ -18,7 +18,7 @@ export class SCnode extends ANode {
         if (!this.s_key.match(
             /^(courses_id|courses_dept|courses_instructor|courses_title|courses_uuid)/
             )) {
-            throw error('SYNTAXERR - some s_key is poorly formed')
+            throw new Error('SYNTAXERR - some s_key is poorly formed')
         }
 
         this.inputstring = sc[this.s_key]

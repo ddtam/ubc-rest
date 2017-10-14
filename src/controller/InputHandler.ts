@@ -65,7 +65,7 @@ export default class InputHandler {
         // wait for all promises for file processing to settle
         await Promise.all(coursePromiseCollection).then(function () {
             // complete contents of zip added to database
-            Log.info('.zip completely processed!');
+            Log.info('=== DATABASE LOADED ===');
             Log.info('processed ' + (counter - 1) + ' files');
             Log.info('database contains ' + db.countEntries().toString() + ' entries');
 
