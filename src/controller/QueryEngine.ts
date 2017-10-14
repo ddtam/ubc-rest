@@ -1,7 +1,9 @@
 import {InsightResponse} from "./IInsightFacade";
 import {Section} from "./Section";
-import {FilterJSON, QueryJSON} from "./IJSON";
+import {FilterJSON, OptionsJSON, QueryJSON} from "./IJSON";
 import {FILTERnode} from "./nodes/FILTERnode";
+import {ResultSection} from "./ResultSection";
+import {OPTIONnode} from "./nodes/OPTIONnode";
 
 export class QueryEngine {
 
@@ -27,7 +29,7 @@ export class QueryEngine {
         let results: Array<Section> = this.getMatch(query.WHERE);
 
         // format the results based on OPTIONS
-        let fResults: Array<Section> = this.formatMatch(query.OPTIONS, results);
+        let fResults: Array<ResultSection> = this.formatMatch(query.OPTIONS, results);
 
         // return the results in the form of an InsightResponse
         return QueryEngine.encapsulate(fResults);
@@ -66,11 +68,63 @@ export class QueryEngine {
 
     }
 
-    private formatMatch(OPTIONS: any, results: Array<Section>): Array<Section> {
-        return results; // TODO actually implement this
+    private formatMatch(OPTIONS: any, results: Array<Section>): Array<ResultSection> {
+        let optKeys: Array<string>;
+        let colKeys: Array<string>;
+        let fResults: Array<ResultSection> = [];
+
+        optKeys = Object.keys(OPTIONS);
+
+        // syntax check for COLUMNS
+        if (!optKeys.includes('COLUMNS')) {
+            throw {
+                code: 400,
+                body: {err: 'SYNTAXERR - no COLUMNS field found'}
+            }
+        }
+
+        colKeys = OPTIONS.COLUMNS;
+
+        // check syntax for KEYS in COLUMN
+        for (let key of colKeys) {
+            switch (key) {
+                case 'courses_dept':
+                case 'courses_id':
+                case 'courses_title':
+                case 'courses_instructor':
+                case 'courses_avg':
+                case 'courses_pass':
+                case 'courses_fail':
+                case 'courses_audit':
+                case 'courses_uuid':
+                    break;
+                default:
+                    throw {
+                        code: 400,
+                        body: {err: 'SYNTAXERR - some key in COLUMNS dne'}
+                    }
+            }
+        }
+
+        // create the results
+        for (let section of results) {
+            let rSec = new ResultSection();
+
+            for (let key of colKeys) {
+                // this is terrible, we know
+                rSec[key] = section[key];
+
+            }
+            fResults.push(rSec);
+
+        }
+
+        // TODO check for ORDER and execute
+
+        return fResults;
     }
 
-    private static encapsulate(fResults: Array<Section> ): Promise<InsightResponse> {
+    private static encapsulate(fResults: Array<ResultSection> ): Promise<InsightResponse> {
         // turn fResults into the JSON return format
         let asJSON = "{\"result\": ";
         let withCollection = asJSON.concat(JSON.stringify(fResults));

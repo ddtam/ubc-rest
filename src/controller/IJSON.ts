@@ -41,6 +41,7 @@ export interface FilterJSON{
 
 export interface OptionsJSON {
     COLUMNS: Array<KeyJSON>
+    ORDER?: KeyJSON
 }
 
 export interface SCompJSON {

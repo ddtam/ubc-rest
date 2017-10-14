@@ -44,7 +44,8 @@ describe("QueryEngineSpec", function () {
 
         inFac.performQuery(query).then(function (obj) {
             Log.test('Return code: ' + obj.code);
-            expect(obj.code).to.equal(200)
+            expect(obj.code).to.equal(200);
+            Log.info(obj.body.toString());
             // TODO expect the actual results here
 
         }).then(done, done).catch(function (err) {
@@ -59,7 +60,8 @@ describe("QueryEngineSpec", function () {
 
         inFac.performQuery(query).then(function (obj) {
             Log.test('Return code: ' + obj.code);
-            expect(obj.code).to.equal(200)
+            expect(obj.code).to.equal(200);
+            Log.info(obj.body.toString());
             // TODO expect the actual results here
 
         }).then(done, done).catch(function (err) {
@@ -74,7 +76,8 @@ describe("QueryEngineSpec", function () {
 
         inFac.performQuery(query).then(function (obj) {
             Log.test('Return code: ' + obj.code);
-            expect(obj.code).to.equal(200)
+            expect(obj.code).to.equal(200);
+            Log.info(obj.body.toString());
             // TODO expect the actual results here
 
         }).then(done, done).catch(function (err) {
