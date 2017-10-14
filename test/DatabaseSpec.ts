@@ -51,19 +51,19 @@ describe("DatabaseSpec", function () {
             // query db for first section of first course
             var sCollection: Array<Section> = db.getUUID(32311);
             expect(sCollection.length === 1);
-            expect(sCollection[0].dept).to.deep.equal("asia");
-            expect(sCollection[0].id).to.deep.equal("254");
-            expect(sCollection[0].title).to.deep.equal("jpn sex&gend flm");
-            expect(sCollection[0].instructor).to.deep.equal("hall, nicholas");
+            expect(sCollection[0].courses_dept).to.deep.equal("asia");
+            expect(sCollection[0].courses_id).to.deep.equal("254");
+            expect(sCollection[0].courses_title).to.deep.equal("jpn sex&gend flm");
+            expect(sCollection[0].courses_instructor).to.deep.equal("hall, nicholas");
 
             // query db for 12th section of second course
             var sCollection: Array<Section> = db.getUUID(74337);
             expect(sCollection.length === 1);
-            expect(sCollection[0].dept).to.deep.equal("econ");
-            expect(sCollection[0].id).to.deep.equal("311");
-            expect(sCollection[0].title).to.deep.equal("macroeconomics");
-            expect(sCollection[0].instructor).to.deep.equal("shrestha, ratna");
-            expect(sCollection[0].fail).to.equal(11);
+            expect(sCollection[0].courses_dept).to.deep.equal("econ");
+            expect(sCollection[0].courses_id).to.deep.equal("311");
+            expect(sCollection[0].courses_title).to.deep.equal("macroeconomics");
+            expect(sCollection[0].courses_instructor).to.deep.equal("shrestha, ratna");
+            expect(sCollection[0].courses_fail).to.equal(11);
 
         }).catch(function (err) {
             Log.test(err);
@@ -125,8 +125,8 @@ describe("DatabaseSpec", function () {
             let results: Array<Section> = db.getDept('econ');
 
             for (let s of results) {
-                expect(s.dept === 'econ');
-                // Log.info(s.uuid + ' is in ' + s.dept + ' department')
+                expect(s.courses_dept === 'econ');
+                // Log.info(s.courses_uuid + ' is in ' + s.courses_dept + ' department')
             }
 
             expect(results.length).to.equal(18);
@@ -149,8 +149,8 @@ describe("DatabaseSpec", function () {
             let results: Array<Section> = db.getInstructor('hall, nicholas');
 
             for (let s of results) {
-                expect(s.instructor === 'hall, nicholas');
-                // Log.info(s.uuid + ' is in ' + s.dept + ' department')
+                expect(s.courses_instructor === 'hall, nicholas');
+                // Log.info(s.courses_uuid + ' is in ' + s.courses_dept + ' department')
             }
 
             expect(results.length).to.equal(1);
@@ -173,8 +173,8 @@ describe("DatabaseSpec", function () {
             let results: Array<Section> = db.getID('254');
 
             for (let s of results) {
-                expect(s.id === '254');
-                // Log.info(s.uuid + ' is in ' + s.dept + ' department')
+                expect(s.courses_id === '254');
+                // Log.info(s.courses_uuid + ' is in ' + s.courses_dept + ' department')
             }
 
             expect(results.length).to.equal(4);
@@ -197,8 +197,8 @@ describe("DatabaseSpec", function () {
             let results: Array<Section> = db.getTitle('macroeconomics');
 
             for (let s of results) {
-                expect(s.title === 'macroeconomics');
-                // Log.info(s.uuid + ' is in ' + s.dept + ' department')
+                expect(s.courses_title === 'macroeconomics');
+                // Log.info(s.courses_uuid + ' is in ' + s.courses_dept + ' department')
             }
 
             expect(results.length).to.equal(12);
@@ -219,11 +219,11 @@ describe("DatabaseSpec", function () {
             // Log.info('return code: ' + obj.code);
 
             let threshold = 74.3;
-            let results: Array<Section> = db.getAvg(threshold, "gt");
+            let results: Array<Section> = db.getAvg(threshold, "GT");
 
             for (let s of results) {
-                expect(s.avg > threshold);
-                // Log.info(s.uuid + ' has average ' + s.avg)
+                expect(s.courses_avg > threshold);
+                // Log.info(s.courses_uuid + ' has average ' + s.courses_avg)
             }
 
             expect(results.length).to.equal(6);
@@ -244,10 +244,10 @@ describe("DatabaseSpec", function () {
             // Log.info('return code: ' + obj.code);
 
             let threshold = 230;
-            let results: Array<Section> = db.getPass(threshold, "lt");
+            let results: Array<Section> = db.getPass(threshold, "LT");
 
             for (let s of results) {
-                expect(s.pass < threshold);
+                expect(s.courses_pass < threshold);
             }
 
             expect(results.length).to.equal(18);
@@ -268,10 +268,10 @@ describe("DatabaseSpec", function () {
             // Log.info('return code: ' + obj.code);
 
             let threshold = 11;
-            let results: Array<Section> = db.getFail(threshold, "eq");
+            let results: Array<Section> = db.getFail(threshold, "EQ");
 
             for (let s of results) {
-                expect(s.fail === threshold);
+                expect(s.courses_fail === threshold);
             }
 
             expect(results.length).to.equal(4);
@@ -292,10 +292,10 @@ describe("DatabaseSpec", function () {
             // Log.info('return code: ' + obj.code);
 
             let threshold = 1;
-            let results: Array<Section> = db.getAudit(threshold, "gt");
+            let results: Array<Section> = db.getAudit(threshold, "GT");
 
             for (let s of results) {
-                expect(s.audit > threshold);
+                expect(s.courses_audit > threshold);
             }
 
             expect(results.length).to.equal(2);
@@ -323,7 +323,7 @@ describe("DatabaseSpec", function () {
             done();
 
         }).catch(function (err) {
-            expect(err.toString()).to.deep.equal('Error: equality query expected "gt", "lt", or "eq"');
+            expect(err.toString()).to.deep.equal('Error: equality query expected "GT", "LT", or "EQ"');
 
         }).then(done, done);
     });
@@ -339,20 +339,19 @@ describe("DatabaseSpec", function () {
 
             // build the query
             let query: Array<Criteria> = [{
-                property: 'dept',
+                property: 'courses_dept',
                 value: 'cpsc',
-                equality: 'n/a'
             }, {
-                property: 'avg',
+                property: 'courses_avg',
                 value: 75,
-                equality: 'lt'
+                equality: 'LT'
             }];
 
             let results: Array<Section> = db.query(query);
 
             for (let s of results) {
-                expect(s.dept === 'cpsc');
-                expect(s.avg < 75);
+                expect(s.courses_dept === 'cpsc');
+                expect(s.courses_avg < 75);
             }
 
             expect(results.length).to.equal(468);
@@ -378,9 +377,9 @@ describe("DatabaseSpec", function () {
 
             // build the query
             let query: Array<Criteria> = [{
-                property: 'avg',
+                property: 'courses_avg',
                 value: 0,
-                equality: 'lt'
+                equality: 'LT'
             }];
 
             let results: Array<Section> = db.query(query);
@@ -408,7 +407,6 @@ describe("DatabaseSpec", function () {
             let query: Array<Criteria> = [{
                 property: 'DNE',
                 value: 'cpsc',
-                equality: ''
             }];
 
             db.query(query);
@@ -434,55 +432,51 @@ describe("DatabaseSpec", function () {
 
             // build the query
             let query: Array<Criteria> = [{
-                property: 'dept',
+                property: 'courses_dept',
                 value: 'phar',
-                equality: ''
             }, {
-                property: 'id',
+                property: 'courses_id',
                 value: '460',
-                equality: ''
             }, {
-                property: 'title',
+                property: 'courses_title',
                 value: 'nat hlth prodcts',
-                equality: ''
             }, {
-                property: 'instructor',
+                property: 'courses_instructor',
                 value: 'cadario, barbara',
-                equality: 'lt'
+                equality: 'LT'
             }, {
-                property: 'avg',
+                property: 'courses_avg',
                 value: 82,
-                equality: 'gt'
+                equality: 'GT'
             }, {
-                property: 'pass',
+                property: 'courses_pass',
                 value: 148,
-                equality: 'lt'
+                equality: 'LT'
             }, {
-                property: 'fail',
+                property: 'courses_fail',
                 value: 1,
-                equality: 'eq'
+                equality: 'EQ'
             }, {
-                property: 'audit',
+                property: 'courses_audit',
                 value: 0,
-                equality: 'eq'
+                equality: 'EQ'
             }, {
-                property: 'uuid',
+                property: 'courses_uuid',
                 value: 4754,
-                equality: ''
             }];
 
             let results: Array<Section> = db.query(query);
 
             for (let s of results) {
-                expect(s.dept === 'phar');
-                expect(s.id === '460');
-                expect(s.title === 'nat hlth prodcts');
-                expect(s.instructor === 'cadario, barbara');
-                expect(s.avg > 82);
-                expect(s.pass < 148);
-                expect(s.fail === 1);
-                expect(s.audit === 10000);
-                expect(s.uuid === 4754);
+                expect(s.courses_dept === 'phar');
+                expect(s.courses_id === '460');
+                expect(s.courses_title === 'nat hlth prodcts');
+                expect(s.courses_instructor === 'cadario, barbara');
+                expect(s.courses_avg > 82);
+                expect(s.courses_pass < 148);
+                expect(s.courses_fail === 1);
+                expect(s.courses_audit === 10000);
+                expect(s.courses_uuid === 4754);
             }
 
             expect(results.length).to.equal(1);
