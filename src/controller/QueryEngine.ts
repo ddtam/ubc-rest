@@ -76,6 +76,13 @@ export class QueryEngine {
         let withCollection = asJSON.concat(JSON.stringify(fResults));
         let finalBracket = withCollection.concat("}");
 
-        return ;
+        let output = new Promise(function (fulfill) {
+            fulfill({
+                code: 200,
+                body: finalBracket
+            })
+        });
+
+        return output;
     }
 }
