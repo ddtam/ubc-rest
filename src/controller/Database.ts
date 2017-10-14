@@ -61,7 +61,10 @@ export class Database {
      * Delete a section from the database
      */
     deleteEntry(s: Section) {
-        // TODO delete entry from inside the database
+        let target:number = this.sectionCollection.indexOf(s);
+        if (target > -1) {
+            this.sectionCollection.splice(target, 1);
+        }
     }
 
     /**
@@ -292,6 +295,26 @@ export class Database {
         let finalBracket = withCollection.concat("}");
 
         return finalBracket;
+    }
+
+    getOpposite(a: Array<Section>): Array<Section> {
+        let originalDB: Array<Section> = this.sectionCollection.slice(0);
+        let result: Array<Section> = [];
+
+        for (let s of a) {
+            this.deleteEntry(s)
+        }
+
+        result = this.sectionCollection.slice(0);
+
+        // done getting opposite; restore original database
+        this.reset();
+        for (let s of originalDB) {
+            this.sectionCollection.push(s);
+        }
+
+        return result;
+
     }
 
     // returns number of entries loaded in current database

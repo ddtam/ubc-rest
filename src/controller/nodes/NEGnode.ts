@@ -2,6 +2,7 @@ import {FILTERnode} from "./FILTERnode";
 import {ANode} from "./ANode";
 import {FilterJSON} from "../IJSON";
 import {Section} from "../Section";
+import {Database} from "../Database";
 
 export class NEGnode extends ANode {
 
@@ -15,7 +16,12 @@ export class NEGnode extends ANode {
     }
 
     evaluate(): Array<Section> {
-        return undefined;
+        let result = this.filter.evaluate()
+        let db = new Database();
+
+        let antiresult = db.getOpposite(result);
+
+        return antiresult;
     }
 
 }
