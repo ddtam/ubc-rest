@@ -21,7 +21,7 @@ export class QueryEngine {
             return new Promise(function (fulfill, reject) {
                 reject({
                     code: 400,
-                    body: {err: 'query fundamentally malformed: no WHERE/OPTIONS information'}
+                    body: {error: 'query fundamentally malformed: no WHERE/OPTIONS information'}
                 })
             })
         }
@@ -51,7 +51,7 @@ export class QueryEngine {
         if (db.countEntries() === 0){
             throw {
                 code: 424,
-                body: {err: 'Missing dataset'}
+                body: {error: 'Missing dataset'}
             }
         }
 
@@ -68,13 +68,13 @@ export class QueryEngine {
             if (err.message.includes('SYNTAXERR')) {
                 throw {
                     code: 400,
-                    body: {err: err.message}
+                    body: {error: err.message}
                 }
 
             } else if (err.message.includes('DATASETERR')) {
                 throw {
                     code: 424,
-                    body: {err: err.message}
+                    body: {error: err.message}
                 }
 
             }
@@ -98,7 +98,7 @@ export class QueryEngine {
         if (!optKeys.includes('COLUMNS')) {
             throw {
                 code: 400,
-                body: {err: 'SYNTAXERR - no COLUMNS field found'}
+                body: {error: 'SYNTAXERR - no COLUMNS field found'}
             }
         }
 
@@ -120,7 +120,7 @@ export class QueryEngine {
                 default:
                     throw {
                         code: 400,
-                        body: {err: 'SYNTAXERR - some key in COLUMNS dne'}
+                        body: {error: 'SYNTAXERR - some key in COLUMNS dne'}
                     }
             }
         }

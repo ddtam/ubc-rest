@@ -39,7 +39,7 @@ export class FILTERnode extends ANode {
                 break;
 
             default:
-                throw error('SYNTAXERR - some FILTER query is poorly formed');
+                throw new Error('SYNTAXERR - some FILTER query is poorly formed');
 
         }
     }
