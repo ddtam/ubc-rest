@@ -102,4 +102,23 @@ describe("QueryEngineSpec", function () {
         }).then(done, done)
     });
 
+    it("Should throw 424 with a missing dataset", function (done) {
+        let db = new Database();
+        db.reset();
+
+        let query: string = fs.readFileSync('test/testQueries/simpleQuery');
+
+        inFac.performQuery(query).then(function (obj) {
+            Log.test('Return code: ' + obj.code);
+            expect.fail();
+            done()
+
+
+        }).catch(function (err) {
+            Log.warn('Return code: ' + err.code + ' FAILED TEST');
+            expect(err.code).to.equal(424);
+
+        }).then(done, done)
+    });
+
 });

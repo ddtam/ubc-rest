@@ -4,6 +4,7 @@ import {FilterJSON, OptionsJSON, QueryJSON} from "./IJSON";
 import {FILTERnode} from "./nodes/FILTERnode";
 import {ResultSection} from "./ResultSection";
 import {OPTIONnode} from "./nodes/OPTIONnode";
+import {Database} from "./Database";
 
 export class QueryEngine {
 
@@ -25,19 +26,34 @@ export class QueryEngine {
             })
         }
 
-        // get the results that match the query based on FILTER
-        let results: Array<Section> = this.getMatch(query.WHERE);
+        try {
+            // get the results that match the query based on FILTER
+            let results: Array<Section> = this.getMatch(query.WHERE);
 
-        // format the results based on OPTIONS
-        let fResults: Array<ResultSection> = this.formatMatch(query.OPTIONS, results);
+            // format the results based on OPTIONS
+            let fResults: Array<ResultSection> = this.formatMatch(query.OPTIONS, results);
 
-        // return the results in the form of an InsightResponse
-        return QueryEngine.encapsulate(fResults);
+            // return the results in the form of an InsightResponse
+            return QueryEngine.encapsulate(fResults);
+
+        } catch (err) {
+            return new Promise(function (fulfill, reject) {
+                reject(err)
+            })
+        }
 
     }
 
     private getMatch(criteria: FilterJSON): Array<Section> {
         // build the filters AST rooted on a FILTERnode
+
+        let db = new Database();
+        if (db.countEntries() === 0){
+            throw {
+                code: 424,
+                body: {err: 'Missing dataset'}
+            }
+        }
 
         let root: FILTERnode;
         let result: Array<Section>;
