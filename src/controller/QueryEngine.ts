@@ -72,6 +72,9 @@ export class QueryEngine {
         let optKeys: Array<string>;
         let colKeys: Array<string>;
         let fResults: Array<ResultSection> = [];
+        let sortOn: string;
+        let hasStringOrder: boolean = false; // flag for if OPTIONS has alphabetical ORDER
+        let hasNumberOrder: boolean = false; // flag for if OPTIONS has numerical ORDER
 
         optKeys = Object.keys(OPTIONS);
 
@@ -119,7 +122,53 @@ export class QueryEngine {
 
         }
 
-        // TODO check for ORDER and execute
+
+        if(optKeys.length === 2 && optKeys.includes('ORDER')){
+            sortOn = OPTIONS.ORDER;
+
+            switch (sortOn) {
+                case 'courses_dept':
+                case 'courses_id':
+                case 'courses_title':
+                case 'courses_instructor':
+                case 'courses_uuid':
+                    hasStringOrder = true;
+                    break;
+
+                case 'courses_avg':
+                case 'courses_pass':
+                case 'courses_fail':
+                case 'courses_audit':
+                    hasNumberOrder = true;
+                    break;
+
+            }
+        }
+
+        if (hasStringOrder) {
+            // sort on a string
+            fResults.sort(function(a, b) {
+                var nameA = a[sortOn];
+                var nameB = b[sortOn];
+                if (nameA < nameB) {
+                    return -1;
+                }
+                if (nameA > nameB) {
+                    return 1;
+                }
+
+                // names must be equal
+                return 0;
+            });
+
+        } else if(hasNumberOrder) {
+            // sort on a number
+            fResults.sort(function (a, b) {
+                return Number(a[sortOn]) - Number(b[sortOn]);
+
+            });
+
+        }
 
         return fResults;
     }
