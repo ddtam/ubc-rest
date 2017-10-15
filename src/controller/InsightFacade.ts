@@ -115,7 +115,7 @@ export default class InsightFacade implements IInsightFacade {
         return new Promise(function (fulfill, reject) {
             try {
                 // execute the query and get back stringified array of matching Sections
-                let p: string = QueryEngine.prototype.parse(query);
+                let p: JSON = QueryEngine.prototype.parse(query);
 
                 fulfill({
                     code: 200,

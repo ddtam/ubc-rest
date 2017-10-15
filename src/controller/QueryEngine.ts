@@ -8,7 +8,7 @@ import {Database} from "./Database";
 
 export class QueryEngine {
 
-    parse(query: QueryJSON): string {
+    parse(query: QueryJSON): JSON {
 
         // check fundamental syntax structure for WHERE and OPTIONS in the root
         let objKeys: Array<string> = Object.keys(query);
@@ -181,12 +181,12 @@ export class QueryEngine {
      * @param {Array<ResultSection>} fResults are formatted results from formatMatch helper
      * @returns {string} as stringified JSON
      */
-    private static encapsulate(fResults: Array<ResultSection> ): string {
+    private static encapsulate(fResults: Array<ResultSection> ): JSON {
         // turn fResults into the JSON return format
         let asJSON = "{\"result\":";
         let withCollection = asJSON.concat(JSON.stringify(fResults));
         let finalBracket = withCollection.concat("}");
 
-        return finalBracket;
+        return JSON.parse(finalBracket);
     }
 }
