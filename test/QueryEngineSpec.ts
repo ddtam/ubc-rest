@@ -45,7 +45,6 @@ describe("QueryEngineSpec", function () {
         inFac.performQuery(JSON.parse(query)).then(function (obj) {
             Log.test('Return code: ' + obj.code);
             expect(obj.code).to.equal(200);
-            Log.info(obj.body.toString());
             // TODO expect the actual results here
 
         }).then(done, done).catch(function (err) {
@@ -61,7 +60,6 @@ describe("QueryEngineSpec", function () {
         inFac.performQuery(JSON.parse(query)).then(function (obj) {
             Log.test('Return code: ' + obj.code);
             expect(obj.code).to.equal(200);
-            Log.info(obj.body.toString());
             // TODO expect the actual results here
 
         }).then(done, done).catch(function (err) {
@@ -77,7 +75,6 @@ describe("QueryEngineSpec", function () {
         inFac.performQuery(JSON.parse(query)).then(function (obj) {
             Log.test('Return code: ' + obj.code);
             expect(obj.code).to.equal(200);
-            Log.info(obj.body.toString());
             // TODO expect the actual results here
 
         }).then(done, done).catch(function (err) {
@@ -93,7 +90,36 @@ describe("QueryEngineSpec", function () {
         inFac.performQuery(JSON.parse(query)).then(function (obj) {
             Log.test('Return code: ' + obj.code);
             expect(obj.code).to.equal(200);
-            Log.info(obj.body.toString());
+            // TODO expect the actual results here
+
+        }).then(done, done).catch(function (err) {
+            Log.warn('Return code: ' + err.code + ' FAILED TEST');
+            expect.fail();
+            done()
+        })
+    });
+
+    it("Should be able to sort strings alphabetically", function (done) {
+        let query: string = fs.readFileSync('test/testQueries/simpleQuerySortInstructor');
+
+        inFac.performQuery(JSON.parse(query)).then(function (obj) {
+            Log.test('Return code: ' + obj.code);
+            expect(obj.code).to.equal(200);
+            // TODO expect the actual results here
+
+        }).then(done, done).catch(function (err) {
+            Log.warn('Return code: ' + err.code + ' FAILED TEST');
+            expect.fail();
+            done()
+        })
+    });
+
+    it("Should be able to sort UUID alphabetically", function (done) {
+        let query: string = fs.readFileSync('test/testQueries/simpleQuerySortUUID');
+
+        inFac.performQuery(JSON.parse(query)).then(function (obj) {
+            Log.test('Return code: ' + obj.code);
+            expect(obj.code).to.equal(200);
             // TODO expect the actual results here
 
         }).then(done, done).catch(function (err) {
@@ -109,7 +135,6 @@ describe("QueryEngineSpec", function () {
         inFac.performQuery(JSON.parse(query)).then(function (obj) {
             Log.test('Return code: ' + obj.code);
             expect(obj.code).to.equal(200);
-            Log.info(obj.body.toString());
             // TODO expect the actual results here
 
         }).then(done, done).catch(function (err) {
@@ -127,7 +152,6 @@ describe("QueryEngineSpec", function () {
         inFac.performQuery(JSON.parse(query)).then(function (obj) {
             Log.test('Return code: ' + obj.code);
             expect(obj.code).to.equal(200);
-            Log.info(obj.body.toString());
             // TODO expect the actual results here
 
         }).then(done, done).catch(function (err) {
