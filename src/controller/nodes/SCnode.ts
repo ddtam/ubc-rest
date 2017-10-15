@@ -23,23 +23,35 @@ export class SCnode extends ANode {
 
         let placeHolder: any = sc[this.s_key];
 
-        if (
-            !isString(placeHolder) ||
-                // input is not a string
-            !RegExp('[^*]+').test(placeHolder)
-                // input string is not one or more of any character except asterisk
-        ) {
-            throw new Error('SYNTAXERR - search string "' + placeHolder + '" is invalid')
+        // check syntax of to-be regex
+        let regexOk: boolean = false; // flag default to false
 
-        } else {
+        if (placeHolder === '') {
+            // accept empty string
+            regexOk = true;
+
+        } else if (
+            isString(placeHolder) &&
+                // input is a string
+            RegExp('[^*]+').test(placeHolder)
+                // AND input string is one or more of any character except asterisk
+        ) {
+            regexOk = true;
+        }
+
+        if (regexOk) {
             // process inputstring into a RegEx-ready string
             this.inputstring = this.inputstring.concat('^');
             placeHolder = placeHolder.replace(new RegExp('\\*', 'g'), '.*');
             this.inputstring = this.inputstring.concat(placeHolder).concat('$');
 
-        }
+        } else {
+            // throw error because RegEx is bad
+            throw new Error('SYNTAXERR - search string "' + placeHolder + '" is invalid')
 
+        }
     }
+
 
     evaluate(): Array<Section> {
         let db = new Database();

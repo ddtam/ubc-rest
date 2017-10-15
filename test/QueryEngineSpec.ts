@@ -176,6 +176,23 @@ describe("QueryEngineSpec", function () {
         })
     });
 
+    it("Should complete a query for all sections in CPSC except for a handful", function (done) {
+        this.timeout(5000);
+
+        let query: string = fs.readFileSync('test/testQueries/hardQueryWithException');
+
+        inFac.performQuery(JSON.parse(query)).then(function (obj) {
+            Log.test('Return code: ' + obj.code);
+            expect(obj.code).to.equal(200);
+            // TODO expect the actual results here
+
+        }).then(done, done).catch(function (err) {
+            Log.warn('Return code: ' + err.code + ' FAILED TEST');
+            expect.fail();
+            done()
+        })
+    });
+
     it("Should throw 400 with a query that is missing WHERE", function (done) {
         let query: string = fs.readFileSync('test/testQueries/badQueryRoot');
 
