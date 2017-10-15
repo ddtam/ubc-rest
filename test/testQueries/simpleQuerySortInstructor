@@ -1,0 +1,16 @@
+{
+  "WHERE":{
+     "GT":{
+        "courses_pass":500
+     }
+  },
+  "OPTIONS":{
+     "COLUMNS":[
+        "courses_dept",
+        "courses_instructor",
+        "courses_pass",
+        "courses_fail"
+     ],
+     "ORDER":"courses_instructor"
+  }
+}

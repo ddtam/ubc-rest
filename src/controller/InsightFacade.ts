@@ -6,14 +6,18 @@ import {IInsightFacade, InsightResponse} from "./IInsightFacade";
 import Log from "../Util";
 import {Database} from "./Database";
 import InputHandler from "./InputHandler";
+import {stringify} from "querystring";
+import {QueryEngine} from "./QueryEngine";
+import {QueryJSON} from "./IJSON";
 let JSZip = require('jszip');
 let fs = require('fs');
 
 export default class InsightFacade implements IInsightFacade {
 
     constructor() {
-        Log.trace('InsightFacadeImpl::init()');
+        // Log.trace('InsightFacadeImpl::init()');
 
+        // check if dbFiles directory exists; if not create
         try {
             fs.mkdirSync('./dbFiles');
 
@@ -109,10 +113,38 @@ export default class InsightFacade implements IInsightFacade {
 
     performQuery(query: any): Promise<InsightResponse> {
         return new Promise(function (fulfill, reject) {
-            reject({
-                code: 400,
-                body: {error: 'placeholder fail'} // TODO
-            })
+            try {
+                // execute the query and get back stringified array of matching Sections
+                let p: JSON = QueryEngine.prototype.parse(query);
+
+                fulfill({
+                    code: 200,
+                    body: p
+                })
+
+            } catch (err) {
+                // something went wrong in building or evaluating AST
+
+                if (err.message.includes('SYNTAXERR')) {
+                    reject({
+                        code: 400,
+                        body: {error: err.message}
+                    })
+
+                } else if (err.message.includes('DATASETERR')) {
+                    reject({
+                        code: 424,
+                        body: {error: err.message}
+                    })
+
+                } else {
+                    reject({
+                        code: 400,
+                        body: {error: 'something is wrong... - ' + err.message}
+                    })
+                }
+
+            }
         })
     }
 

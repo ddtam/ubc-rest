@@ -1,0 +1,15 @@
+{
+  "WHERE":{
+     "IS":{
+        "courses_dept":"z*"
+     }
+  },
+  "OPTIONS":{
+     "COLUMNS":[
+        "courses_dept",
+        "courses_pass",
+        "courses_fail"
+     ],
+     "ORDER":"courses_pass"
+  }
+}
