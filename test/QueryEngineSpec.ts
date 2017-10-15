@@ -10,7 +10,7 @@ describe("QueryEngineSpec", function () {
     let inFac: InsightFacade;
 
     beforeEach(function (done) {
-        this.timeout(10000);
+        this.timeout(5000);
 
         Log.warn('database is being reset...');
         db.reset();
@@ -59,6 +59,24 @@ describe("QueryEngineSpec", function () {
 
         inFac.performQuery(JSON.parse(query)).then(function (obj) {
             Log.test('Return code: ' + obj.code);
+            console.log(obj.body);
+            expect(obj.code).to.equal(200);
+            // TODO expect the actual results here
+
+        }).then(done, done).catch(function (err) {
+            Log.warn('Return code: ' + err.code + ' FAILED TEST');
+            expect.fail();
+            done()
+        })
+    });
+
+    it("Should complete a query for huge NOT query", function (done) {
+        this.timeout(120000);
+        let query: string = fs.readFileSync('test/testQueries/deptQuery2');
+
+        inFac.performQuery(JSON.parse(query)).then(function (obj) {
+            Log.test('Return code: ' + obj.code);
+            //console.log(obj.body);
             expect(obj.code).to.equal(200);
             // TODO expect the actual results here
 

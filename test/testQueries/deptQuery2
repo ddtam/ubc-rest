@@ -1,0 +1,62 @@
+{
+ "WHERE": {
+   "AND": [
+     {
+       "IS": {
+         "courses_dept": "caps"
+       }
+     },
+     {
+       "AND": [
+         {
+           "NOT": {
+             "IS": {
+               "courses_instructor": "*ma*"
+             }
+           }
+         },
+         {
+           "NOT": {
+             "IS": {
+               "courses_id": "4*"
+             }
+           }
+         },
+         {
+           "NOT": {
+             "IS": {
+               "courses_uuid": "35*"
+             }
+           }
+         },
+         {
+           "NOT": {
+             "NOT": {
+               "NOT": {
+                 "NOT": {
+                   "NOT": {
+                     "IS": {
+                       "courses_instructor": ""
+                     }
+                   }
+                 }
+               }
+             }
+           }
+         }
+       ]
+     }
+   ]
+ },
+ "OPTIONS": {
+   "COLUMNS": [
+     "courses_dept",
+     "courses_id",
+     "courses_instructor",
+     "courses_avg",
+     "courses_fail",
+     "courses_pass",
+     "courses_uuid"
+   ]
+ }
+}

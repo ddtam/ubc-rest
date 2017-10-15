@@ -314,21 +314,26 @@ export class Database {
 
     getOpposite(a: Array<Section>): Array<Section> {
         let originalDB: Array<Section> = this.sectionCollection.slice(0);
-        let result: Array<Section> = [];
+
+
+
 
         for (let s of a) {
-            this.deleteEntry(s)
+            let target:number = originalDB.indexOf(s);
+            if (target > -1) {
+                originalDB.splice(target, 1);
+            }
         }
 
-        result = this.sectionCollection.slice(0);
+        //result = this.sectionCollection.slice(0);
 
         // done getting opposite; restore original database
-        this.reset();
-        for (let s of originalDB) {
-            this.sectionCollection.push(s);
-        }
+        //this.reset();
+        //for (let s of originalDB) {
+        //    this.sectionCollection.push(s);
+        //}
 
-        return result;
+        return originalDB;
 
     }
 
