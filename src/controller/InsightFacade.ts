@@ -114,10 +114,8 @@ export default class InsightFacade implements IInsightFacade {
     performQuery(query: any): Promise<InsightResponse> {
         return new Promise(function (fulfill, reject) {
             try {
-                // parse the string query into JSON
-                let q: QueryJSON = JSON.parse(query);
                 // execute the query and get back stringified array of matching Sections
-                let p: string = QueryEngine.prototype.parse(q);
+                let p: JSON = QueryEngine.prototype.parse(query);
 
                 fulfill({
                     code: 200,

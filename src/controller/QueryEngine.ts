@@ -8,7 +8,7 @@ import {Database} from "./Database";
 
 export class QueryEngine {
 
-    parse(query: QueryJSON): string {
+    parse(query: QueryJSON): JSON {
 
         // check fundamental syntax structure for WHERE and OPTIONS in the root
         let objKeys: Array<string> = Object.keys(query);
@@ -63,6 +63,8 @@ export class QueryEngine {
      * @returns {Array<ResultSection>} as an array of sections conforming to OPTIONS specifications
      */
     private formatMatch(OPTIONS: any, results: Array<Section>): Array<ResultSection> {
+        // TODO this big ass method needs refactoring, pronto
+
         let optKeys: Array<string>;
         let colKeys: Array<string>;
         let fResults: Array<ResultSection> = [];
@@ -113,9 +115,20 @@ export class QueryEngine {
         }
 
 
-        if(optKeys.length === 2 && optKeys.includes('ORDER')){
+        if(
+            optKeys.length === 2 && // this is the only other key
+            optKeys.includes('ORDER') // and the second key is ORDER
+
+        ){
             sortOn = OPTIONS.ORDER;
 
+            // check if sortOn is retained by COLUMNS
+            if (!colKeys.includes(sortOn)) {
+                // sorting on a column that is not printed
+                throw new Error('SYNTAXERR - cannot order on a column that is not printed')
+            }
+
+            // determine what type of field is being sorted on
             switch (sortOn) {
                 case 'courses_dept':
                 case 'courses_id':
@@ -168,12 +181,12 @@ export class QueryEngine {
      * @param {Array<ResultSection>} fResults are formatted results from formatMatch helper
      * @returns {string} as stringified JSON
      */
-    private static encapsulate(fResults: Array<ResultSection> ): string {
+    private static encapsulate(fResults: Array<ResultSection> ): JSON {
         // turn fResults into the JSON return format
         let asJSON = "{\"result\":";
         let withCollection = asJSON.concat(JSON.stringify(fResults));
         let finalBracket = withCollection.concat("}");
 
-        return finalBracket;
+        return JSON.parse(finalBracket);
     }
 }

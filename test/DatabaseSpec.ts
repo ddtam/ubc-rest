@@ -49,7 +49,7 @@ describe("DatabaseSpec", function () {
             Log.test('Return code: ' + obj.code);
 
             // query db for first section of first course
-            var sCollection: Array<Section> = db.getUUID(32311);
+            var sCollection: Array<Section> = db.getUUID("32311");
             expect(sCollection.length === 1);
             expect(sCollection[0].courses_dept).to.deep.equal("asia");
             expect(sCollection[0].courses_id).to.deep.equal("254");
@@ -57,7 +57,7 @@ describe("DatabaseSpec", function () {
             expect(sCollection[0].courses_instructor).to.deep.equal("hall, nicholas");
 
             // query db for 12th section of second course
-            var sCollection: Array<Section> = db.getUUID(74337);
+            var sCollection: Array<Section> = db.getUUID("74337");
             expect(sCollection.length === 1);
             expect(sCollection[0].courses_dept).to.deep.equal("econ");
             expect(sCollection[0].courses_id).to.deep.equal("311");
@@ -476,7 +476,7 @@ describe("DatabaseSpec", function () {
                 expect(s.courses_pass < 148);
                 expect(s.courses_fail === 1);
                 expect(s.courses_audit === 10000);
-                expect(s.courses_uuid === 4754);
+                expect(s.courses_uuid === '4754');
             }
 
             expect(results.length).to.equal(1);

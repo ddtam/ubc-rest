@@ -1,13 +1,13 @@
 import {ANode} from "./ANode";
 import {SCompJSON} from "../IJSON";
 import {Section} from "../Section";
-import {error} from "util";
+import {error, isString} from "util";
 import {Database} from "../Database";
 
 export class SCnode extends ANode {
 
     s_key: string;
-    inputstring: string;
+    inputstring: string = '';
 
     constructor(sc: SCompJSON) {
         super();
@@ -21,8 +21,23 @@ export class SCnode extends ANode {
             throw new Error('SYNTAXERR - some s_key is poorly formed')
         }
 
-        this.inputstring = sc[this.s_key]
-        // TODO? do we need to check if this is a string? or just cast as one
+        let placeHolder: any = sc[this.s_key];
+
+        if (
+            !isString(placeHolder) ||
+                // input is not a string
+            !RegExp('[^*]+').test(placeHolder)
+                // input string is not one or more of any character except asterisk
+        ) {
+            throw new Error('SYNTAXERR - search string "' + placeHolder + '" is invalid')
+
+        } else {
+            // process inputstring into a RegEx-ready string
+            this.inputstring = this.inputstring.concat('^');
+            placeHolder = placeHolder.replace('*','.*');
+            this.inputstring = this.inputstring.concat(placeHolder).concat('$');
+
+        }
 
     }
 
