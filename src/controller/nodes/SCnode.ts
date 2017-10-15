@@ -34,7 +34,7 @@ export class SCnode extends ANode {
         } else {
             // process inputstring into a RegEx-ready string
             this.inputstring = this.inputstring.concat('^');
-            placeHolder = placeHolder.replace('*','\\w*');
+            placeHolder = placeHolder.replace('*','.*');
             this.inputstring = this.inputstring.concat(placeHolder).concat('$');
 
         }
