@@ -63,6 +63,8 @@ export class QueryEngine {
      * @returns {Array<ResultSection>} as an array of sections conforming to OPTIONS specifications
      */
     private formatMatch(OPTIONS: any, results: Array<Section>): Array<ResultSection> {
+        // TODO this big ass method needs refactoring, pronto
+
         let optKeys: Array<string>;
         let colKeys: Array<string>;
         let fResults: Array<ResultSection> = [];
@@ -113,9 +115,20 @@ export class QueryEngine {
         }
 
 
-        if(optKeys.length === 2 && optKeys.includes('ORDER')){
+        if(
+            optKeys.length === 2 && // this is the only other key
+            optKeys.includes('ORDER') // and the second key is ORDER
+
+        ){
             sortOn = OPTIONS.ORDER;
 
+            // check if sortOn is retained by COLUMNS
+            if (!colKeys.includes(sortOn)) {
+                // sorting on a column that is not printed
+                throw new Error('SYNTAXERR - cannot order on a column that is printed')
+            }
+
+            // determine what type of field is being sorted on
             switch (sortOn) {
                 case 'courses_dept':
                 case 'courses_id':

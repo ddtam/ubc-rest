@@ -1,0 +1,29 @@
+{
+  "WHERE": {
+    "AND": [
+      {
+        "GT": {
+          "courses_avg": 83.7
+        }
+      },
+      {
+        "LT": {
+          "courses_pass": 20
+        }
+      },
+      {
+        "IS": {
+          "courses_title": "childbring women"
+        }
+      }
+    ]
+  },
+  "OPTIONS": {
+    "COLUMNS": [
+      "courses_dept",
+      "courses_id",
+      "courses_instructor",
+      "courses_avg"
+    ]
+  }
+}

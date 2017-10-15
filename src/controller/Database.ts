@@ -220,19 +220,19 @@ export class Database {
      */
 
     getDept(dept: string): Array<Section> {
-        return this.sectionCollection.filter(s => s.courses_dept === dept)
+        return this.meetRegexCriteria('courses_dept', dept)
     }
 
     getID(id: string): Array<Section> {
-        return this.sectionCollection.filter(s => s.courses_id === id)
+        return this.meetRegexCriteria('courses_id', id)
     }
 
     getTitle(title: string): Array<Section> {
-        return this.sectionCollection.filter(s => s.courses_title === title)
+        return this.meetRegexCriteria('courses_title', title)
     }
 
     getInstructor(instructor: string): Array<Section> {
-        return this.sectionCollection.filter(s => s.courses_instructor === instructor)
+        return this.meetRegexCriteria('courses_instructor', instructor)
     }
 
     getAvg(avg: number, equality: string): Array<Section> {
@@ -251,9 +251,26 @@ export class Database {
         return this.meetEqualityCriteria('courses_audit', audit, equality);
     }
 
-    getUUID(uuid: number) {
+    getUUID(uuid: string) {
         // expects ONE result b/c UUID is unique by definition
-        return this.sectionCollection.filter(s => s.courses_uuid === uuid);
+        return this.meetRegexCriteria('courses_uuid', uuid)
+    }
+
+    /**
+     * Abstracted helper function to process regular expression queries of relevant string fields
+     * @param {string} property is the Section property that is being queried
+     * @param regex is the regular expression query
+     * @returns {Section[]} an array of sections with fields matching regex
+     */
+    private meetRegexCriteria(property: string, regex: string) {
+        let filtered: Array<Section> = [];
+        let re: RegExp = RegExp(regex);
+
+        filtered = this.sectionCollection.filter(function (section) {
+            return re.test(section[property]);
+        });
+
+        return filtered;
     }
 
     /**
