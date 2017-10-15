@@ -203,6 +203,23 @@ describe("QueryEngineSpec", function () {
         }).then(done, done)
     });
 
+    it("Should throw 400 when given an empty AND", function (done) {
+        let query: string = fs.readFileSync('test/testQueries/badQueryEmptyAND');
+
+        inFac.performQuery(JSON.parse(query)).then(function (obj) {
+            Log.test('Return code: ' + obj.code);
+            expect.fail();
+            done();
+
+        }).catch(function (err) {
+            Log.warn('Return code: ' + err.code + ' FAILED TEST');
+            Log.warn(err.body.error);
+            expect(err.code).to.equal(400);
+            expect(err.body.error).to.contain('SYNTAXERR')
+
+        }).then(done, done)
+    });
+
     it("Should throw 424 with a missing dataset", function (done) {
         let db = new Database();
         db.reset();

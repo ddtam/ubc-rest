@@ -18,8 +18,14 @@ export class LOGICCnode extends ANode {
         // initialize all the filters and keep them in the array
         this.filters = [];
 
-        for (let o of filterOn) {
-            this.filters.push(new FILTERnode(o))
+        if (filterOn.length === 0) {
+            throw new Error('SYNTAXERR - AND/OR queries must be given filters')
+
+        } else {
+            for (let o of filterOn) {
+                this.filters.push(new FILTERnode(o))
+            }
+
         }
     }
 

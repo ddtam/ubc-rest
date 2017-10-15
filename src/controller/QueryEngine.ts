@@ -125,7 +125,7 @@ export class QueryEngine {
             // check if sortOn is retained by COLUMNS
             if (!colKeys.includes(sortOn)) {
                 // sorting on a column that is not printed
-                throw new Error('SYNTAXERR - cannot order on a column that is printed')
+                throw new Error('SYNTAXERR - cannot order on a column that is not printed')
             }
 
             // determine what type of field is being sorted on
