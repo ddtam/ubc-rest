@@ -16,7 +16,7 @@ export class NEGnode extends ANode {
     }
 
     evaluate(): Array<Section> {
-        let result = this.filter.evaluate()
+        let result = this.filter.evaluate();
         let db = new Database();
 
         let antiresult = db.getOpposite(result);

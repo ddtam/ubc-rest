@@ -338,7 +338,7 @@ describe("DatabaseSpec", function () {
             // Log.info('return code: ' + obj.code);
 
             // build the query
-            let query: Array<Criteria> = [{
+            let qs: Array<Criteria> = [{
                 property: 'courses_dept',
                 value: 'cpsc',
             }, {
@@ -347,7 +347,7 @@ describe("DatabaseSpec", function () {
                 equality: 'LT'
             }];
 
-            let results: Array<Section> = db.query(query);
+            let results: Array<Section> = db.queries(qs);
 
             for (let s of results) {
                 expect(s.courses_dept === 'cpsc');
@@ -376,13 +376,13 @@ describe("DatabaseSpec", function () {
             // Log.info('return code: ' + obj.code);
 
             // build the query
-            let query: Array<Criteria> = [{
+            let qs: Array<Criteria> = [{
                 property: 'courses_avg',
                 value: 0,
                 equality: 'LT'
             }];
 
-            let results: Array<Section> = db.query(query);
+            let results: Array<Section> = db.queries(qs);
 
             expect(results.length).to.equal(0);
 
@@ -404,12 +404,12 @@ describe("DatabaseSpec", function () {
             // Log.info('return code: ' + obj.code);
 
             // build the query
-            let query: Array<Criteria> = [{
+            let qs: Array<Criteria> = [{
                 property: 'DNE',
                 value: 'cpsc',
             }];
 
-            db.query(query);
+            db.queries(qs);
 
             expect.fail();
             done();
@@ -431,7 +431,7 @@ describe("DatabaseSpec", function () {
             // Log.info('return code: ' + obj.code);
 
             // build the query
-            let query: Array<Criteria> = [{
+            let qs: Array<Criteria> = [{
                 property: 'courses_dept',
                 value: 'phar',
             }, {
@@ -465,7 +465,7 @@ describe("DatabaseSpec", function () {
                 value: 4754,
             }];
 
-            let results: Array<Section> = db.query(query);
+            let results: Array<Section> = db.queries(qs);
 
             for (let s of results) {
                 expect(s.courses_dept === 'phar');

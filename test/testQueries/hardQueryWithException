@@ -1,0 +1,82 @@
+{
+  "WHERE": {
+    "AND": [
+      {
+        "IS": {
+          "courses_dept": "cpsc"
+        }
+      },
+      {
+        "NOT": {
+          "OR": [
+            {
+              "IS": {
+                "courses_id": "110"
+              }
+            },
+            {
+              "IS": {
+                "courses_id": "213"
+              }
+            },
+            {
+              "IS": {
+                "courses_id": "121"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "NOT":{
+          "AND": [
+            {
+              "IS": {
+                "courses_id": "210"
+              }
+            },
+            {
+              "IS": {
+                "courses_instructor": "baniassad, elisa"
+              }
+            },
+            {
+              "EQ": {
+                "courses_avg": 76.32
+              }
+            },
+            {
+              "EQ": {
+                "courses_fail": 5
+              }
+            }
+          ]
+        }
+      },
+      {
+        "NOT": {
+          "IS": {
+            "courses_instructor": "kiczales, gregor"
+          }
+        }
+      },
+      {
+        "NOT": {
+          "IS": {
+            "courses_instructor": ""
+          }
+        }
+      }
+    ]
+  },
+  "OPTIONS": {
+    "COLUMNS": [
+      "courses_dept",
+      "courses_id",
+      "courses_instructor",
+      "courses_avg",
+      "courses_fail",
+      "courses_audit"
+    ]
+  }
+}

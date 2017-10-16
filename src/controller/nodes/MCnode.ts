@@ -35,12 +35,11 @@ export class MCnode extends ANode {
     evaluate(): Array<Section> {
         let db = new Database();
 
-        let accumulatingResult: Array<Section> = db.query([{
+        let accumulatingResult: Array<Section> = db.query({
             property: this.m_key,
             value: this.num,
             equality: this.equality
-        }]);
-
+        });
         return accumulatingResult;
     }
 
