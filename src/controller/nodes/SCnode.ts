@@ -1,7 +1,7 @@
 import {ANode} from "./ANode";
 import {SCompJSON} from "../IJSON";
 import {Section} from "../Section";
-import {error, isString} from "util";
+import {isString} from "util";
 import {Database} from "../Database";
 
 export class SCnode extends ANode {
@@ -56,10 +56,10 @@ export class SCnode extends ANode {
     evaluate(): Array<Section> {
         let db = new Database();
 
-        let accumulatingResult: Array<Section> = db.query([{
+        let accumulatingResult: Array<Section> = db.query({
             property: this.s_key,
-            value: this.inputstring, // TODO: need to handle regex
-        }]);
+            value: this.inputstring
+        });
 
         return accumulatingResult;
     }
