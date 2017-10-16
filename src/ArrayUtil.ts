@@ -8,36 +8,50 @@ export default class ArrayUtil {
 
     /**
      * Computes the union of two input arrays
-     * @param {Array<any>} a1 is the first input
-     * @param {Array<any>} a2 is the second input
-     * @returns {Array<any>} the union of a1 and a2
+     * @param {Array<Array<any>>} arrays is an array of the arrays that will be union-ed
+     * @returns {Array<any>} an array that is the union of the inputs
      */
-    public static union(a1: Array<any>, a2: Array<any>): Array<any> {
-        let result: Array<any> = [];
+    public static union(arrays: Array<Array<any>>): Array<any> {
+        let result = [];
+        let joinedArray: Array<any> = [];
 
-        if (a1.length > a2.length) {
-            // a1 is longer; filter for diffs with a2
-            result = a1.concat(a2.filter((n) => !a1.includes(n)))
-
-        } else {
-            // a2 may be longer; filter for diffs with a1
-            result = a2.concat(a1.filter((n) => !a2.includes(n)))
-
+        for (let a of arrays) {
+            joinedArray = joinedArray.concat(a);
         }
+
+        result = Array.from(new Set(joinedArray));
 
         return result;
     }
 
     /**
      * Computes the intersection of two input arrays
-     * @param {Array<any>} a1 is the first input
-     * @param {Array<any>} a2 is the second input
-     * @returns {Array<any>} the intersection of a1 and a2
+     * @param {Array<Array<any>>} arrays is an array of the arrays that will be intersect-ed
+     * @returns {Array<any>} an array that is the intersection of the inputs
      */
-    public static intersection(a1: Array<any>, a2: Array<any>): Array<any> {
+    public static intersection(arrays: Array<Array<any>>): Array<any> {
         let result: Array<any> = [];
 
-        result = a1.filter((n) => a2.includes(n));
+        // determine the shortest array
+        let indexOfShortest: number = 0;
+        let length: number = arrays[0].length;
+
+        for (let i = 1; i < arrays.length; i++) {
+            if (arrays[i].length < length) {
+                indexOfShortest = i;
+                length = arrays[i].length
+
+            }
+        }
+
+        // store the shortest array as running result and remove it from the input
+        result = arrays[indexOfShortest].slice(0);
+        arrays.splice(indexOfShortest, 1);
+
+        for (let a of arrays) {
+            let tempSet = new Set(a);
+            result = result.filter(e => tempSet.has(e));
+        }
 
         return result;
     }

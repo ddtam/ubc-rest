@@ -1,7 +1,6 @@
 /**
  * This is the singleton database in which all course information will be stored
  */
-import Log from "../Util";
 import {CourseJSON, DatabaseJSON, SectionJSON} from "./IJSON";
 let fs = require('fs');
 import {Section} from "./Section";
@@ -128,12 +127,12 @@ export class Database {
     }
 
     /**
-     * Query takes an array of Criteria and queries the database to return an array of sections that fulfill
+     * Queries takes an array of Criteria and queries the database to return an array of sections that fulfill
      *  all the criteria
      * @param {Array<Criteria>} questions
      * @returns {Array<Section>}
      */
-    query(questions: Array<Criteria>): Array<Section> {
+    queries(questions: Array<Criteria>): Array<Section> {
         let result: Array<Section>;
         let originalDB: Array<Section>;
 
@@ -187,6 +186,45 @@ export class Database {
         this.reset();
         for (let s of originalDB) {
             this.sectionCollection.push(s);
+        }
+
+        // return query results
+        return result;
+
+    }
+
+    /**
+     * Query takes a Criteria object and queries the database to return an array of sections that fulfill
+     *  the criteria
+     * @param {Array<Criteria>} question
+     * @returns {Array<Section>}
+     */
+    query(question: Criteria): Array<Section> {
+        let result: Array<Section>;
+
+        if (
+            question.property === "courses_dept" ||
+            question.property === "courses_id" ||
+            question.property === "courses_title" ||
+            question.property === "courses_instructor" ||
+            question.property === "courses_uuid"
+        ) {
+            // is a string query
+            result = this.handleStrQuery(question.property, question.value)
+
+        } else if (
+            question.property === "courses_avg" ||
+            question.property === "courses_pass" ||
+            question.property === "courses_fail" ||
+            question.property === "courses_audit"
+        ) {
+            // is a numerical query with some equality comparison
+            result = this.handleNumQuery(question.property, question.value, question.equality)
+
+        } else {
+            // query is poorly formed; throw error
+            throw new Error('query is poorly formed; property "' + question.property + '" does not exist')
+
         }
 
         // return query results
@@ -313,23 +351,15 @@ export class Database {
     }
 
     getOpposite(a: Array<Section>): Array<Section> {
-        let originalDB: Array<Section> = this.sectionCollection.slice(0);
-        let result: Array<Section> = [];
+        let inputContents = new Set(a);
 
-        for (let s of a) {
-            this.deleteEntry(s)
-        }
+        let diff = Array.from(
+            new Set(
+                this.sectionCollection.filter(x => !inputContents.has(x))
+            )
+        );
 
-        result = this.sectionCollection.slice(0);
-
-        // done getting opposite; restore original database
-        this.reset();
-        for (let s of originalDB) {
-            this.sectionCollection.push(s);
-        }
-
-        return result;
-
+        return diff;
     }
 
     // returns number of entries loaded in current database

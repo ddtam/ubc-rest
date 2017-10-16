@@ -30,44 +30,28 @@ export class LOGICCnode extends ANode {
     }
 
     evaluate(): Array<Section> {
-        let accumulatingResult: Array<Section> = [];
-        let first: boolean = true; // flag to indicate if this is the first query
+
+        let results: Array<Array<Section>> = [];
+        let combinedResult: Array<Section> = [];
+
+        // evaluate all the filters
+        for (let f of this.filters) {
+            results.push(f.evaluate())
+        }
 
         if (this.logic === 'AND') {
-            // looking for AND result from the filters
-            for (let f of this.filters) {
-                let iteratingResult: Array<Section> = f.evaluate();
-
-                if (first) { // then just set accumulating result to these first results
-                    accumulatingResult = iteratingResult;
-                    first = false;
-
-                } else { // perform the intersection
-                    accumulatingResult = ArrayUtil.intersection(accumulatingResult, iteratingResult);
-
-                }
-            }
+            // looking for AND of all the result arrays
+            combinedResult = ArrayUtil.intersection(results)
 
         }
 
         if (this.logic === 'OR') {
             // looking for OR result from the filters
-            for (let f of this.filters) {
-                let iteratingResult: Array<Section> = f.evaluate();
-
-                if (first) { // then just set accumulating result to these first results
-                    accumulatingResult = iteratingResult;
-                    first = false;
-
-                } else { // perform the union
-                    accumulatingResult = ArrayUtil.union(accumulatingResult, iteratingResult);
-
-                }
-            }
+            combinedResult = ArrayUtil.union(results)
 
         }
 
-        return accumulatingResult;
+        return combinedResult;
 
     }
 
