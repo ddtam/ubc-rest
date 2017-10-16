@@ -10,7 +10,7 @@ describe("QueryEngineSpec", function () {
     let inFac: InsightFacade;
 
     beforeEach(function (done) {
-        this.timeout(10000);
+        this.timeout(5000);
 
         Log.warn('database is being reset...');
         db.reset();
