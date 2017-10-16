@@ -41,7 +41,7 @@ describe("AddDatasetSpec", function () {
     });
 
     it("Should iterate through the 3 files in the test zip", function (done) {
-        content = new Buffer(fs.readFileSync('courses_3test.zip'))
+        content = new Buffer(fs.readFileSync('./zips/courses_3test.zip'))
             .toString('base64');
 
         inFac.addDataset('courses', content).then(function (obj) {
@@ -61,7 +61,7 @@ describe("AddDatasetSpec", function () {
         // because my machine is slow or something ._.
         this.timeout(5000);
 
-        content = new Buffer(fs.readFileSync('courses.zip'))
+        content = new Buffer(fs.readFileSync('./zips/courses.zip'))
             .toString('base64');
 
         inFac.addDataset('courses', content).then(function (obj) {
@@ -78,7 +78,7 @@ describe("AddDatasetSpec", function () {
     });
 
     it("Should give 400 response when given empty zip", function (done) {
-        content = new Buffer(fs.readFileSync('coursesEmpty.zip'))
+        content = new Buffer(fs.readFileSync('./zips/coursesEmpty.zip'))
             .toString('base64');
 
         inFac.addDataset('courses', content).then(function (obj) {
@@ -96,7 +96,7 @@ describe("AddDatasetSpec", function () {
     });
 
     it("Should give 400 response when given zip with no valid JSON", function (done) {
-        content = new Buffer(fs.readFileSync('coursesNoValidJSON.zip'))
+        content = new Buffer(fs.readFileSync('./zips/coursesNoValidJSON.zip'))
             .toString('base64');
 
         inFac.addDataset('courses', content).then(function (obj) {
@@ -113,7 +113,7 @@ describe("AddDatasetSpec", function () {
     });
 
     it("Should process valid JSONs when only some JSON in zip are invalid", function (done) {
-        content = new Buffer(fs.readFileSync('coursesSomeValidJSON.zip'))
+        content = new Buffer(fs.readFileSync('./zips/coursesSomeValidJSON.zip'))
             .toString('base64');
 
         inFac.addDataset('courses', content).then(function (obj) {
@@ -131,7 +131,7 @@ describe("AddDatasetSpec", function () {
     });
 
     it("Should give 400 response when given corrupted zip", function (done) {
-        content = new Buffer(fs.readFileSync('coursesCorrupted.zip'))
+        content = new Buffer(fs.readFileSync('./zips/coursesCorrupted.zip'))
             .toString('base64');
 
         inFac.addDataset('courses', content).then(function (obj) {
@@ -148,7 +148,7 @@ describe("AddDatasetSpec", function () {
     });
 
     it("Should give 400 response when given encrypted zip", function (done) {
-        content = new Buffer(fs.readFileSync('coursesEncrypted.zip'))
+        content = new Buffer(fs.readFileSync('./zips/coursesEncrypted.zip'))
             .toString('base64');
 
         inFac.addDataset('courses', content).then(function (obj) {
@@ -165,7 +165,7 @@ describe("AddDatasetSpec", function () {
     });
 
     it("Should give 400 response when given something that is not a zip", function (done) {
-        content = new Buffer(fs.readFileSync('coursesNotZip.rar'))
+        content = new Buffer(fs.readFileSync('./zips/coursesNotZip.rar'))
             .toString('base64');
 
         inFac.addDataset('courses', content).then(function (obj) {
@@ -182,7 +182,7 @@ describe("AddDatasetSpec", function () {
     });
 
     it("Should give 400 response when given JSON with no real section data", function (done) {
-        content = new Buffer(fs.readFileSync('coursesNoRealData.zip'))
+        content = new Buffer(fs.readFileSync('./zips/coursesNoRealData.zip'))
             .toString('base64');
 
         inFac.addDataset('courses', content).then(function (obj) {
@@ -201,7 +201,7 @@ describe("AddDatasetSpec", function () {
     it("Should give 201 response when adding a database with the same ID", function (done) {
         this.timeout(10000);
 
-        content = new Buffer(fs.readFileSync('courses_3test.zip'))
+        content = new Buffer(fs.readFileSync('./zips/courses_3test.zip'))
             .toString('base64');
 
         // add first time

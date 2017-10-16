@@ -41,7 +41,7 @@ describe("DatabaseSpec", function () {
     });
 
     it("should write 9 fields correctly", function (done) {
-        content = new Buffer(fs.readFileSync('courses_3test.zip'))
+        content = new Buffer(fs.readFileSync('./zips/courses_3test.zip'))
             .toString('base64');
 
         inFac.addDataset('courses', content).then(function (obj) {
@@ -74,7 +74,7 @@ describe("DatabaseSpec", function () {
     });
 
     it("Should return a singleton database", function (done) {
-        content = new Buffer(fs.readFileSync('courses_3test.zip'))
+        content = new Buffer(fs.readFileSync('./zips/courses_3test.zip'))
             .toString('base64');
 
         inFac.addDataset('courses', content).then(function (obj) {
@@ -95,7 +95,7 @@ describe("DatabaseSpec", function () {
         let content: string;
         let db = new Database();
 
-        content = new Buffer(fs.readFileSync('courses_3test.zip'))
+        content = new Buffer(fs.readFileSync('./zips/courses_3test.zip'))
             .toString('base64');
 
         let fileID = 'courses';
@@ -116,7 +116,7 @@ describe("DatabaseSpec", function () {
     });
 
     it("Should query all courses in department correctly", function (done) {
-        content = new Buffer(fs.readFileSync('courses_3test.zip'))
+        content = new Buffer(fs.readFileSync('./zips/courses_3test.zip'))
             .toString('base64');
 
         inFac.addDataset('courses', content).then(function () {
@@ -140,7 +140,7 @@ describe("DatabaseSpec", function () {
     });
 
     it("Should query a professor correctly", function (done) {
-        content = new Buffer(fs.readFileSync('courses_3test.zip'))
+        content = new Buffer(fs.readFileSync('./zips/courses_3test.zip'))
             .toString('base64');
 
         inFac.addDataset('courses', content).then(function () {
@@ -164,7 +164,7 @@ describe("DatabaseSpec", function () {
     });
 
     it("Should query a course number correctly", function (done) {
-        content = new Buffer(fs.readFileSync('courses_3test.zip'))
+        content = new Buffer(fs.readFileSync('./zips/courses_3test.zip'))
             .toString('base64');
 
         inFac.addDataset('courses', content).then(function () {
@@ -188,7 +188,7 @@ describe("DatabaseSpec", function () {
     });
 
     it("Should query a course name correctly", function (done) {
-        content = new Buffer(fs.readFileSync('courses_3test.zip'))
+        content = new Buffer(fs.readFileSync('./zips/courses_3test.zip'))
             .toString('base64');
 
         inFac.addDataset('courses', content).then(function () {
@@ -212,7 +212,7 @@ describe("DatabaseSpec", function () {
     });
 
     it("Should query averages correctly", function (done) {
-        content = new Buffer(fs.readFileSync('courses_3test.zip'))
+        content = new Buffer(fs.readFileSync('./zips/courses_3test.zip'))
             .toString('base64');
 
         inFac.addDataset('courses', content).then(function () {
@@ -237,7 +237,7 @@ describe("DatabaseSpec", function () {
     });
 
     it("Should query number of passing students correctly", function (done) {
-        content = new Buffer(fs.readFileSync('courses_3test.zip'))
+        content = new Buffer(fs.readFileSync('./zips/courses_3test.zip'))
             .toString('base64');
 
         inFac.addDataset('courses', content).then(function () {
@@ -261,7 +261,7 @@ describe("DatabaseSpec", function () {
     });
 
     it("Should query number of failing students correctly", function (done) {
-        content = new Buffer(fs.readFileSync('courses_3test.zip'))
+        content = new Buffer(fs.readFileSync('./zips/courses_3test.zip'))
             .toString('base64');
 
         inFac.addDataset('courses', content).then(function () {
@@ -285,7 +285,7 @@ describe("DatabaseSpec", function () {
     });
 
     it("Should query number of auditing students correctly", function (done) {
-        content = new Buffer(fs.readFileSync('courses_3test.zip'))
+        content = new Buffer(fs.readFileSync('./zips/courses_3test.zip'))
             .toString('base64');
 
         inFac.addDataset('courses', content).then(function () {
@@ -309,7 +309,7 @@ describe("DatabaseSpec", function () {
     });
 
     it("Should throw error with bad inequality parameter", function (done) {
-        content = new Buffer(fs.readFileSync('courses_3test.zip'))
+        content = new Buffer(fs.readFileSync('./zips/courses_3test.zip'))
             .toString('base64');
 
         inFac.addDataset('courses', content).then(function () {
@@ -331,7 +331,7 @@ describe("DatabaseSpec", function () {
     it("Should be able to handle complex query from entire dataset", function (done) {
         this.timeout(5000);
 
-        content = new Buffer(fs.readFileSync('courses.zip'))
+        content = new Buffer(fs.readFileSync('./zips/courses.zip'))
             .toString('base64');
 
         inFac.addDataset('courses', content).then(function () {
@@ -369,7 +369,7 @@ describe("DatabaseSpec", function () {
     it("Should be able to handle a query for which no results exist", function (done) {
         this.timeout(5000);
 
-        content = new Buffer(fs.readFileSync('courses.zip'))
+        content = new Buffer(fs.readFileSync('./zips/courses.zip'))
             .toString('base64');
 
         inFac.addDataset('courses', content).then(function () {
@@ -397,7 +397,7 @@ describe("DatabaseSpec", function () {
     it("Should be err when given querying for a property that does not exist", function (done) {
         this.timeout(5000);
 
-        content = new Buffer(fs.readFileSync('courses.zip'))
+        content = new Buffer(fs.readFileSync('./zips/courses.zip'))
             .toString('base64');
 
         inFac.addDataset('courses', content).then(function () {
@@ -424,7 +424,7 @@ describe("DatabaseSpec", function () {
     it("Should be able to find a very, very specific section", function (done) {
         this.timeout(5000);
 
-        content = new Buffer(fs.readFileSync('courses.zip'))
+        content = new Buffer(fs.readFileSync('./zips/courses.zip'))
             .toString('base64');
 
         inFac.addDataset('courses', content).then(function () {

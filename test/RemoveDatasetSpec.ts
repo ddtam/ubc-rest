@@ -59,7 +59,7 @@ describe("RemoveDatasetSpec", function () {
     it("Should give 204 response if attempting to delete a previously cached database", function (done) {
         // populate database...
         inFac = new InsightFacade();
-        let content: string = new Buffer(fs.readFileSync('courses_3test.zip'))
+        let content: string = new Buffer(fs.readFileSync('./zips/courses_3test.zip'))
             .toString('base64');
 
         inFac.addDataset('courses', content).then(function () {
@@ -95,7 +95,7 @@ describe("RemoveDatasetSpec", function () {
 
         // populate database...
         inFac = new InsightFacade();
-        let content: string = new Buffer(fs.readFileSync('courses.zip'))
+        let content: string = new Buffer(fs.readFileSync('./zips/courses.zip'))
             .toString('base64');
 
         inFac.addDataset('courses', content).then(function () {
@@ -129,10 +129,10 @@ describe("RemoveDatasetSpec", function () {
     it("Should retain memory if database to be deleted is not the one loaded", function (done) {
 
         inFac = new InsightFacade();
-        let first: string = new Buffer(fs.readFileSync('courses_3test.zip'))
+        let first: string = new Buffer(fs.readFileSync('./zips/courses_3test.zip'))
             .toString('base64');
 
-        let second: string = new Buffer(fs.readFileSync('coursesSomeValidJSON.zip'))
+        let second: string = new Buffer(fs.readFileSync('./zips/coursesSomeValidJSON.zip'))
             .toString('base64');
 
         // add the first database...

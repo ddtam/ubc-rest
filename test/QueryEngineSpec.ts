@@ -26,7 +26,7 @@ describe("QueryEngineSpec", function () {
         }
 
         // load default courses.zip
-        let content: string = new Buffer(fs.readFileSync('courses.zip'))
+        let content: string = new Buffer(fs.readFileSync('./zips/courses.zip'))
             .toString('base64');
 
         inFac.addDataset('courses', content).then(function () {
