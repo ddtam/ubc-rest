@@ -1,9 +1,7 @@
-import {InsightResponse} from "./IInsightFacade";
 import {Section} from "./Section";
-import {FilterJSON, OptionsJSON, QueryJSON} from "./IJSON";
+import {FilterJSON, QueryJSON} from "./IJSON";
 import {FILTERnode} from "./nodes/FILTERnode";
 import {ResultSection} from "./ResultSection";
-import {OPTIONnode} from "./nodes/OPTIONnode";
 import {Database} from "./Database";
 
 export class QueryEngine {

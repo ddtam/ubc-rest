@@ -6,9 +6,7 @@ import {IInsightFacade, InsightResponse} from "./IInsightFacade";
 import Log from "../Util";
 import {Database} from "./Database";
 import InputHandler from "./InputHandler";
-import {stringify} from "querystring";
 import {QueryEngine} from "./QueryEngine";
-import {QueryJSON} from "./IJSON";
 let JSZip = require('jszip');
 let fs = require('fs');
 
