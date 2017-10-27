@@ -30,54 +30,24 @@ export default class InsightFacade implements IInsightFacade {
 
     addDataset(id: string, content: string): Promise<InsightResponse> {
 
-        // get current list of databases
-        let db = new Database();
-        let dbList: Array<string> = db.listDB();
-
-        db.reset(); // blank loaded database before adding new entries
-
         return new Promise(function (fulfill, reject) {
 
             let zip = new JSZip();
 
+            // get current list of databases BEFORE adding new
+            let db = new Database();
+            let dbList: Array<string> = db.listDB();
+
             // load serialized zip into JSZip object
             zip.loadAsync(content, {base64: true})
                 .then(function (zipContents: JSZip) {
-
                     // process the zip
-                    InputHandler.prototype.handleZip(zipContents)
-                        .then(function () {
+                    return InputHandler.prototype.handleZip(zipContents)
 
-                            // completely processed zip; save database and fulfill promise
-                            if (dbList.includes(id)) {
-                                // this database has been loaded before
-                                db.saveDB(id, false);
-
-                                fulfill({
-                                    code: 201,
-                                    body: {message: 'dataset successfully added; id already exists'}
-                                })
-
-                            } else {
-                                // is a new database id
-                                db.saveDB(id, true);
-
-                                fulfill({
-                                    code: 204,
-                                    body: {message: 'dataset successfully added'}
-                                })
-                            }
-                        })
-
-                        .catch(function (err: InsightResponse) {
-                        // there was an error processing zip contents
-                        Log.error('zip content error');
-                        reject(err);
-                    })
                 })
 
                 .catch(function (err: Error) {
-                    // else error on decoding base64 representation of zip
+                    // if error on decoding base64 representation of zip
                     Log.error('JSZip err - ' + err.message);
                     reject({
                         code: 400,
@@ -85,7 +55,37 @@ export default class InsightFacade implements IInsightFacade {
                     })
                 })
 
-        });
+                .then(function () {
+                    // save id to Database and fulfill
+                    let returnCode: number = db.saveZipToDatabase(id, dbList);
+
+                    switch(returnCode) {
+                        case 201:
+                            fulfill({
+                                code: 201,
+                                body: {message: 'dataset successfully added; id already exists'}
+                            });
+                            break;
+
+                        case 204:
+                            fulfill({
+                                code: 204,
+                                body: {message: 'dataset successfully added'}
+                            });
+                            break;
+
+                        default:
+                            break;
+                    }
+
+                })
+
+                .catch(function (err: InsightResponse) {
+                    // there was an error processing zip contents
+                    Log.error('zip content error');
+                    reject(err);
+                })
+        })
     }
 
     removeDataset(id: string): Promise<InsightResponse> {
