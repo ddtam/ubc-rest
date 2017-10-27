@@ -38,11 +38,13 @@ export default class InsightFacade implements IInsightFacade {
             let db = new Database();
             let dbList: Array<string> = db.listDB();
 
+
+
             // load serialized zip into JSZip object
             zip.loadAsync(content, {base64: true})
                 .then(function (zipContents: JSZip) {
                     // process the zip
-                    return InputHandler.prototype.handleZip(zipContents)
+                    return InputHandler.prototype.handleCourseZip(zipContents)
 
                 })
 

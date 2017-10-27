@@ -9,44 +9,28 @@ import {InsightResponse} from "./IInsightFacade";
 
 export default class InputHandler {
 
+    containsValidJSON: boolean;
+
     /**
-     * Helper iterates over .zip file contents to add each containing file to Database
+     * Helper iterates over Courses .zip file contents to add each containing file to Database
      * @param {JSZip} zipContents is .zip file represented as JSZip object
      * @returns {Promise<InsightResponse>} when all files are handled
      */
-    async handleZip(zipContents: JSZip) {
-        // load up Database singleton
-        let db = new Database;
+    async handleCourseZip(zipContents: JSZip) {
 
         // store all the promises in this array
         let coursePromiseCollection: Array<Promise<InsightResponse>> = [];
         let counter: number = 1;
 
-        // track existence of AT LEAST ONE valid JSON; assume false
-        let containsValidJSON: boolean = false;
-
         let that = this;
+
+        // track existence of AT LEAST ONE valid JSON; assume false
+        this.containsValidJSON = false;
 
         zipContents.forEach(function (relativePath, file) {
             if (!file.dir) { // process only files, NOT directories
-                let p: Promise<InsightResponse> =
-                    new Promise(function (fulfill) {
-                        that.handleFile(file, counter)
-                            .then(function () {
-                                if (!containsValidJSON) {
-                                    containsValidJSON = true;
-                                }
-                                fulfill();
 
-                            })
-
-                            .catch(function (err) {
-                                // SyntaxError OR JSON is valid but empty
-                                // Log.error('file failed to be processed - ' + err.body.error);
-                                fulfill();
-
-                            });
-                    });
+                let p: Promise<InsightResponse> = that.buildFilePromise(file, counter);
 
                 // add promise to iterable
                 coursePromiseCollection.push(p);
@@ -60,35 +44,84 @@ export default class InputHandler {
         }
 
         // wait for all promises for file processing to settle
-        await Promise.all(coursePromiseCollection).then(function () {
-            // complete contents of zip added to database
-            Log.info('=== DATABASE LOADED ===');
-            Log.info('processed ' + (counter - 1) + ' files');
-            Log.info('database contains ' + db.countEntries().toString() + ' entries');
-
-            if (!containsValidJSON) {
-                // there were no valid JSON files in the zip
-                return Promise.reject({
-                    code: 400,
-                    body: {error: 'zip contained no valid JSON files'}
-                })
-            }
-
-        }).catch(function (err: InsightResponse) {
-            // something went wrong...
-            Log.info('failed to process all files in .zip');
-
-            return Promise.reject(err);
-        })
+        await this.ProcessAllFiles(coursePromiseCollection, counter);
     }
 
     /**
-     * Helper handles addition of individual files within zip to Database
+     * Helper to build individual promises that each process one file
+     * @param {JSZipObject} file is the file that will be processed
+     * @param {number} counter is the unique number of this file in the zip
+     * @returns {Promise<any>} of file being added to the database
+     */
+    buildFilePromise(file: JSZipObject, counter: number): Promise<any> {
+        let that = this;
+
+        return new Promise(function (fulfill) {
+            that.handleCourseFile(file, counter)
+                .then(function () {
+                    if (!that.containsValidJSON) {
+                        that.containsValidJSON = true;
+                    }
+                    fulfill();
+
+                })
+
+                .catch(function (err) {
+                    // SyntaxError OR JSON is valid but empty
+                    // Log.error('file failed to be processed - ' + err.body.error);
+                    fulfill();
+
+                });
+        });
+    }
+
+    /**
+     * Helper that awaits the resolution of an array of promises
+     * @param {Array<Promise<InsightResponse>>} coursePromiseCollection is the array of promises to-complete
+     * @param {number} counter is the number of files in the array
+     * @returns {Promise<any>}
+     * @constructor
+     */
+    private ProcessAllFiles(coursePromiseCollection: Array<Promise<InsightResponse>>, counter: number): Promise<any> {
+        let that = this;
+
+        return Promise.all(coursePromiseCollection)
+            .then(function () {
+                InputHandler.LogDatabaseStateToConsole(counter);
+
+                if (!that.containsValidJSON) {
+                    // there were no valid JSON files in the zip
+                    return Promise.reject({
+                        code: 400,
+                        body: {error: 'zip contained no valid JSON files'}
+                    })
+                }
+            })
+
+            .catch(function (err: InsightResponse) {
+                // something went wrong...
+                Log.info('failed to process all files in .zip');
+
+                return Promise.reject(err);
+            })
+    }
+
+    private static LogDatabaseStateToConsole(counter: number) {
+        let db = new Database();
+
+        // complete contents of zip added to database
+        Log.info('=== DATABASE LOADED ===');
+        Log.info('processed ' + (counter - 1) + ' files');
+        Log.info('database contains ' + db.countEntries().toString() + ' entries');
+    }
+
+    /**
+     * Helper handles addition of individual Course files within zip to Database
      * @param {JSZipObject} file is the file to be processed
      * @param {number} counter uniquely identifies sequence of this file within zip
      * @returns {Promise<any>} queuing entry of this file into Database
      */
-    private handleFile(file: JSZipObject, counter: number): Promise<InsightResponse> {
+    private handleCourseFile(file: JSZipObject, counter: number): Promise<InsightResponse> {
         return new Promise<InsightResponse>(function (fulfill, reject) {
 
             let db = new Database();
@@ -150,4 +183,6 @@ export default class InputHandler {
             })
         });
     }
+
+
 }
