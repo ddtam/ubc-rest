@@ -1,6 +1,7 @@
 /**
  * Interfaces for all JSON objects used by input zip and database files
  */
+import {Section} from "./Section";
 
 export interface CourseJSON {
     result: Array<SectionJSON>
@@ -22,7 +23,10 @@ export interface SectionJSON {
     Title: string; // courses_title
 }
 
-
+export interface bodyJSON {
+    result?: Array<Section>;
+    error?: string;
+}
 
 export interface QueryJSON {
     WHERE: FilterJSON;

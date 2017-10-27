@@ -56,10 +56,7 @@ export default class InputHandler {
 
         if (coursePromiseCollection.length === 0) {
             // there were no files processed
-            return Promise.reject({
-                code: 400,
-                body: {error: 'zip is empty'}
-            })
+            throw new Error('zip is empty');
         }
 
         // wait for all promises for file processing to settle

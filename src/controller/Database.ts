@@ -56,6 +56,23 @@ export class Database {
         }
     }
 
+    saveZipToDatabase(id: string, dbList: Array<string>): number {
+        let db = new Database;
+
+        // completely processed zip; save database and fulfill promise
+        if (dbList.includes(id)) {
+            // this database has been loaded before
+            this.saveDB(id, false);
+            return 201;
+
+        } else {
+            // is a new database id
+            db.saveDB(id, true);
+            return 204;
+
+        }
+    }
+
     /**
      * Delete a section from the database
      */
