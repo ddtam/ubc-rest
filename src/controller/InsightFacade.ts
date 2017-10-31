@@ -51,7 +51,10 @@ export default class InsightFacade implements IInsightFacade {
 
                         default:
                             // id is not one of courses or room;
-                            throw new Error("input ID is neither 'courses' nor 'rooms'")
+                            reject({
+                                code: 400,
+                                body: {error: 'input id is neither "courses" nor "rooms"'}
+                            })
 
                     }
 
