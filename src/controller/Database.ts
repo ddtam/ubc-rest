@@ -112,7 +112,7 @@ export class Database {
      */
     saveDB(dbName: string, firstTime?: boolean){
         // write in as json
-        let cacheContents = this.pukeMemory();
+        let cacheContents = this.pukeMemory(dbName);
         // console.log(finalBracket);
 
         if (!isNullOrUndefined(firstTime) && firstTime) {
@@ -378,11 +378,23 @@ export class Database {
     /**
      * Converts entire array collection into JSON format and returns as string
      *   Should really be diagnostic use only...
-     * @returns {string}
+     * @param {string} id is the database to be regurgitated
+     * @returns {string} as string-encoded JSON representing database contents for given ID
      */
-    pukeMemory(): string {
+    pukeMemory(id: string): string {
         let asJSON = "{\"content\": ";
-        let withCollection = asJSON.concat(JSON.stringify(this.sectionCollection));
+
+        // choose database to fetch
+        let withCollection: string;
+        switch (id) {
+            case 'courses':
+                withCollection = asJSON.concat(JSON.stringify(this.sectionCollection));
+                break;
+            case 'rooms':
+                withCollection = asJSON.concat(JSON.stringify(this.sectionCollection));
+                break;
+        }
+
         let finalBracket = withCollection.concat("}");
 
         return finalBracket;

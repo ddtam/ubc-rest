@@ -106,7 +106,7 @@ describe("DatabaseSpec", function () {
             let diskContent = new Buffer(fs.readFileSync('./dbFiles/' + fileID))
                 .toString('utf8');
 
-            expect(diskContent).to.deep.equal(db.pukeMemory());
+            expect(diskContent).to.deep.equal(db.pukeMemory(fileID));
 
         }).then(done, done).catch(function (err) {
             Log.test(err);

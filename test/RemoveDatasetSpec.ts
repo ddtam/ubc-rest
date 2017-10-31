@@ -62,18 +62,20 @@ describe("RemoveDatasetSpec", function () {
         let content: string = new Buffer(fs.readFileSync('./zips/courses_3test.zip'))
             .toString('base64');
 
-        inFac.addDataset('courses', content).then(function () {
+        let fileID = 'courses';
+
+        inFac.addDataset(fileID, content).then(function () {
             Log.info('successfully populated test database');
 
             // ...then delete it
-            inFac.removeDataset('courses').then(function (obj: InsightResponse) {
+            inFac.removeDataset(fileID).then(function (obj: InsightResponse) {
                 Log.info('successfully deleted test database');
 
                 Log.info('Return code: ' + obj.code);
                 expect(obj.code).to.equal(204);
 
                 // confirm database is empty
-                expect(db.pukeMemory()).to.deep.equal('{"content": []}');
+                expect(db.pukeMemory(fileID)).to.deep.equal('{"content": []}');
 
             }).then(done, done).catch(function (err) {
                 Log.warn('failed to delete a cached database - ' + err.body.error);
@@ -98,18 +100,20 @@ describe("RemoveDatasetSpec", function () {
         let content: string = new Buffer(fs.readFileSync('./zips/courses.zip'))
             .toString('base64');
 
-        inFac.addDataset('courses', content).then(function () {
+        let fileID = 'courses';
+
+        inFac.addDataset(fileID, content).then(function () {
             Log.info('successfully populated test database');
 
             // ...then delete it
-            inFac.removeDataset('courses').then(function (obj: InsightResponse) {
+            inFac.removeDataset(fileID).then(function (obj: InsightResponse) {
                 Log.info('successfully deleted test database');
 
                 Log.info('Return code: ' + obj.code);
                 expect(obj.code).to.equal(204);
 
                 // confirm database is empty
-                expect(db.pukeMemory()).to.deep.equal('{"content": []}');
+                expect(db.pukeMemory(fileID)).to.deep.equal('{"content": []}');
 
             }).then(done, done).catch(function (err) {
                 Log.warn('failed to delete a cached database - ' + err.body.error);
@@ -126,8 +130,7 @@ describe("RemoveDatasetSpec", function () {
 
     });
 
-    // TODO: this test is now irrelevant with new implementation; should remove
-
+    // TODO: this test is now irrelevant with new implementation and is failing; should be removed
     it("Should retain memory if database to be deleted is not the one loaded", function (done) {
 
         inFac = new InsightFacade();
@@ -153,7 +156,7 @@ describe("RemoveDatasetSpec", function () {
                     expect(obj.code).to.equal(204);
 
                     // confirm database is empty
-                    expect(db.pukeMemory()).to.deep.equal('{"content": []}');
+                    expect(db.pukeMemory('courses')).to.deep.equal('{"content": []}');
 
                 }).then(done, done).catch(function (err) {
                     Log.warn('failed to delete a cached database - ' + err.body.error);
