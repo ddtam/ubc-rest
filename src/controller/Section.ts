@@ -13,6 +13,7 @@ export class Section {
     courses_fail: number;
     courses_audit: number;
     courses_uuid: string;
+    courses_year: number;
 
     constructor(
         dept: string,
@@ -23,7 +24,8 @@ export class Section {
         pass: number,
         fail: number,
         audit: number,
-        uuid: number
+        uuid: number,
+        year?: number
     ) {
         this.courses_dept = dept;
         this.courses_id = id;
@@ -34,5 +36,6 @@ export class Section {
         this.courses_fail = fail;
         this.courses_audit= audit;
         this.courses_uuid = String(uuid);
+        this.courses_year = year;
     }
 }
