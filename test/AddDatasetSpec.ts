@@ -229,8 +229,25 @@ describe("AddDatasetSpec", function () {
 
             })
         }
-
-
     });
+
+    it("Should give 203 response when adding a Room database", function (done) {
+        this.timeout(5000);
+
+        content = new Buffer(fs.readFileSync('./zips/rooms.zip'))
+            .toString('base64');
+
+        inFac.addDataset('rooms', content).then(function (obj) {
+            Log.test('Return code: ' + obj.code);
+            expect(obj.code).to.deep.equal(204);
+            expect(db.countEntries()).to.equal(10000); // TODO: change to real number of rooms
+
+        }).then(done, done).catch(function (err) {
+            Log.test(err);
+            expect.fail();
+            done();
+
+        });
+    })
 
 });

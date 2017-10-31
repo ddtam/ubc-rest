@@ -126,6 +126,8 @@ describe("RemoveDatasetSpec", function () {
 
     });
 
+    // TODO: this test is now irrelevant with new implementation; should remove
+
     it("Should retain memory if database to be deleted is not the one loaded", function (done) {
 
         inFac = new InsightFacade();

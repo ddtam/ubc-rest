@@ -6,6 +6,9 @@ import Log from "../Util";
 import {Database} from "./Database";
 import {CourseJSON} from "./IJSON";
 import {InsightResponse} from "./IInsightFacade";
+import {HtmlUtil} from "./HtmlUtil";
+import {Building} from "./Building";
+let parse5 = require('parse5');
 
 export default class InputHandler {
 
@@ -73,46 +76,6 @@ export default class InputHandler {
 
                 });
         });
-    }
-
-    /**
-     * Helper that awaits the resolution of an array of promises
-     * @param {Array<Promise<InsightResponse>>} coursePromiseCollection is the array of promises to-complete
-     * @param {number} counter is the number of files in the array
-     * @returns {Promise<any>}
-     * @constructor
-     */
-    private ProcessAllFiles(coursePromiseCollection: Array<Promise<InsightResponse>>, counter: number): Promise<any> {
-        let that = this;
-
-        return Promise.all(coursePromiseCollection)
-            .then(function () {
-                InputHandler.LogDatabaseStateToConsole(counter);
-
-                if (!that.containsValidJSON) {
-                    // there were no valid JSON files in the zip
-                    return Promise.reject({
-                        code: 400,
-                        body: {error: 'zip contained no valid JSON files'}
-                    })
-                }
-            })
-
-            .catch(function (err: InsightResponse) {
-                // something went wrong...
-                Log.info('failed to process all files in .zip');
-
-                return Promise.reject(err);
-            })
-    }
-
-    private static LogDatabaseStateToConsole(counter: number) {
-        let db = new Database();
-
-        // complete contents of zip added to database
-        Log.info('=== DATABASE LOADED ===');
-        Log.info('processed ' + (counter - 1) + ' files');
-        Log.info('database contains ' + db.countEntries().toString() + ' entries');
     }
 
     /**
@@ -184,5 +147,62 @@ export default class InputHandler {
         });
     }
 
+    /**
+     * Helper that returns a promise awaiting the resolution of an array of
+     *  promises to add individual courses to DB
+     * @param {Array<Promise<InsightResponse>>} coursePromiseCollection is the array of promises to-complete
+     * @param {number} counter is the number of files in the array
+     * @returns {Promise<any>}
+     * @constructor
+     */
+    private ProcessAllFiles(coursePromiseCollection: Array<Promise<InsightResponse>>,
+                            counter: number): Promise<any> {
+        let that = this;
 
+        return Promise.all(coursePromiseCollection)
+            .then(function () {
+                InputHandler.LogDatabaseStateToConsole(counter);
+
+                if (!that.containsValidJSON) {
+                    // there were no valid JSON files in the zip
+                    return Promise.reject({
+                        code: 400,
+                        body: {error: 'zip contained no valid JSON files'}
+                    })
+                }
+            })
+
+            .catch(function (err: InsightResponse) {
+                // something went wrong...
+                Log.info('failed to process all files in .zip');
+
+                return Promise.reject(err);
+            })
+    }
+
+    private static LogDatabaseStateToConsole(counter: number) {
+        let db = new Database();
+
+        // complete contents of zip added to database
+        Log.info('=== DATABASE LOADED ===');
+        Log.info('processed ' + (counter - 1) + ' files');
+        Log.info('database contains ' + db.countEntries().toString() + ' entries');
+    }
+
+    async handleRoomZip(zipContents: JSZip) {
+        let roomProiseCollection: Array<Promise<any>> = [];
+        let counter: number = 1;
+
+        let json: JSON = await zipContents.file('index.htm').async("text")
+            .then(function (html: string) {
+                return parse5.parse(html)
+            });
+
+        let buildingList: Array<Building> = HtmlUtil.readBuildingIndex(json); // get list of buildings
+
+        for (let building of buildingList) {
+            HtmlUtil.readRoomIndex(building, json)
+        }
+
+    }
 }
