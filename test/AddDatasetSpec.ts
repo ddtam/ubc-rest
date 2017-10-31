@@ -240,7 +240,7 @@ describe("AddDatasetSpec", function () {
         inFac.addDataset('rooms', content).then(function (obj) {
             Log.test('Return code: ' + obj.code);
             expect(obj.code).to.deep.equal(204);
-            expect(db.countEntries()).to.equal(10000); // TODO: change to real number of rooms
+            expect(db.countEntries()).to.equal(364);
 
         }).then(done, done).catch(function (err) {
             Log.test(err);

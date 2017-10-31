@@ -5,6 +5,7 @@ import {CourseJSON, DatabaseJSON, SectionJSON} from "./IJSON";
 let fs = require('fs');
 import {Section} from "./Section";
 import {isNullOrUndefined} from "util";
+import {Room} from "./Room";
 
 export interface Criteria {
     [index: string]: any;
@@ -18,7 +19,8 @@ export interface Criteria {
 }
 
 export class Database {
-    private sectionCollection: Array<Section>;
+    private sectionCollection: Array<Section> = [];
+    private roomCollection: Array<Room> = [];
     private loadedDB: Array<string>;
     private static instance: Database;
 
@@ -36,7 +38,7 @@ export class Database {
      * Add takes a JSON object for a course and writes all the sections it encodes into the database
      * @param {string} courseJSON
      */
-    add(courseJSON: CourseJSON) {
+    addCourse(courseJSON: CourseJSON) {
         for (let i = 0; i < courseJSON.result.length; i++) {
             let sectionJSON: SectionJSON = courseJSON.result[i];
             let s = new Section(
@@ -54,6 +56,25 @@ export class Database {
             this.sectionCollection.push(s);
 
         }
+    }
+
+    addRoom(room: Room) {
+        this.roomCollection.push(room);
+    }
+
+    /**
+     * Get an array of promises that resolve every room's address into a lat-lon pair
+     * @returns {Promise<any>}
+     */
+    loadAllRoomGeo(): Array<Promise<null>> {
+        let promises: Array<Promise<null>> = [];
+
+        for (let room of this.roomCollection) {
+            promises.push(room.generateGeo())
+        }
+
+        return promises;
+
     }
 
     saveZipToDatabase(id: string, dbList: Array<string>): number {
@@ -381,7 +402,8 @@ export class Database {
 
     // returns number of entries loaded in current database
     countEntries(): number {
-        return this.sectionCollection.length;
+        let totalEntries: number = (this.sectionCollection.length + this.roomCollection.length);
+        return totalEntries
     }
 
     // returns the database that is currently loaded
@@ -398,9 +420,10 @@ export class Database {
         return this.loadedDB.includes(id);
     }
 
-    // may be used to blank the database before loading a query DB or restoring the main DB
+    // may be used to blank the entire database before loading a query DB or restoring the main DB
     reset() {
         this.sectionCollection.length = 0;
+        this.roomCollection.length = 0;
 
     }
 }

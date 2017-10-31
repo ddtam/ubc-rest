@@ -103,7 +103,7 @@ export default class InputHandler {
                         })
 
                     } else {
-                        db.add(parsedJSON);
+                        db.addCourse(parsedJSON);
                         fulfill({
                             code: 204,
                             body: {message: 'successfully added file ' + counter}
@@ -145,6 +145,59 @@ export default class InputHandler {
 
             })
         });
+    }
+
+    async handleRoomZip(zipContents: JSZip) {
+        // TODO: REFACTOR ME, I'M FRANKENSTEIN'S MONSTER D:
+        this.containsValidJSON = false; // RESET the flag
+
+        let counter: number = 1;
+
+        let index: JSON = await zipContents.file('index.htm').async("text")
+            .then(function (html: string) {
+                return parse5.parse(html)
+            });
+
+        // get list of buildings
+        let buildingList: Array<Building> = HtmlUtil.readBuildingIndex(index);
+
+        for (let building of buildingList) {
+            // count number of rooms
+            counter++;
+
+            // extract building short-name code
+            let buildingCode = building.bldg_shortname;
+
+            // get this building's HTML and convert to JSON
+            let buildingJson: JSON =
+                await zipContents.file('campus/discover/buildings-and-classrooms/' +
+                    buildingCode).async("text")
+                    .then(function (html: string) {
+                        return parse5.parse(html)
+                    });
+
+            // process rooms in a given building and add to DB
+            try {
+                HtmlUtil.readRoomsInBuilding(building, buildingJson);
+
+                // only reachable if readRooms returns w/o error
+                this.containsValidJSON = true;
+
+            } catch (err) {
+                // catch error and log; should just be room w/o building...
+                // Log.info(err.message)
+
+            }
+
+        }
+
+        // complete processing of all rooms by populating their geo-location information;
+        //  then save the db to file
+        let db = new Database();
+        let geoPromises = db.loadAllRoomGeo();
+
+        await this.ProcessAllFiles(geoPromises, counter)
+
     }
 
     /**
@@ -189,20 +242,4 @@ export default class InputHandler {
         Log.info('database contains ' + db.countEntries().toString() + ' entries');
     }
 
-    async handleRoomZip(zipContents: JSZip) {
-        let roomProiseCollection: Array<Promise<any>> = [];
-        let counter: number = 1;
-
-        let json: JSON = await zipContents.file('index.htm').async("text")
-            .then(function (html: string) {
-                return parse5.parse(html)
-            });
-
-        let buildingList: Array<Building> = HtmlUtil.readBuildingIndex(json); // get list of buildings
-
-        for (let building of buildingList) {
-            HtmlUtil.readRoomIndex(building, json)
-        }
-
-    }
 }

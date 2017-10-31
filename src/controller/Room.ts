@@ -38,11 +38,13 @@ export class Room {
         this.rooms_type = type;
         this.rooms_furniture = furniture;
         this.rooms_href = href;
+    }
 
+    async generateGeo() {
         // set the Lat-Lon pair for this address
         let that = this;
 
-        GeoUtil.getLatLon(this.rooms_address)
+        await GeoUtil.getLatLon(this.rooms_address)
             .then(function (gr) {
                 that.rooms_lat = gr.lat;
                 that.rooms_lon = gr.lon;
