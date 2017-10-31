@@ -1,11 +1,9 @@
 /**
  * This is the object that all rooms will be represented as, similar structure to Section
  */
-import * as fs from "fs";
 import {GeoResponse} from "./IGeoResponse";
-const http = require('http');
-
-
+import {GeoUtil} from "./GeoUtil";
+let http = require('http');
 
 
 export class Room {
@@ -43,44 +41,20 @@ export class Room {
         this.rooms_furniture = furniture;
         this.rooms_href = href;
 
-        this.rooms_lat = this.getLatLon().lat;
-        this.rooms_lon = this.getLatLon().lon;
+        let gu = new GeoUtil();
+
+        let that = this;
+
+        gu.getLatLon(this.rooms_address)
+            .then(function (gr) {
+                that.rooms_lat = gr.lat;
+                that.rooms_lon = gr.lon;
+            })
 
     }
 
 
     //TODO: fix getLatLon
-
-     getLatLon():GeoResponse {
-        let got = http.get(this.getSiteFromAddress(), (resp:any) => {
-            let data = '';
-
-            // A chunk of data has been recieved.
-            resp.on('data', (chunk:any) => {
-                data += chunk;
-            });
-
-            // The whole response has been received. Print out the result.
-            resp.on('end', () => {
-                console.log(data);
-            });
-
-        }).on("error", (err:any) => {
-            console.log("Error: " + err.message);
-        });
-
-        //console.log(got);
-
-
-
-
-
-        return 0;
-    }
-
-    getSiteFromAddress():string{
-        return "http://skaha.cs.ubc.ca:11316/api/v1/team164/" + encodeURI(this.rooms_address);
-    }
 }
 
 
@@ -98,3 +72,11 @@ export class Room {
     rooms_furniture: string; The room type (e.g., "Classroom-Movable Tables & Chairs").
     rooms_href: string; The link to full details online (e.g., "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/DMP-201").
 */
+
+
+// fetch(this.getSiteFromAddress()).then(function (obj: any) {
+//     console.log(obj.lat);
+//     console.log(obj.lon);
+// }).catch(function (err: Error) {
+//     console.log(err.message);
+// })
