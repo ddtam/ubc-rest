@@ -20,7 +20,7 @@ export class MCnode extends ANode {
         this.m_key = Object.keys(mc)[0];
 
         if (!this.m_key.match(
-                /^(courses_avg|courses_pass|courses_fail|courses_audit)/
+                /^(courses_avg|courses_pass|courses_fail|courses_audit|courses_year|rooms_lat|rooms_lon|rooms_seats)/
             )) {
             throw new Error('SYNTAXERR - some m_key is poorly formed')
         }
@@ -35,7 +35,7 @@ export class MCnode extends ANode {
     evaluate(): Array<Section> {
         let db = new Database();
 
-        let accumulatingResult: Array<Section> = db.query({
+        let accumulatingResult: Array<any> = db.query({
             property: this.m_key,
             value: this.num,
             equality: this.equality

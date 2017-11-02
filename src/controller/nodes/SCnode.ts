@@ -16,7 +16,7 @@ export class SCnode extends ANode {
         this.s_key = Object.keys(sc)[0];
 
         if (!this.s_key.match(
-            /^(courses_id|courses_dept|courses_instructor|courses_title|courses_uuid)/
+            /^(courses_id|courses_dept|courses_instructor|courses_title|courses_uuid|rooms_fullname|rooms_shortname|rooms_number|rooms_name|rooms_address|rooms_type|rooms_furniture|rooms_href)/
             )) {
             throw new Error('SYNTAXERR - some s_key is poorly formed')
         }
@@ -26,7 +26,7 @@ export class SCnode extends ANode {
         // check syntax of to-be regex
         let regexOk: boolean = false; // flag default to false
 
-        if (placeHolder === '') {
+        if (!placeHolder) {
             // accept empty string
             regexOk = true;
 
@@ -56,7 +56,7 @@ export class SCnode extends ANode {
     evaluate(): Array<Section> {
         let db = new Database();
 
-        let accumulatingResult: Array<Section> = db.query({
+        let accumulatingResult: Array<any> = db.query({
             property: this.s_key,
             value: this.inputstring
         });

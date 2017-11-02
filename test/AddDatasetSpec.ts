@@ -231,7 +231,7 @@ describe("AddDatasetSpec", function () {
         }
     });
 
-    it("Should give 203 response when adding a Room database", function (done) {
+    it("Should give 204 response when adding a Room database", function (done) {
         this.timeout(5000);
 
         content = new Buffer(fs.readFileSync('./zips/rooms.zip'))

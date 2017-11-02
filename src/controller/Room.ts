@@ -32,7 +32,7 @@ export class Room {
         this.rooms_fullname = fullName;
         this.rooms_shortname = shortName;
         this.rooms_number = number;
-        this.rooms_name = this.rooms_shortname + " " + this.rooms_number;
+        this.rooms_name = this.rooms_shortname + "_" + this.rooms_number;
         this.rooms_address = address;
         this.rooms_seats= seats;
         this.rooms_type = type;

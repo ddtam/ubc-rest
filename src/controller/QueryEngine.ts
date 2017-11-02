@@ -3,6 +3,8 @@ import {FilterJSON, QueryJSON} from "./IJSON";
 import {FILTERnode} from "./nodes/FILTERnode";
 import {ResultSection} from "./ResultSection";
 import {Database} from "./Database";
+import {Room} from "./Room";
+import {ResultRoom} from "./ResultRoom";
 
 export class QueryEngine {
 
@@ -65,7 +67,7 @@ export class QueryEngine {
 
         let optKeys: Array<string>;
         let colKeys: Array<string>;
-        let fResults: Array<ResultSection> = [];
+        let fResults: Array<ResultSection|ResultRoom> = [];
         let sortOn: string;
         let hasStringOrder: boolean = false; // flag for if OPTIONS has alphabetical ORDER
         let hasNumberOrder: boolean = false; // flag for if OPTIONS has numerical ORDER
@@ -93,23 +95,49 @@ export class QueryEngine {
                 case 'courses_fail':
                 case 'courses_audit':
                 case 'courses_uuid':
+                case 'rooms_fullname':
+                case 'rooms_shortname':
+                case 'rooms_number':
+                case 'rooms_name':
+                case 'rooms_address':
+                case 'rooms_lat':
+                case 'rooms_lon':
+                case 'rooms_seats':
+                case 'rooms_type':
+                case 'rooms_furniture':
+                case 'rooms_href':
                     break;
                 default:
                     throw new Error('key "' + key + '" does not exist')
             }
         }
 
+
+
         // create the results
         for (let section of results) {
-            let rSec = new ResultSection();
+            if (section instanceof Room) {
+                let rRoom = new ResultRoom();
 
-            for (let key of colKeys) {
-                // this is terrible, we know
-                rSec[key] = section[key];
+                for (let key of colKeys) {
+                    // this is terrible, we know
+                    rRoom[key] = section[key];
+                }
+
+                fResults.push(rRoom);
+
+
+            } else if (section instanceof Section) {
+                let rSec = new ResultSection();
+
+                for (let key of colKeys) {
+                    // this is terrible, we know
+                    rSec[key] = section[key];
+                }
+
+                fResults.push(rSec);
 
             }
-            fResults.push(rSec);
-
         }
 
 

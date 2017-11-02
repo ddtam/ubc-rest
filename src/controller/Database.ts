@@ -51,6 +51,7 @@ export class Database {
                 sectionJSON.Fail,
                 sectionJSON.Audit,
                 sectionJSON.id
+                // TODO: get year information out of JSON
             );
 
             this.sectionCollection.push(s);
@@ -170,66 +171,66 @@ export class Database {
      * @param {Array<Criteria>} questions
      * @returns {Array<Section>}
      */
-    queries(questions: Array<Criteria>): Array<Section> {
-        let result: Array<Section>;
-        let originalDB: Array<Section>;
-
-        for (let q of questions) {
-            // check if first query
-            if (questions[0] === q) {
-                // hold onto the current database
-                originalDB = this.sectionCollection.slice(0);
-
-            }
-
-            if (
-                q.property === "courses_dept" ||
-                q.property === "courses_id" ||
-                q.property === "courses_title" ||
-                q.property === "courses_instructor" ||
-                q.property === "courses_uuid"
-            ) {
-                // is a string query
-                result = this.handleStrQuery(q.property, q.value)
-
-            } else if (
-                q.property === "courses_avg" ||
-                q.property === "courses_pass" ||
-                q.property === "courses_fail" ||
-                q.property === "courses_audit"
-            ) {
-                // is a numerical query with some equality comparison
-                result = this.handleNumQuery(q.property, q.value, q.equality)
-
-            } else {
-                // query is poorly formed; throw error
-                throw new Error('query is poorly formed; property "' + q.property + '" does not exist')
-
-            }
-            // set result of this sub-query as the new database for the next query
-            this.reset();
-
-            // if nothing was returned, no sections match the search criteria; break out
-            if (result.length === 0) {
-                break;
-            }
-
-            // write in results as working database for next sub-query
-            for (let s of result) {
-                this.sectionCollection.push(s);
-            }
-
-        }
-        // done all queries; restore original database
-        this.reset();
-        for (let s of originalDB) {
-            this.sectionCollection.push(s);
-        }
-
-        // return query results
-        return result;
-
-    }
+    // queries(questions: Array<Criteria>): Array<Section|Room> {
+    //     let result: Array<Section|Room>;
+    //     let originalDB: Array<Section>;
+    //
+    //     for (let q of questions) {
+    //         // check if first query
+    //         if (questions[0] === q) {
+    //             // hold onto the current database
+    //             originalDB = this.sectionCollection.slice(0);
+    //
+    //         }
+    //
+    //         if (
+    //             q.property === "courses_dept" ||
+    //             q.property === "courses_id" ||
+    //             q.property === "courses_title" ||
+    //             q.property === "courses_instructor" ||
+    //             q.property === "courses_uuid"
+    //         ) {
+    //             // is a string query
+    //             result = this.handleStrQuery(q.property, q.value)
+    //
+    //         } else if (
+    //             q.property === "courses_avg" ||
+    //             q.property === "courses_pass" ||
+    //             q.property === "courses_fail" ||
+    //             q.property === "courses_audit"
+    //         ) {
+    //             // is a numerical query with some equality comparison
+    //             result = this.handleNumQuery(q.property, q.value, q.equality)
+    //
+    //         } else {
+    //             // query is poorly formed; throw error
+    //             throw new Error('query is poorly formed; property "' + q.property + '" does not exist')
+    //
+    //         }
+    //         // set result of this sub-query as the new database for the next query
+    //         this.reset();
+    //
+    //         // if nothing was returned, no sections match the search criteria; break out
+    //         if (result.length === 0) {
+    //             break;
+    //         }
+    //
+    //         // write in results as working database for next sub-query
+    //         for (let s of result) {
+    //             this.sectionCollection.push(s);
+    //         }
+    //
+    //     }
+    //     // done all queries; restore original database
+    //     this.reset();
+    //     for (let s of originalDB) {
+    //         this.sectionCollection.push(s);
+    //     }
+    //
+    //     // return query results
+    //     return result;
+    //
+    // }
 
     /**
      * Query takes a Criteria object and queries the database to return an array of sections that fulfill
@@ -237,15 +238,23 @@ export class Database {
      * @param {Array<Criteria>} question
      * @returns {Array<Section>}
      */
-    query(question: Criteria): Array<Section> {
-        let result: Array<Section>;
+    query(question: Criteria): Array<Section|Room> {
+        let result: Array<Section|Room>;
 
         if (
             question.property === "courses_dept" ||
             question.property === "courses_id" ||
             question.property === "courses_title" ||
             question.property === "courses_instructor" ||
-            question.property === "courses_uuid"
+            question.property === "courses_uuid"||
+            question.property === "rooms_fullname"||
+            question.property === "rooms_shortname"||
+            question.property === "rooms_number"||
+            question.property === "rooms_name"||
+            question.property === "rooms_address"||
+            question.property === "rooms_type"||
+            question.property === "rooms_furniture"||
+            question.property === "rooms_href"
         ) {
             // is a string query
             result = this.handleStrQuery(question.property, question.value)
@@ -254,7 +263,11 @@ export class Database {
             question.property === "courses_avg" ||
             question.property === "courses_pass" ||
             question.property === "courses_fail" ||
-            question.property === "courses_audit"
+            question.property === "courses_audit"||
+            question.property === "courses_year"||
+            question.property === "rooms_lat"||
+            question.property === "rooms_lon"||
+            question.property === "rooms_seats"
         ) {
             // is a numerical query with some equality comparison
             result = this.handleNumQuery(question.property, question.value, question.equality)
@@ -271,23 +284,35 @@ export class Database {
     }
 
     // helper to courses_pass into the correct case of the 5 possible string-match queries
-    private handleStrQuery(property: string, value: any): Array<Section> {
+    private handleStrQuery(property: string, value: any): Array<Section|Room> {
         switch (property) {
             case 'courses_dept': return this.getDept(value);
             case 'courses_id': return this.getID(value);
             case 'courses_title': return this.getTitle(value);
             case 'courses_instructor': return this.getInstructor(value);
             case 'courses_uuid': return this.getUUID(value);
+            case 'rooms_fullname': return this.getFullName(value);
+            case 'rooms_shortname': return this.getShortName(value);
+            case 'rooms_number': return this.getNumber(value);
+            case 'rooms_name': return this.getName(value);
+            case 'rooms_address': return this.getAddress(value);
+            case 'rooms_type': return this.getType(value);
+            case 'rooms_furniture': return this.getFurniture(value);
+            case 'rooms_href': return this.getHref(value);
         }
     }
 
     // helper to courses_pass into the correct case of the 4 possible numerical queries
-    private handleNumQuery(property: string, value: any, equality: string): Array<Section> {
+    private handleNumQuery(property: string, value: any, equality: string): Array<Section|Room> {
         switch (property) {
             case 'courses_avg': return this.getAvg(value, equality);
             case 'courses_pass': return this.getPass(value, equality);
             case 'courses_fail': return this.getFail(value, equality);
             case 'courses_audit': return this.getAudit(value, equality);
+            case 'courses_year': return this.getYear(value, equality);
+            case 'rooms_lat': return this.getLat(value, equality);
+            case 'rooms_lon': return this.getLon(value, equality);
+            case 'rooms_seats': return this.getSeats(value, equality);
         }
     }
 
@@ -327,9 +352,59 @@ export class Database {
         return this.meetEqualityCriteria('courses_audit', audit, equality);
     }
 
-    getUUID(uuid: string) {
+    getUUID(uuid: string): Array<Section> {
         // expects ONE result b/c UUID is unique by definition
         return this.meetRegexCriteria('courses_uuid', uuid)
+    }
+
+    getYear(year: number, equality: string): Array<Section> {
+        return this.meetEqualityCriteria('courses_year', year, equality)
+    }
+
+    //Rooms
+
+    getFullName(fullname: string): Array<Room> {
+        return this.meetRegexCriteria('rooms_fullname', fullname)
+    }
+
+    getShortName(shortname: string): Array<Room> {
+        return this.meetRegexCriteria('rooms_shortname', shortname)
+    }
+
+    getNumber(number: string): Array<Section|Room> {
+        return this.meetRegexCriteria('rooms_number', number)
+    }
+
+    getName(name: string): Array<Section|Room> {
+        return this.meetRegexCriteria('rooms_name', name)
+    }
+
+    getAddress(address: string): Array<Room> {
+        return this.meetRegexCriteria('rooms_address', address)
+    }
+
+    getType(type: string): Array<Room> {
+        return this.meetRegexCriteria('rooms_type', type)
+    }
+
+    getFurniture(furniture: string): Array<Room> {
+        return this.meetRegexCriteria('rooms_furniture', furniture)
+    }
+
+    getHref(href: string): Array<Room> {
+        return this.meetRegexCriteria('rooms_href', href)
+    }
+
+    getLat(lat: number, equality: string): Array<Room> {
+        return this.meetEqualityCriteria('rooms_lat', lat, equality)
+    }
+
+    getLon(lon: number, equality: string): Array<Room> {
+        return this.meetEqualityCriteria('rooms_lon', lon, equality)
+    }
+
+    getSeats(seats: number, equality: string): Array<Room> {
+        return this.meetEqualityCriteria('rooms_seats', seats, equality)
     }
 
     /**
@@ -339,12 +414,35 @@ export class Database {
      * @returns {Section[]} an array of sections with fields matching regex
      */
     private meetRegexCriteria(property: string, regex: string) {
-        let filtered: Array<Section> = [];
+        let filtered: Array<any> = [];
         let re: RegExp = RegExp(regex);
 
-        filtered = this.sectionCollection.filter(function (section) {
-            return re.test(section[property]);
-        });
+        switch(property){
+            case 'courses_dept':
+            case 'courses_id':
+            case 'courses_title':
+            case 'courses_instructor':
+            case 'courses_uuid':
+                // query is for a section
+                filtered = this.sectionCollection.filter(function (section: Section) {
+                    return re.test(section[property]);
+                });
+                break;
+
+            case 'rooms_fullname':
+            case 'rooms_shortname':
+            case 'rooms_number':
+            case 'rooms_name':
+            case 'rooms_address':
+            case 'rooms_type':
+            case 'rooms_furniture':
+            case 'rooms_href':
+                // query is for a room
+                filtered = this.roomCollection.filter(function (room: Room) {
+                    return re.test(room[property]);
+                });
+                break;
+        }
 
         return filtered;
     }
@@ -356,23 +454,56 @@ export class Database {
      * @param {string} equality is one of eq = equals, lt = less than, or gt = greater than
      * @returns {Section[]} an array of sections
      */
-    private meetEqualityCriteria(property: string, threshold: number, equality: string) {
-        if (equality === "GT") {
-            return this.sectionCollection.filter(function (section: Section) {
-                return section[property] > threshold;
-            })
-        } else if (equality === "LT") {
-            return this.sectionCollection.filter(function (section) {
-                return section[property] < threshold;
-            })
-        } else if (equality === "EQ") {
-            return this.sectionCollection.filter(function (section) {
-                return section[property] === threshold;
-            })
-        } else {
-            // equality did not match gt, lt, or eq; throw error
-            throw new Error('equality query expected "GT", "LT", or "EQ"')
+    private meetEqualityCriteria(property: string, threshold: number, equality: string): Array<any> {
+
+        switch (property) {
+            case 'courses_avg':
+            case 'courses_pass':
+            case 'courses_fail':
+            case 'courses_audit':
+            case 'courses_year':
+                // query is for a course
+                if (equality === "GT") {
+                    return this.sectionCollection.filter(function (section: Section) {
+                        return section[property] > threshold;
+                    })
+                } else if (equality === "LT") {
+                    return this.sectionCollection.filter(function (section: Section) {
+                        return section[property] < threshold;
+                    })
+                } else if (equality === "EQ") {
+                    return this.sectionCollection.filter(function (section: Section) {
+                        return section[property] === threshold;
+                    })
+                } else {
+                    // equality did not match gt, lt, or eq; throw error
+                    throw new Error('equality query expected "GT", "LT", or "EQ"')
+                }
+
+            case 'rooms_lat':
+            case 'rooms_lon':
+            case 'rooms_seats':
+                // query is for a room
+                if (equality === "GT") {
+                    return this.roomCollection.filter(function (room: Room) {
+                        return room[property] > threshold;
+                    })
+                } else if (equality === "LT") {
+                    return this.roomCollection.filter(function (room: Room) {
+                        return room[property] < threshold;
+                    })
+                } else if (equality === "EQ") {
+                    return this.roomCollection.filter(function (room: Room) {
+                        return room[property] === threshold;
+                    })
+                } else {
+                    // equality did not match gt, lt, or eq; throw error
+                    throw new Error('equality query expected "GT", "LT", or "EQ"')
+                }
+
         }
+
+
     }
 
     /**
