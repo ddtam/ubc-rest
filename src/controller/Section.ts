@@ -36,6 +36,6 @@ export class Section {
         this.courses_fail = fail;
         this.courses_audit= audit;
         this.courses_uuid = String(uuid);
-        this.courses_year = year;
+        this.courses_year = Number(year);
     }
 }

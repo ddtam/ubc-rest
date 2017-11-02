@@ -95,6 +95,7 @@ export class QueryEngine {
                 case 'courses_fail':
                 case 'courses_audit':
                 case 'courses_uuid':
+                case 'courses_year':
                 case 'rooms_fullname':
                 case 'rooms_shortname':
                 case 'rooms_number':
@@ -168,6 +169,7 @@ export class QueryEngine {
                 case 'courses_pass':
                 case 'courses_fail':
                 case 'courses_audit':
+                case 'courses_year':
                     hasNumberOrder = true;
                     break;
 

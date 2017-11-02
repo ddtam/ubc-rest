@@ -50,8 +50,8 @@ export class Database {
                 sectionJSON.Pass,
                 sectionJSON.Fail,
                 sectionJSON.Audit,
-                sectionJSON.id
-                // TODO: get year information out of JSON
+                sectionJSON.id,
+                sectionJSON.Year
             );
 
             this.sectionCollection.push(s);
@@ -358,7 +358,7 @@ export class Database {
     }
 
     getYear(year: number, equality: string): Array<Section> {
-        return this.meetEqualityCriteria('courses_year', year, equality)
+        return this.meetEqualityCriteria('courses_year', year, equality);
     }
 
     //Rooms

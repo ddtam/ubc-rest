@@ -14,5 +14,5 @@ export class ResultSection{
     courses_fail?: number;
     courses_audit?: number;
     courses_uuid?: number;
-
+    courses_year?: number;
 }

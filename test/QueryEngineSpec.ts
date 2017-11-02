@@ -369,4 +369,24 @@ describe("QueryEngineSpec", function () {
         }).then(done, done)
     });
 
+    it("Should complete a query with year", function (done) {
+        this.timeout(5000);
+        let query: string = fs.readFileSync('test/testQueries/yearQuery');
+        let expectedResult: string = '{"result":[{"courses_dept":"chem","courses_fail":213,"courses_avg":63.33,"courses_year":1900},{"courses_dept":"biol","courses_fail":230,"courses_avg":68.77,"courses_year":1900},{"courses_dept":"chem","courses_fail":266,"courses_avg":67.42,"courses_year":1900},{"courses_dept":"chem","courses_fail":264,"courses_avg":68.72,"courses_year":1900},{"courses_dept":"chem","courses_fail":235,"courses_avg":70.22,"courses_year":1900},{"courses_dept":"chem","courses_fail":250,"courses_avg":69.3,"courses_year":1900},{"courses_dept":"chem","courses_fail":287,"courses_avg":68.2,"courses_year":1900},{"courses_dept":"chem","courses_fail":260,"courses_avg":68.77,"courses_year":1900},{"courses_dept":"chem","courses_fail":251,"courses_avg":69.41,"courses_year":1900},{"courses_dept":"biol","courses_fail":204,"courses_avg":64.73,"courses_year":1900},{"courses_dept":"chem","courses_fail":226,"courses_avg":64.94,"courses_year":1900},{"courses_dept":"math","courses_fail":205,"courses_avg":65.99,"courses_year":1900},{"courses_dept":"math","courses_fail":203,"courses_avg":64.55,"courses_year":1900},{"courses_dept":"econ","courses_fail":221,"courses_avg":67.24,"courses_year":1900},{"courses_dept":"math","courses_fail":222,"courses_avg":65.38,"courses_year":1900},{"courses_dept":"epse","courses_fail":0,"courses_avg":97.69,"courses_year":2013},{"courses_dept":"crwr","courses_fail":0,"courses_avg":98,"courses_year":2013},{"courses_dept":"crwr","courses_fail":0,"courses_avg":98,"courses_year":2013},{"courses_dept":"nurs","courses_fail":0,"courses_avg":98.5,"courses_year":2013}]}';
+
+        inFac.performQuery(JSON.parse(query)).then(function (obj) {
+            Log.test('Return code: ' + obj.code);
+            expect(obj.code).to.equal(200);
+            let body: bodyJSON = obj.body;
+            checkResults(JSON.parse(expectedResult).result, body.result)
+
+        }).then(done, done).catch(function (err) {
+            Log.warn('Return code: ' + err.code + ' FAILED TEST');
+            expect.fail();
+            done()
+        })
+
+
+    });
+
 });
