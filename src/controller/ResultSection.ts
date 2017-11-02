@@ -1,9 +1,8 @@
 /**
  * This is the course section object that all sections will be represented as
  */
-import {Result} from "./nodes/Result";
 
-export class ResultSection extends Result{
+export class ResultSection{
     [index: string]: string | number;
 
     courses_dept?: string;

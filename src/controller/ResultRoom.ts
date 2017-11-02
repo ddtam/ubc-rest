@@ -1,9 +1,8 @@
 /**
  * This is the course section object that all rooms will be represented as
  */
-import {Result} from "./nodes/Result";
 
-export class ResultRoom extends Result{
+export class ResultRoom{
     [index: string]: string | number;
 
     rooms_fullname?: string;
