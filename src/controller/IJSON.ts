@@ -22,6 +22,7 @@ export interface SectionJSON {
     Subject: string; // courses_dept
     Title: string; // courses_title
     Year: number; //courses_year
+    Section: string; //courses_section
 }
 
 export interface bodyJSON {
@@ -56,6 +57,7 @@ export interface SCompJSON {
     courses_instructor?: string;
     courses_title?: string;
     courses_uuid?: string;
+    courses_section?: string;
 }
 
 export interface MCompJSON {
@@ -79,4 +81,5 @@ export interface KeyJSON {
     courses_fail?: number;
     courses_audit?: number;
     courses_year?: number;
+    courses_section?: string;
 }

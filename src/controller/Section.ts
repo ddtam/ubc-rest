@@ -14,6 +14,7 @@ export class Section {
     courses_audit: number;
     courses_uuid: string;
     courses_year: number;
+    courses_section: string;
 
     constructor(
         dept: string,
@@ -25,7 +26,8 @@ export class Section {
         fail: number,
         audit: number,
         uuid: number,
-        year?: number
+        year?: number,
+        section?: string
     ) {
         this.courses_dept = dept;
         this.courses_id = id;
@@ -36,6 +38,11 @@ export class Section {
         this.courses_fail = fail;
         this.courses_audit= audit;
         this.courses_uuid = String(uuid);
-        this.courses_year = Number(year);
+        this.courses_section = section;
+        if (section === "overall"){
+            this.courses_year = 1900;
+        }else{
+            this.courses_year = Number(year);
+        }
     }
 }

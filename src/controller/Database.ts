@@ -51,7 +51,8 @@ export class Database {
                 sectionJSON.Fail,
                 sectionJSON.Audit,
                 sectionJSON.id,
-                sectionJSON.Year
+                sectionJSON.Year,
+                sectionJSON.Section
             );
 
             this.sectionCollection.push(s);
@@ -247,6 +248,7 @@ export class Database {
             question.property === "courses_title" ||
             question.property === "courses_instructor" ||
             question.property === "courses_uuid"||
+            question.property === "courses_section"||
             question.property === "rooms_fullname"||
             question.property === "rooms_shortname"||
             question.property === "rooms_number"||
@@ -291,6 +293,7 @@ export class Database {
             case 'courses_title': return this.getTitle(value);
             case 'courses_instructor': return this.getInstructor(value);
             case 'courses_uuid': return this.getUUID(value);
+            case 'courses_section': return this.getSection(value);
             case 'rooms_fullname': return this.getFullName(value);
             case 'rooms_shortname': return this.getShortName(value);
             case 'rooms_number': return this.getNumber(value);
@@ -361,6 +364,10 @@ export class Database {
         return this.meetEqualityCriteria('courses_year', year, equality);
     }
 
+    getSection(section: string): Array<Section> {
+        return this.meetRegexCriteria('courses_section', section)
+    }
+
     //Rooms
 
     getFullName(fullname: string): Array<Room> {
@@ -423,6 +430,7 @@ export class Database {
             case 'courses_title':
             case 'courses_instructor':
             case 'courses_uuid':
+            case 'courses_section':
                 // query is for a section
                 filtered = this.sectionCollection.filter(function (section: Section) {
                     return re.test(section[property]);

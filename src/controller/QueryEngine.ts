@@ -96,6 +96,7 @@ export class QueryEngine {
                 case 'courses_audit':
                 case 'courses_uuid':
                 case 'courses_year':
+                case 'courses_section':
                 case 'rooms_fullname':
                 case 'rooms_shortname':
                 case 'rooms_number':
@@ -162,6 +163,7 @@ export class QueryEngine {
                 case 'courses_title':
                 case 'courses_instructor':
                 case 'courses_uuid':
+                case 'courses_section':
                     hasStringOrder = true;
                     break;
 

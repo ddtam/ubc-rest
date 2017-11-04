@@ -15,4 +15,5 @@ export class ResultSection{
     courses_audit?: number;
     courses_uuid?: number;
     courses_year?: number;
+    courses_section?: string;
 }
