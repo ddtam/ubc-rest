@@ -1,0 +1,82 @@
+{
+  "WHERE": {
+    "OR": [
+      {
+        "IS": {
+          "rooms_fullname": "*B*"
+        }
+      },
+      {
+        "NOT": {
+          "OR": [
+            {
+              "IS": {
+                "rooms_shortname": "BUCH"
+              }
+            },
+            {
+              "IS": {
+                "rooms_type": "Tiered Large Group"
+              }
+            },
+            {
+              "IS": {
+                "rooms_furniture": "*Fixed*"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "NOT":{
+          "OR": [
+            {
+              "LT": {
+                "rooms_seats": 25
+              }
+            },
+            {
+              "IS": {
+                "rooms_furniture": "*Mov*"
+              }
+            },
+            {
+              "GT": {
+                "rooms_lat": 49.26125
+              }
+            },
+            {
+              "IS": {
+                "rooms_number": "A*"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "NOT": {
+          "GT": {
+            "rooms_lon": -123.24807
+          }
+        }
+      },
+      {
+        "NOT": {
+          "IS": {
+            "rooms_href": ""
+          }
+        }
+      }
+    ]
+  },
+  "OPTIONS": {
+    "COLUMNS": [
+      "rooms_shortname",
+      "rooms_number",
+      "rooms_seats",
+      "rooms_type",
+      "rooms_furniture",
+      "rooms_lat"
+    ]
+  }
+}
