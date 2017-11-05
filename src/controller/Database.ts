@@ -539,16 +539,27 @@ export class Database {
         return finalBracket;
     }
 
-    getOpposite(a: Array<Section>): Array<Section> {
+    getOpposite(a: Array<Section|Room>): Array<Section|Room> {
         let inputContents = new Set(a);
 
-        let diff = Array.from(
-            new Set(
-                this.sectionCollection.filter(x => !inputContents.has(x))
-            )
-        );
+        if (a[0] instanceof Room) {
+            let diff = Array.from(
+                new Set(
+                    this.roomCollection.filter(x => !inputContents.has(x))
+                )
+            );
 
-        return diff;
+            return diff;
+
+        } else {
+            let diff = Array.from(
+                new Set(
+                    this.sectionCollection.filter(x => !inputContents.has(x))
+                )
+            );
+
+            return diff;
+        }
     }
 
     // returns number of entries loaded in current database

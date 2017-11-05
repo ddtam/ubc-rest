@@ -3,6 +3,7 @@ import {ANode} from "./ANode";
 import {FilterJSON} from "../IJSON";
 import {Section} from "../Section";
 import {Database} from "../Database";
+import {Room} from "../Room";
 
 export class NEGnode extends ANode {
 
@@ -15,7 +16,7 @@ export class NEGnode extends ANode {
         this.filter = new FILTERnode(f)
     }
 
-    evaluate(): Array<Section> {
+    evaluate(): Array<Section|Room> {
         let result = this.filter.evaluate();
         let db = new Database();
 

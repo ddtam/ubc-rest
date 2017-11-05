@@ -1,9 +1,9 @@
 {
   "WHERE": {
-    "OR": [
+    "AND": [
       {
         "IS": {
-          "rooms_fullname": "*B*"
+          "rooms_fullname": "*b*"
         }
       },
       {
@@ -16,7 +16,7 @@
             },
             {
               "IS": {
-                "rooms_type": "Tiered Large Group"
+                "rooms_type": "*Large*"
               }
             },
             {
@@ -32,22 +32,22 @@
           "OR": [
             {
               "LT": {
-                "rooms_seats": 25
+                "rooms_seats": 50
               }
             },
             {
               "IS": {
-                "rooms_furniture": "*Mov*"
+                "rooms_furniture": "*Tablet*"
               }
             },
             {
               "GT": {
-                "rooms_lat": 49.26125
+                "rooms_lat": 49.2683
               }
             },
             {
               "IS": {
-                "rooms_number": "A*"
+                "rooms_number": "*5*"
               }
             }
           ]
@@ -55,8 +55,8 @@
       },
       {
         "NOT": {
-          "GT": {
-            "rooms_lon": -123.24807
+          "LT": {
+            "rooms_lon": -124.24807
           }
         }
       },

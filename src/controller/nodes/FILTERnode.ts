@@ -6,6 +6,7 @@ import {FilterJSON} from "../IJSON";
 import {error} from "util";
 import {ANode} from "./ANode";
 import {Section} from "../Section";
+import {Room} from "../Room";
 
 export class FILTERnode extends ANode {
     criteria: LOGICCnode | MCnode | SCnode | NEGnode;
@@ -44,8 +45,8 @@ export class FILTERnode extends ANode {
         }
     }
 
-    evaluate(): Array<Section> {
-        let result: Array<Section> = this.criteria.evaluate();
+    evaluate(): Array<Section|Room> {
+        let result: Array<Section|Room> = this.criteria.evaluate();
 
         return result
 

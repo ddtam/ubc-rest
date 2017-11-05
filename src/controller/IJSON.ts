@@ -2,6 +2,7 @@
  * Interfaces for all JSON objects used by input zip and database files
  */
 import {Section} from "./Section";
+import {Room} from "./Room";
 
 export interface CourseJSON {
     result: Array<SectionJSON>
@@ -26,7 +27,7 @@ export interface SectionJSON {
 }
 
 export interface bodyJSON {
-    result?: Array<Section>;
+    result?: Array<Section|Room>;
     error?: string;
 }
 

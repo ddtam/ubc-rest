@@ -22,10 +22,10 @@ export class QueryEngine {
         }
 
         // get the results that match the query based on FILTER
-        let results: Array<Section> = this.getMatch(query.WHERE);
+        let results: Array<Section|Room> = this.getMatch(query.WHERE);
 
         // format the results based on OPTIONS
-        let fResults: Array<ResultSection> = this.formatMatch(query.OPTIONS, results);
+        let fResults: Array<ResultSection|ResultRoom> = this.formatMatch(query.OPTIONS, results);
 
         // return the results in the form of an InsightResponse
         return QueryEngine.encapsulate(fResults);
@@ -38,7 +38,7 @@ export class QueryEngine {
      *  sections should be selected
      * @returns {Array<Section>} as an array of Section objects which pass all filter specifications
      */
-    private getMatch(criteria: FilterJSON): Array<Section> {
+    private getMatch(criteria: FilterJSON): Array<Section|Room> {
         // build the filters AST rooted on a FILTERnode
 
         let db = new Database();
@@ -47,7 +47,7 @@ export class QueryEngine {
         }
 
         let root: FILTERnode;
-        let result: Array<Section>;
+        let result: Array<Section|Room>;
 
         root = new FILTERnode(criteria);
         result = root.evaluate();
@@ -62,7 +62,7 @@ export class QueryEngine {
      * @param {Array<Section>} results is output of getMatch helper
      * @returns {Array<ResultSection>} as an array of sections conforming to OPTIONS specifications
      */
-    private formatMatch(OPTIONS: any, results: Array<Section>): Array<ResultSection> {
+    private formatMatch(OPTIONS: any, results: Array<Section|Room>): Array<ResultSection|ResultRoom> {
         // TODO this big ass method needs refactoring, pronto
 
         let optKeys: Array<string>;
@@ -117,24 +117,24 @@ export class QueryEngine {
 
 
         // create the results
-        for (let section of results) {
-            if (section instanceof Room) {
+        for (let x of results) {
+            if (x instanceof Room) {
                 let rRoom = new ResultRoom();
 
                 for (let key of colKeys) {
                     // this is terrible, we know
-                    rRoom[key] = section[key];
+                    rRoom[key] = x[key];
                 }
 
                 fResults.push(rRoom);
 
 
-            } else if (section instanceof Section) {
+            } else if (x instanceof Section) {
                 let rSec = new ResultSection();
 
                 for (let key of colKeys) {
                     // this is terrible, we know
-                    rSec[key] = section[key];
+                    rSec[key] = x[key];
                 }
 
                 fResults.push(rSec);
@@ -211,7 +211,7 @@ export class QueryEngine {
      * @param {Array<ResultSection>} fResults are formatted results from formatMatch helper
      * @returns {string} as stringified JSON
      */
-    private static encapsulate(fResults: Array<ResultSection> ): JSON {
+    private static encapsulate(fResults: Array<ResultSection|ResultRoom> ): JSON {
         // turn fResults into the JSON return format
         let asJSON = "{\"result\":";
         let withCollection = asJSON.concat(JSON.stringify(fResults));

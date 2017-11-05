@@ -3,6 +3,7 @@ import {SCompJSON} from "../IJSON";
 import {Section} from "../Section";
 import {isString} from "util";
 import {Database} from "../Database";
+import {Room} from "../Room";
 
 export class SCnode extends ANode {
 
@@ -53,7 +54,7 @@ export class SCnode extends ANode {
     }
 
 
-    evaluate(): Array<Section> {
+    evaluate(): Array<Section|Room> {
         let db = new Database();
 
         let accumulatingResult: Array<any> = db.query({

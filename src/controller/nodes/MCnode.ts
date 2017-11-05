@@ -3,6 +3,7 @@ import {MCompJSON} from "../IJSON";
 import {Section} from "../Section";
 import {error, isNumber} from "util";
 import {Database} from "../Database";
+import {Room} from "../Room";
 
 export class MCnode extends ANode {
 
@@ -32,7 +33,7 @@ export class MCnode extends ANode {
         }
     }
 
-    evaluate(): Array<Section> {
+    evaluate(): Array<Section|Room> {
         let db = new Database();
 
         let accumulatingResult: Array<any> = db.query({
