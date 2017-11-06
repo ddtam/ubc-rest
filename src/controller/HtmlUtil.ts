@@ -95,7 +95,7 @@ export class HtmlUtil {
                         number = node1.childNodes[1].childNodes[0].value.trim()
 
                     } else if (node2.value === 'views-field views-field-field-room-capacity') { // found # of seats
-                        seats = node1.childNodes[0].value.trim()
+                        seats = parseInt(node1.childNodes[0].value.trim())
 
                     } else if (node2.value === 'views-field views-field-field-room-type') { // found room type
                         type = node1.childNodes[0].value.trim()
