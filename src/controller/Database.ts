@@ -551,7 +551,7 @@ export class Database {
 
             return diff;
 
-        } else {
+        } else if (a[0] instanceof Section){
             let diff = Array.from(
                 new Set(
                     this.sectionCollection.filter(x => !inputContents.has(x))
@@ -559,6 +559,12 @@ export class Database {
             );
 
             return diff;
+        } else{
+            if (this.sectionCollection.length > 0) {
+                return this.sectionCollection;
+            }else{
+                return this.roomCollection;
+            }
         }
     }
 
