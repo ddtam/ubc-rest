@@ -369,4 +369,62 @@ describe("QueryEngineSpec", function () {
         }).then(done, done)
     });
 
+    it("Should throw 424 with a query for rooms using section dataset", function (done) {
+        let db = new Database();
+
+        let query: string = fs.readFileSync('test/testQueries/simpleQueryRoom');
+
+        inFac.performQuery(JSON.parse(query)).then(function (obj) {
+            Log.test('Return code: ' + obj.code);
+            expect.fail();
+            done()
+
+
+        }).catch(function (err) {
+            Log.warn('Return code: ' + err.code + ' FAILED TEST');
+            expect(err.code).to.equal(424);
+
+        }).then(done, done)
+    });
+
+    it("Should complete a query with year", function (done) {
+        this.timeout(5000);
+        let query: string = fs.readFileSync('test/testQueries/yearQuery');
+        let expectedResult: string = '{"result":[{"courses_dept":"chem","courses_fail":213,"courses_avg":63.33,"courses_year":1900},{"courses_dept":"biol","courses_fail":230,"courses_avg":68.77,"courses_year":1900},{"courses_dept":"chem","courses_fail":266,"courses_avg":67.42,"courses_year":1900},{"courses_dept":"chem","courses_fail":264,"courses_avg":68.72,"courses_year":1900},{"courses_dept":"chem","courses_fail":235,"courses_avg":70.22,"courses_year":1900},{"courses_dept":"chem","courses_fail":250,"courses_avg":69.3,"courses_year":1900},{"courses_dept":"chem","courses_fail":287,"courses_avg":68.2,"courses_year":1900},{"courses_dept":"chem","courses_fail":260,"courses_avg":68.77,"courses_year":1900},{"courses_dept":"chem","courses_fail":251,"courses_avg":69.41,"courses_year":1900},{"courses_dept":"biol","courses_fail":204,"courses_avg":64.73,"courses_year":1900},{"courses_dept":"chem","courses_fail":226,"courses_avg":64.94,"courses_year":1900},{"courses_dept":"math","courses_fail":205,"courses_avg":65.99,"courses_year":1900},{"courses_dept":"math","courses_fail":203,"courses_avg":64.55,"courses_year":1900},{"courses_dept":"econ","courses_fail":221,"courses_avg":67.24,"courses_year":1900},{"courses_dept":"math","courses_fail":222,"courses_avg":65.38,"courses_year":1900},{"courses_dept":"epse","courses_fail":0,"courses_avg":97.69,"courses_year":2013},{"courses_dept":"crwr","courses_fail":0,"courses_avg":98,"courses_year":2013},{"courses_dept":"crwr","courses_fail":0,"courses_avg":98,"courses_year":2013},{"courses_dept":"nurs","courses_fail":0,"courses_avg":98.5,"courses_year":2013}]}';
+
+        inFac.performQuery(JSON.parse(query)).then(function (obj) {
+            Log.test('Return code: ' + obj.code);
+            expect(obj.code).to.equal(200);
+            let body: bodyJSON = obj.body;
+            checkResults(JSON.parse(expectedResult).result, body.result)
+
+        }).then(done, done).catch(function (err) {
+            Log.warn('Return code: ' + err.code + ' FAILED TEST');
+            expect.fail();
+            done()
+        })
+
+
+    });
+
+    it("Should complete a query with audit", function (done) {
+        this.timeout(10000);
+        let query: string = fs.readFileSync('test/testQueries/smallQueryImproveCoverage');
+        let expectedResult: string = '{"result":[{"courses_audit":0,"courses_id":"330","courses_avg":4},{"courses_audit":0,"courses_id":"475","courses_avg":1},{"courses_audit":0,"courses_id":"330","courses_avg":4},{"courses_audit":0,"courses_id":"100","courses_avg":0},{"courses_audit":0,"courses_id":"100","courses_avg":0},{"courses_audit":0,"courses_id":"202","courses_avg":0},{"courses_audit":0,"courses_id":"362","courses_avg":4.5},{"courses_audit":14,"courses_id":"340","courses_avg":80.29},{"courses_audit":14,"courses_id":"507","courses_avg":82.56},{"courses_audit":15,"courses_id":"340","courses_avg":76.21},{"courses_audit":15,"courses_id":"501","courses_avg":76},{"courses_audit":15,"courses_id":"507","courses_avg":88.2},{"courses_audit":17,"courses_id":"509","courses_avg":88},{"courses_audit":18,"courses_id":"540","courses_avg":90.53},{"courses_audit":18,"courses_id":"505","courses_avg":87.14},{"courses_audit":19,"courses_id":"503","courses_avg":77.65},{"courses_audit":19,"courses_id":"505","courses_avg":87},{"courses_audit":19,"courses_id":"530","courses_avg":85.56},{"courses_audit":19,"courses_id":"530","courses_avg":85.56},{"courses_audit":19,"courses_id":"503","courses_avg":86},{"courses_audit":20,"courses_id":"507","courses_avg":87.26},{"courses_audit":21,"courses_id":"540","courses_avg":90.53},{"courses_audit":21,"courses_id":"501","courses_avg":86.89},{"courses_audit":23,"courses_id":"501","courses_avg":88.79}]}';
+
+        inFac.performQuery(JSON.parse(query)).then(function (obj) {
+            Log.test('Return code: ' + obj.code);
+            expect(obj.code).to.equal(200);
+            let body: bodyJSON = obj.body;
+            checkResults(JSON.parse(expectedResult).result, body.result)
+
+        }).then(done, done).catch(function (err) {
+            Log.warn('Return code: ' + err.code + ' FAILED TEST');
+            expect.fail();
+            done()
+        })
+
+
+    });
+
 });

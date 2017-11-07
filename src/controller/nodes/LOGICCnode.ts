@@ -3,6 +3,7 @@ import {ANode} from "./ANode";
 import {FilterJSON} from "../IJSON";
 import {Section} from "../Section";
 import ArrayUtil from "../../ArrayUtil";
+import {Room} from "../Room";
 
 export class LOGICCnode extends ANode {
 
@@ -29,10 +30,10 @@ export class LOGICCnode extends ANode {
         }
     }
 
-    evaluate(): Array<Section> {
+    evaluate(): Array<Section|Room> {
 
-        let results: Array<Array<Section>> = [];
-        let combinedResult: Array<Section> = [];
+        let results: Array<Array<Section|Room>> = [];
+        let combinedResult: Array<Section|Room> = [];
 
         // evaluate all the filters
         for (let f of this.filters) {

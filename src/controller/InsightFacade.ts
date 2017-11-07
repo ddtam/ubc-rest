@@ -41,8 +41,22 @@ export default class InsightFacade implements IInsightFacade {
             // load serialized zip into JSZip object
             zip.loadAsync(content, {base64: true})
                 .then(function (zipContents: JSZip) {
-                    // process the zip
-                    return InputHandler.prototype.handleZip(zipContents)
+                    // process the zip based on id
+                    switch (id) {
+                        case "courses":
+                            return InputHandler.prototype.handleCourseZip(zipContents);
+
+                        case "rooms":
+                            return InputHandler.prototype.handleRoomZip(zipContents);
+
+                        default:
+                            // id is not one of courses or room;
+                            reject({
+                                code: 400,
+                                body: {error: 'input id is neither "courses" nor "rooms"'}
+                            })
+
+                    }
 
                 })
 

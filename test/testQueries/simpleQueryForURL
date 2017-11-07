@@ -1,0 +1,14 @@
+{
+  "WHERE":{
+     "IS":{
+        "rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/SOWK-*"
+     }
+  },
+  "OPTIONS":{
+     "COLUMNS":[
+        "rooms_href",
+        "rooms_name"
+     ],
+     "ORDER":"rooms_href"
+  }
+}
