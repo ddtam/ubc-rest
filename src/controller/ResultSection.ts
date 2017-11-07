@@ -1,7 +1,8 @@
 /**
  * This is the course section object that all sections will be represented as
  */
-export class ResultSection {
+
+export class ResultSection{
     [index: string]: string | number;
 
     courses_dept?: string;
@@ -13,5 +14,6 @@ export class ResultSection {
     courses_fail?: number;
     courses_audit?: number;
     courses_uuid?: number;
-
+    courses_year?: number;
+    courses_section?: string;
 }

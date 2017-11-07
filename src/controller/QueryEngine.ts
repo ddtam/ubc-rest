@@ -1,10 +1,10 @@
-import {InsightResponse} from "./IInsightFacade";
 import {Section} from "./Section";
-import {FilterJSON, OptionsJSON, QueryJSON} from "./IJSON";
+import {FilterJSON, QueryJSON} from "./IJSON";
 import {FILTERnode} from "./nodes/FILTERnode";
 import {ResultSection} from "./ResultSection";
-import {OPTIONnode} from "./nodes/OPTIONnode";
 import {Database} from "./Database";
+import {Room} from "./Room";
+import {ResultRoom} from "./ResultRoom";
 
 export class QueryEngine {
 
@@ -22,10 +22,10 @@ export class QueryEngine {
         }
 
         // get the results that match the query based on FILTER
-        let results: Array<Section> = this.getMatch(query.WHERE);
+        let results: Array<Section|Room> = this.getMatch(query.WHERE);
 
         // format the results based on OPTIONS
-        let fResults: Array<ResultSection> = this.formatMatch(query.OPTIONS, results);
+        let fResults: Array<ResultSection|ResultRoom> = this.formatMatch(query.OPTIONS, results);
 
         // return the results in the form of an InsightResponse
         return QueryEngine.encapsulate(fResults);
@@ -38,7 +38,7 @@ export class QueryEngine {
      *  sections should be selected
      * @returns {Array<Section>} as an array of Section objects which pass all filter specifications
      */
-    private getMatch(criteria: FilterJSON): Array<Section> {
+    private getMatch(criteria: FilterJSON): Array<Section|Room> {
         // build the filters AST rooted on a FILTERnode
 
         let db = new Database();
@@ -47,10 +47,13 @@ export class QueryEngine {
         }
 
         let root: FILTERnode;
-        let result: Array<Section>;
+        let result: Array<Section|Room>;
 
         root = new FILTERnode(criteria);
         result = root.evaluate();
+
+        // reset the query-type
+        db.resetQuery();
 
         return result;
 
@@ -62,12 +65,12 @@ export class QueryEngine {
      * @param {Array<Section>} results is output of getMatch helper
      * @returns {Array<ResultSection>} as an array of sections conforming to OPTIONS specifications
      */
-    private formatMatch(OPTIONS: any, results: Array<Section>): Array<ResultSection> {
+    private formatMatch(OPTIONS: any, results: Array<Section|Room>): Array<ResultSection|ResultRoom> {
         // TODO this big ass method needs refactoring, pronto
 
         let optKeys: Array<string>;
         let colKeys: Array<string>;
-        let fResults: Array<ResultSection> = [];
+        let fResults: Array<ResultSection|ResultRoom> = [];
         let sortOn: string;
         let hasStringOrder: boolean = false; // flag for if OPTIONS has alphabetical ORDER
         let hasNumberOrder: boolean = false; // flag for if OPTIONS has numerical ORDER
@@ -95,23 +98,51 @@ export class QueryEngine {
                 case 'courses_fail':
                 case 'courses_audit':
                 case 'courses_uuid':
+                case 'courses_year':
+                case 'courses_section':
+                case 'rooms_fullname':
+                case 'rooms_shortname':
+                case 'rooms_number':
+                case 'rooms_name':
+                case 'rooms_address':
+                case 'rooms_lat':
+                case 'rooms_lon':
+                case 'rooms_seats':
+                case 'rooms_type':
+                case 'rooms_furniture':
+                case 'rooms_href':
                     break;
                 default:
                     throw new Error('key "' + key + '" does not exist')
             }
         }
 
-        // create the results
-        for (let section of results) {
-            let rSec = new ResultSection();
 
-            for (let key of colKeys) {
-                // this is terrible, we know
-                rSec[key] = section[key];
+
+        // create the results
+        for (let x of results) {
+            if (x instanceof Room) {
+                let rRoom = new ResultRoom();
+
+                for (let key of colKeys) {
+                    // this is terrible, we know
+                    rRoom[key] = x[key];
+                }
+
+                fResults.push(rRoom);
+
+
+            } else if (x instanceof Section) {
+                let rSec = new ResultSection();
+
+                for (let key of colKeys) {
+                    // this is terrible, we know
+                    rSec[key] = x[key];
+                }
+
+                fResults.push(rSec);
 
             }
-            fResults.push(rSec);
-
         }
 
 
@@ -135,6 +166,7 @@ export class QueryEngine {
                 case 'courses_title':
                 case 'courses_instructor':
                 case 'courses_uuid':
+                case 'courses_section':
                     hasStringOrder = true;
                     break;
 
@@ -142,6 +174,7 @@ export class QueryEngine {
                 case 'courses_pass':
                 case 'courses_fail':
                 case 'courses_audit':
+                case 'courses_year':
                     hasNumberOrder = true;
                     break;
 
@@ -181,7 +214,7 @@ export class QueryEngine {
      * @param {Array<ResultSection>} fResults are formatted results from formatMatch helper
      * @returns {string} as stringified JSON
      */
-    private static encapsulate(fResults: Array<ResultSection> ): JSON {
+    private static encapsulate(fResults: Array<ResultSection|ResultRoom> ): JSON {
         // turn fResults into the JSON return format
         let asJSON = "{\"result\":";
         let withCollection = asJSON.concat(JSON.stringify(fResults));

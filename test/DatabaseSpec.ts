@@ -1,6 +1,7 @@
 /**
  * Created by sprecious on 2017-10-04.
  */
+import {Room} from "../src/controller/Room";
 
 let fs = require('fs');
 import InsightFacade from "../src/controller/InsightFacade";
@@ -41,7 +42,7 @@ describe("DatabaseSpec", function () {
     });
 
     it("should write 9 fields correctly", function (done) {
-        content = new Buffer(fs.readFileSync('courses_3test.zip'))
+        content = new Buffer(fs.readFileSync('./zips/courses_3test.zip'))
             .toString('base64');
 
         inFac.addDataset('courses', content).then(function (obj) {
@@ -74,7 +75,7 @@ describe("DatabaseSpec", function () {
     });
 
     it("Should return a singleton database", function (done) {
-        content = new Buffer(fs.readFileSync('courses_3test.zip'))
+        content = new Buffer(fs.readFileSync('./zips/courses_3test.zip'))
             .toString('base64');
 
         inFac.addDataset('courses', content).then(function (obj) {
@@ -95,7 +96,7 @@ describe("DatabaseSpec", function () {
         let content: string;
         let db = new Database();
 
-        content = new Buffer(fs.readFileSync('courses_3test.zip'))
+        content = new Buffer(fs.readFileSync('./zips/courses_3test.zip'))
             .toString('base64');
 
         let fileID = 'courses';
@@ -106,7 +107,7 @@ describe("DatabaseSpec", function () {
             let diskContent = new Buffer(fs.readFileSync('./dbFiles/' + fileID))
                 .toString('utf8');
 
-            expect(diskContent).to.deep.equal(db.pukeMemory());
+            expect(diskContent).to.deep.equal(db.pukeMemory(fileID));
 
         }).then(done, done).catch(function (err) {
             Log.test(err);
@@ -116,7 +117,7 @@ describe("DatabaseSpec", function () {
     });
 
     it("Should query all courses in department correctly", function (done) {
-        content = new Buffer(fs.readFileSync('courses_3test.zip'))
+        content = new Buffer(fs.readFileSync('./zips/courses_3test.zip'))
             .toString('base64');
 
         inFac.addDataset('courses', content).then(function () {
@@ -140,7 +141,7 @@ describe("DatabaseSpec", function () {
     });
 
     it("Should query a professor correctly", function (done) {
-        content = new Buffer(fs.readFileSync('courses_3test.zip'))
+        content = new Buffer(fs.readFileSync('./zips/courses_3test.zip'))
             .toString('base64');
 
         inFac.addDataset('courses', content).then(function () {
@@ -164,7 +165,7 @@ describe("DatabaseSpec", function () {
     });
 
     it("Should query a course number correctly", function (done) {
-        content = new Buffer(fs.readFileSync('courses_3test.zip'))
+        content = new Buffer(fs.readFileSync('./zips/courses_3test.zip'))
             .toString('base64');
 
         inFac.addDataset('courses', content).then(function () {
@@ -188,7 +189,7 @@ describe("DatabaseSpec", function () {
     });
 
     it("Should query a course name correctly", function (done) {
-        content = new Buffer(fs.readFileSync('courses_3test.zip'))
+        content = new Buffer(fs.readFileSync('./zips/courses_3test.zip'))
             .toString('base64');
 
         inFac.addDataset('courses', content).then(function () {
@@ -212,7 +213,7 @@ describe("DatabaseSpec", function () {
     });
 
     it("Should query averages correctly", function (done) {
-        content = new Buffer(fs.readFileSync('courses_3test.zip'))
+        content = new Buffer(fs.readFileSync('./zips/courses_3test.zip'))
             .toString('base64');
 
         inFac.addDataset('courses', content).then(function () {
@@ -237,7 +238,7 @@ describe("DatabaseSpec", function () {
     });
 
     it("Should query number of passing students correctly", function (done) {
-        content = new Buffer(fs.readFileSync('courses_3test.zip'))
+        content = new Buffer(fs.readFileSync('./zips/courses_3test.zip'))
             .toString('base64');
 
         inFac.addDataset('courses', content).then(function () {
@@ -261,7 +262,7 @@ describe("DatabaseSpec", function () {
     });
 
     it("Should query number of failing students correctly", function (done) {
-        content = new Buffer(fs.readFileSync('courses_3test.zip'))
+        content = new Buffer(fs.readFileSync('./zips/courses_3test.zip'))
             .toString('base64');
 
         inFac.addDataset('courses', content).then(function () {
@@ -285,7 +286,7 @@ describe("DatabaseSpec", function () {
     });
 
     it("Should query number of auditing students correctly", function (done) {
-        content = new Buffer(fs.readFileSync('courses_3test.zip'))
+        content = new Buffer(fs.readFileSync('./zips/courses_3test.zip'))
             .toString('base64');
 
         inFac.addDataset('courses', content).then(function () {
@@ -309,7 +310,7 @@ describe("DatabaseSpec", function () {
     });
 
     it("Should throw error with bad inequality parameter", function (done) {
-        content = new Buffer(fs.readFileSync('courses_3test.zip'))
+        content = new Buffer(fs.readFileSync('./zips/courses_3test.zip'))
             .toString('base64');
 
         inFac.addDataset('courses', content).then(function () {
@@ -328,168 +329,168 @@ describe("DatabaseSpec", function () {
         }).then(done, done);
     });
 
-    it("Should be able to handle complex query from entire dataset", function (done) {
-        this.timeout(5000);
+    // it("Should be able to handle complex query from entire dataset", function (done) {
+    //     this.timeout(5000);
+    //
+    //     content = new Buffer(fs.readFileSync('./zips/courses.zip'))
+    //         .toString('base64');
+    //
+    //     inFac.addDataset('courses', content).then(function () {
+    //         // Log.info('return code: ' + obj.code);
+    //
+    //         // build the query
+    //         let qs: Array<Criteria> = [{
+    //             property: 'courses_dept',
+    //             value: 'cpsc',
+    //         }, {
+    //             property: 'courses_avg',
+    //             value: 75,
+    //             equality: 'LT'
+    //         }];
+    //
+    //         let results: Array<Section> = db.queries(qs);
+    //
+    //         for (let s of results) {
+    //             expect(s.courses_dept === 'cpsc');
+    //             expect(s.courses_avg < 75);
+    //         }
+    //
+    //         expect(results.length).to.equal(468);
+    //
+    //         expect(db.countEntries()).to.equal(64612);
+    //
+    //     }).catch(function (err) {
+    //         Log.test(err);
+    //         expect.fail();
+    //         done();
+    //
+    //     }).then(done, done);
+    // });
 
-        content = new Buffer(fs.readFileSync('courses.zip'))
-            .toString('base64');
+    // it("Should be able to handle a query for which no results exist", function (done) {
+    //     this.timeout(5000);
+    //
+    //     content = new Buffer(fs.readFileSync('./zips/courses.zip'))
+    //         .toString('base64');
+    //
+    //     inFac.addDataset('courses', content).then(function () {
+    //         // Log.info('return code: ' + obj.code);
+    //
+    //         // build the query
+    //         let qs: Array<Criteria> = [{
+    //             property: 'courses_avg',
+    //             value: 0,
+    //             equality: 'LT'
+    //         }];
+    //
+    //         let results: Array<Section> = db.queries(qs);
+    //
+    //         expect(results.length).to.equal(0);
+    //
+    //     }).catch(function (err) {
+    //         Log.test(err);
+    //         expect.fail();
+    //         done();
+    //
+    //     }).then(done, done);
+    // });
 
-        inFac.addDataset('courses', content).then(function () {
-            // Log.info('return code: ' + obj.code);
+    // it("Should be err when given querying for a property that does not exist", function (done) {
+    //     this.timeout(5000);
+    //
+    //     content = new Buffer(fs.readFileSync('./zips/courses.zip'))
+    //         .toString('base64');
+    //
+    //     inFac.addDataset('courses', content).then(function () {
+    //         // Log.info('return code: ' + obj.code);
+    //
+    //         // build the query
+    //         let qs: Array<Criteria> = [{
+    //             property: 'DNE',
+    //             value: 'cpsc',
+    //         }];
+    //
+    //         db.queries(qs);
+    //
+    //         expect.fail();
+    //         done();
+    //
+    //     }).catch(function (err) {
+    //         Log.test(err);
+    //         expect(err.toString()).to.deep.equal("Error: query is poorly formed; property \"DNE\" does not exist");
+    //
+    //     }).then(done, done);
+    // });
 
-            // build the query
-            let qs: Array<Criteria> = [{
-                property: 'courses_dept',
-                value: 'cpsc',
-            }, {
-                property: 'courses_avg',
-                value: 75,
-                equality: 'LT'
-            }];
-
-            let results: Array<Section> = db.queries(qs);
-
-            for (let s of results) {
-                expect(s.courses_dept === 'cpsc');
-                expect(s.courses_avg < 75);
-            }
-
-            expect(results.length).to.equal(468);
-
-            expect(db.countEntries()).to.equal(64612);
-
-        }).catch(function (err) {
-            Log.test(err);
-            expect.fail();
-            done();
-
-        }).then(done, done);
-    });
-
-    it("Should be able to handle a query for which no results exist", function (done) {
-        this.timeout(5000);
-
-        content = new Buffer(fs.readFileSync('courses.zip'))
-            .toString('base64');
-
-        inFac.addDataset('courses', content).then(function () {
-            // Log.info('return code: ' + obj.code);
-
-            // build the query
-            let qs: Array<Criteria> = [{
-                property: 'courses_avg',
-                value: 0,
-                equality: 'LT'
-            }];
-
-            let results: Array<Section> = db.queries(qs);
-
-            expect(results.length).to.equal(0);
-
-        }).catch(function (err) {
-            Log.test(err);
-            expect.fail();
-            done();
-
-        }).then(done, done);
-    });
-
-    it("Should be err when given querying for a property that does not exist", function (done) {
-        this.timeout(5000);
-
-        content = new Buffer(fs.readFileSync('courses.zip'))
-            .toString('base64');
-
-        inFac.addDataset('courses', content).then(function () {
-            // Log.info('return code: ' + obj.code);
-
-            // build the query
-            let qs: Array<Criteria> = [{
-                property: 'DNE',
-                value: 'cpsc',
-            }];
-
-            db.queries(qs);
-
-            expect.fail();
-            done();
-
-        }).catch(function (err) {
-            Log.test(err);
-            expect(err.toString()).to.deep.equal("Error: query is poorly formed; property \"DNE\" does not exist");
-
-        }).then(done, done);
-    });
-
-    it("Should be able to find a very, very specific section", function (done) {
-        this.timeout(5000);
-
-        content = new Buffer(fs.readFileSync('courses.zip'))
-            .toString('base64');
-
-        inFac.addDataset('courses', content).then(function () {
-            // Log.info('return code: ' + obj.code);
-
-            // build the query
-            let qs: Array<Criteria> = [{
-                property: 'courses_dept',
-                value: 'phar',
-            }, {
-                property: 'courses_id',
-                value: '460',
-            }, {
-                property: 'courses_title',
-                value: 'nat hlth prodcts',
-            }, {
-                property: 'courses_instructor',
-                value: 'cadario, barbara',
-                equality: 'LT'
-            }, {
-                property: 'courses_avg',
-                value: 82,
-                equality: 'GT'
-            }, {
-                property: 'courses_pass',
-                value: 148,
-                equality: 'LT'
-            }, {
-                property: 'courses_fail',
-                value: 1,
-                equality: 'EQ'
-            }, {
-                property: 'courses_audit',
-                value: 0,
-                equality: 'EQ'
-            }, {
-                property: 'courses_uuid',
-                value: 4754,
-            }];
-
-            let results: Array<Section> = db.queries(qs);
-
-            for (let s of results) {
-                expect(s.courses_dept === 'phar');
-                expect(s.courses_id === '460');
-                expect(s.courses_title === 'nat hlth prodcts');
-                expect(s.courses_instructor === 'cadario, barbara');
-                expect(s.courses_avg > 82);
-                expect(s.courses_pass < 148);
-                expect(s.courses_fail === 1);
-                expect(s.courses_audit === 10000);
-                expect(s.courses_uuid === '4754');
-            }
-
-            expect(results.length).to.equal(1);
-
-            // check that the database is restored
-            expect(db.countEntries()).to.equal(64612)
-
-        }).catch(function (err) {
-            Log.test(err);
-            expect.fail();
-            done();
-
-        }).then(done, done);
-    })
+    // it("Should be able to find a very, very specific section", function (done) {
+    //     this.timeout(5000);
+    //
+    //     content = new Buffer(fs.readFileSync('./zips/courses.zip'))
+    //         .toString('base64');
+    //
+    //     inFac.addDataset('courses', content).then(function () {
+    //         // Log.info('return code: ' + obj.code);
+    //
+    //         // build the query
+    //         let qs: Array<Criteria> = [{
+    //             property: 'courses_dept',
+    //             value: 'phar',
+    //         }, {
+    //             property: 'courses_id',
+    //             value: '460',
+    //         }, {
+    //             property: 'courses_title',
+    //             value: 'nat hlth prodcts',
+    //         }, {
+    //             property: 'courses_instructor',
+    //             value: 'cadario, barbara',
+    //             equality: 'LT'
+    //         }, {
+    //             property: 'courses_avg',
+    //             value: 82,
+    //             equality: 'GT'
+    //         }, {
+    //             property: 'courses_pass',
+    //             value: 148,
+    //             equality: 'LT'
+    //         }, {
+    //             property: 'courses_fail',
+    //             value: 1,
+    //             equality: 'EQ'
+    //         }, {
+    //             property: 'courses_audit',
+    //             value: 0,
+    //             equality: 'EQ'
+    //         }, {
+    //             property: 'courses_uuid',
+    //             value: 4754,
+    //         }];
+    //
+    //         let results: Array<Section> = db.queries(qs);
+    //
+    //         for (let s of results) {
+    //             expect(s.courses_dept === 'phar');
+    //             expect(s.courses_id === '460');
+    //             expect(s.courses_title === 'nat hlth prodcts');
+    //             expect(s.courses_instructor === 'cadario, barbara');
+    //             expect(s.courses_avg > 82);
+    //             expect(s.courses_pass < 148);
+    //             expect(s.courses_fail === 1);
+    //             expect(s.courses_audit === 10000);
+    //             expect(s.courses_uuid === '4754');
+    //         }
+    //
+    //         expect(results.length).to.equal(1);
+    //
+    //         // check that the database is restored
+    //         expect(db.countEntries()).to.equal(64612)
+    //
+    //     }).catch(function (err) {
+    //         Log.test(err);
+    //         expect.fail();
+    //         done();
+    //
+    //     }).then(done, done);
+    // })
 
 });

@@ -1,6 +1,8 @@
 /**
  * Interfaces for all JSON objects used by input zip and database files
  */
+import {Section} from "./Section";
+import {Room} from "./Room";
 
 export interface CourseJSON {
     result: Array<SectionJSON>
@@ -20,9 +22,14 @@ export interface SectionJSON {
     Professor: string // courses_instructor
     Subject: string; // courses_dept
     Title: string; // courses_title
+    Year: number; //courses_year
+    Section: string; //courses_section
 }
 
-
+export interface bodyJSON {
+    result?: Array<Section|Room>;
+    error?: string;
+}
 
 export interface QueryJSON {
     WHERE: FilterJSON;
@@ -51,6 +58,7 @@ export interface SCompJSON {
     courses_instructor?: string;
     courses_title?: string;
     courses_uuid?: string;
+    courses_section?: string;
 }
 
 export interface MCompJSON {
@@ -59,6 +67,7 @@ export interface MCompJSON {
     courses_pass?: number;
     courses_fail?: number;
     courses_audit?: number;
+    courses_year?: number;
 }
 
 export interface KeyJSON {
@@ -72,4 +81,6 @@ export interface KeyJSON {
     courses_pass?: number;
     courses_fail?: number;
     courses_audit?: number;
+    courses_year?: number;
+    courses_section?: string;
 }

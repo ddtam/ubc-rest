@@ -1,0 +1,35 @@
+{
+  "WHERE":{
+     "OR":[
+        {
+           "AND":[
+              {
+                 "GT":{
+                    "courses_audit":13
+                 }
+              },
+              {
+              "NOT":{
+                 "IS":{
+                    "courses_section":"adhe"
+                 }
+              }
+              }
+           ]
+        },
+        {
+           "EQ":{
+              "courses_pass":0
+           }
+        }
+     ]
+  },
+  "OPTIONS":{
+     "COLUMNS":[
+        "courses_audit",
+        "courses_id",
+        "courses_avg"
+     ],
+     "ORDER":"courses_avg"
+  }
+}
