@@ -20,12 +20,23 @@ export class SCnode extends ANode {
         if (this.s_key.match(
             /^(courses_id|courses_dept|courses_instructor|courses_title|courses_uuid|courses_section)/
             )) {
+
+            if (!db.listLoaded().includes('courses')) {
+                throw new Error('DATASETERR: courses dataset not loaded')
+            }
+
             db.setSectionQuery();
 
         } else if (this.s_key.match(
                 /^(rooms_fullname|rooms_shortname|rooms_number|rooms_name|rooms_address|rooms_type|rooms_furniture|rooms_href)/
             )) {
+
+            if (!db.listLoaded().includes('rooms')) {
+                throw new Error('DATASETERR: rooms dataset not loaded')
+            }
+
             db.setRoomQuery();
+
 
         } else {
             throw new Error('SYNTAXERR - some s_key is poorly formed')

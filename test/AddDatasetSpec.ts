@@ -248,6 +248,63 @@ describe("AddDatasetSpec", function () {
             done();
 
         });
+    });
+
+    it("Should give 400 response when adding dataset with invalid ID", function (done) {
+        this.timeout(5000);
+
+        content = new Buffer(fs.readFileSync('./zips/rooms.zip'))
+            .toString('base64');
+
+        inFac.addDataset('badID', content).then(function (obj) {
+            Log.test('Return code: ' + obj.code + '; DID NOT FAIL');
+            expect.fail();
+            done();
+
+        }).catch(function (obj) {
+            Log.test('Return code: ' + obj.code);
+            expect(obj.code).to.deep.equal(400);
+            expect(obj.body.error).to.deep.equal('input id is neither "courses" nor "rooms"')
+
+        }).then(done, done);
+    })
+
+    it("Should give 400 response when adding Room dataset with Courses ID", function (done) {
+        this.timeout(5000);
+
+        content = new Buffer(fs.readFileSync('./zips/rooms.zip'))
+            .toString('base64');
+
+        inFac.addDataset('courses', content).then(function (obj) {
+            Log.test('Return code: ' + obj.code + '; DID NOT FAIL');
+            expect.fail();
+            done();
+
+        }).catch(function (obj) {
+            Log.test('Return code: ' + obj.code);
+            expect(obj.code).to.deep.equal(400);
+            // expect(obj.body.error).to.deep.equal('input id is neither "courses" nor "rooms"')
+
+        }).then(done, done);
+    })
+
+    it("Should give 400 response when adding Courses dataset with Room ID", function (done) {
+        this.timeout(5000);
+
+        content = new Buffer(fs.readFileSync('./zips/courses.zip'))
+            .toString('base64');
+
+        inFac.addDataset('rooms', content).then(function (obj) {
+            Log.test('Return code: ' + obj.code + '; DID NOT FAIL');
+            expect.fail();
+            done();
+
+        }).catch(function (obj) {
+            Log.test('Return code: ' + obj.code);
+            expect(obj.code).to.deep.equal(400);
+
+
+        }).then(done, done);
     })
 
 });

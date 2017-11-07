@@ -24,11 +24,21 @@ export class MCnode extends ANode {
         if (this.m_key.match(
                 /^(courses_avg|courses_pass|courses_fail|courses_audit|courses_year)/
             )) {
+
+            if (!db.listLoaded().includes('courses')) {
+                throw new Error('DATASETERR: courses dataset not loaded')
+            }
+
             db.setSectionQuery();
 
         } else if (this.m_key.match(
                 /^(rooms_lat|rooms_lon|rooms_seats)/
             )) {
+
+            if (!db.listLoaded().includes('rooms')) {
+                throw new Error('DATASETERR: rooms dataset not loaded')
+            }
+
             db.setRoomQuery();
 
         } else {

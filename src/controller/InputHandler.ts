@@ -59,7 +59,7 @@ export default class InputHandler {
     buildFilePromise(file: JSZipObject, counter: number): Promise<any> {
         let that = this;
 
-        return new Promise(function (fulfill) {
+        return new Promise(function (fulfill, reject) {
             that.handleCourseFile(file, counter)
                 .then(function () {
                     if (!that.containsValidJSON) {
@@ -72,7 +72,11 @@ export default class InputHandler {
                 .catch(function (err) {
                     // SyntaxError OR JSON is valid but empty
                     // Log.error('file failed to be processed - ' + err.body.error);
-                    fulfill();
+                    if (typeof err === "Error" && err.message.includes("IDERR")) {
+                        reject(err);
+                    } else {
+                        fulfill();
+                    }
 
                 });
         });
@@ -112,11 +116,21 @@ export default class InputHandler {
                     }
 
                 } catch (err) {
-                    Log.error('JSON in file ' + counter + ' is invalid - ' + err.toString());
-                    reject({
-                        code: 400,
-                        body: {error: 'JSON in file ' + counter + ' is invalid - ' + err.toString()}
-                    });
+                    // check if HTML is being parsed as JSON
+                    if (fileContents.includes("result")) {
+                        Log.error('JSON in file ' + counter + ' is invalid - ' + err.toString());
+                        reject({
+                            code: 400,
+                            body: {error: 'JSON in file ' + counter + ' is invalid - ' + err.toString()}
+                        });
+
+                    } else {
+                        reject(new Error('IDERR: HTML being parsed as JSON; should dataset ID be "rooms"?'))
+
+                    }
+
+
+
 
                 }
 
@@ -136,6 +150,8 @@ export default class InputHandler {
                 // }
 
             }).catch(function (err: Error) {
+
+
                 // file.async could not read file
                 Log.error('async error reading file: ' + err);
                 reject({

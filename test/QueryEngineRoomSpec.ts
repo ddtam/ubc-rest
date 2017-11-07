@@ -7,7 +7,7 @@ import Log from "../src/Util";
 import {Database} from "../src/controller/Database";
 
 
-describe("QueryEngineSpec", function () {
+describe("QueryEngineRoomSpec", function () {
 
     let db: Database = new Database;
     let inFac: InsightFacade;

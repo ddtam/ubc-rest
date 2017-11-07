@@ -369,6 +369,24 @@ describe("QueryEngineSpec", function () {
         }).then(done, done)
     });
 
+    it("Should throw 424 with a query for rooms using section dataset", function (done) {
+        let db = new Database();
+
+        let query: string = fs.readFileSync('test/testQueries/simpleQueryRoom');
+
+        inFac.performQuery(JSON.parse(query)).then(function (obj) {
+            Log.test('Return code: ' + obj.code);
+            expect.fail();
+            done()
+
+
+        }).catch(function (err) {
+            Log.warn('Return code: ' + err.code + ' FAILED TEST');
+            expect(err.code).to.equal(424);
+
+        }).then(done, done)
+    });
+
     it("Should complete a query with year", function (done) {
         this.timeout(5000);
         let query: string = fs.readFileSync('test/testQueries/yearQuery');
