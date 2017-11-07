@@ -427,4 +427,23 @@ describe("QueryEngineSpec", function () {
 
     });
 
+    it("Should complete a simple year query", function (done) {
+        this.timeout(5000);
+
+        let query: string = fs.readFileSync('test/testQueries/simpleQueryForYear');
+        let expectedResult: string = "{\"result\":[{\"courses_id\":\"222\",\"courses_year\":2007,\"courses_uuid\":\"41501\"},{\"courses_id\":\"201\",\"courses_year\":2007,\"courses_uuid\":\"51150\"},{\"courses_id\":\"473\",\"courses_year\":2007,\"courses_uuid\":\"71502\"},{\"courses_id\":\"473\",\"courses_year\":2007,\"courses_uuid\":\"71503\"},{\"courses_id\":\"473\",\"courses_year\":2007,\"courses_uuid\":\"71504\"},{\"courses_id\":\"473\",\"courses_year\":2007,\"courses_uuid\":\"71505\"},{\"courses_id\":\"474\",\"courses_year\":2007,\"courses_uuid\":\"71507\"},{\"courses_id\":\"475\",\"courses_year\":2007,\"courses_uuid\":\"71509\"},{\"courses_id\":\"222\",\"courses_year\":2007,\"courses_uuid\":\"41500\"},{\"courses_id\":\"345\",\"courses_year\":2007,\"courses_uuid\":\"18150\"},{\"courses_id\":\"222\",\"courses_year\":2007,\"courses_uuid\":\"41502\"},{\"courses_id\":\"222\",\"courses_year\":2007,\"courses_uuid\":\"41503\"},{\"courses_id\":\"222\",\"courses_year\":2007,\"courses_uuid\":\"41504\"},{\"courses_id\":\"222\",\"courses_year\":2007,\"courses_uuid\":\"41505\"},{\"courses_id\":\"222\",\"courses_year\":2007,\"courses_uuid\":\"41506\"},{\"courses_id\":\"222\",\"courses_year\":2007,\"courses_uuid\":\"41507\"},{\"courses_id\":\"222\",\"courses_year\":2007,\"courses_uuid\":\"41508\"},{\"courses_id\":\"222\",\"courses_year\":2007,\"courses_uuid\":\"41509\"},{\"courses_id\":\"328\",\"courses_year\":2007,\"courses_uuid\":\"79150\"}]}"
+
+        inFac.performQuery(JSON.parse(query)).then(function (obj) {
+            Log.test('Return code: ' + obj.code);
+            expect(obj.code).to.equal(200);
+            let body: bodyJSON = obj.body;
+            checkResults(JSON.parse(expectedResult).result, body.result)
+
+        }).then(done, done).catch(function (err) {
+            Log.warn('Return code: ' + err.code + ' FAILED TEST');
+            expect.fail();
+            done()
+        })
+    });
+
 });

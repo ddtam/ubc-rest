@@ -128,5 +128,4 @@ describe("QueryEngineRoomSpec", function () {
     });
 
 
-
  });
