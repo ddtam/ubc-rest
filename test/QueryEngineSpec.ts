@@ -23,7 +23,7 @@ describe("QueryEngineSpec", function () {
         this.timeout(5000);
 
         Log.warn('database is being reset...');
-        db.reset();
+        db.reset("all");
 
         inFac = new InsightFacade();
 
@@ -352,7 +352,7 @@ describe("QueryEngineSpec", function () {
 
     it("Should throw 424 with a missing dataset", function (done) {
         let db = new Database();
-        db.reset();
+        db.reset("all");
 
         let query: string = fs.readFileSync('test/testQueries/simpleQuery');
 
