@@ -26,10 +26,19 @@ export class GeoUtil {
                         fulfill(js)
                     })
 
-                }).catch(function (err: Error) {
-                    fulfill({
-                        error: err.message
-                    })
+                }).catch(function (err: any) {
+                    if (err.message === "getRequest failed") {
+                        fulfill ({
+                            lat: null,
+                            lon: null
+                        })
+
+                    } else {
+                        fulfill({
+                            error: err.message
+                        })
+
+                    }
                 })
         })
     }
@@ -42,10 +51,14 @@ export class GeoUtil {
     private static getHttpIncomingMessage(addr: string): Promise<IncomingMessage> {
         let that = this;
 
-        return new Promise(function (fulfill) {
-            http.get(that.getSiteFromAddress(addr), function (response: any) {
+        return new Promise(function (fulfill, reject) {
+            let getRequest = http.get(that.getSiteFromAddress(addr), function (response: any) {
                 fulfill(response);
 
+            });
+
+            getRequest.on('error', function (err: Error) {
+                reject(new Error("getRequest failed"))
             })
         })
     }

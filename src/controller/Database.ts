@@ -4,7 +4,7 @@
 import {CourseJSON, DatabaseJSON, SectionJSON} from "./IJSON";
 let fs = require('fs');
 import {Section} from "./Section";
-import {isNullOrUndefined} from "util";
+import {isNull, isNullOrUndefined} from "util";
 import {Room} from "./Room";
 
 export interface Criteria {
@@ -21,6 +21,8 @@ export interface Criteria {
 export class Database {
     private sectionCollection: Array<Section> = [];
     private roomCollection: Array<Room> = [];
+    private performingSectionQuery: Boolean = false;
+    private performingRoomQuery: Boolean = false;
     private loadedDB: Array<string>;
     private static instance: Database;
 
@@ -163,6 +165,41 @@ export class Database {
 
         // delete from disk
         fs.unlinkSync('./dbFiles/' + dbName)
+
+    }
+
+    /**
+     * Sets query flag to be looking for Sections
+     */
+    setSectionQuery() {
+        if (this.performingRoomQuery) {
+            throw new Error("query asks for both room and section information")
+
+        } else {
+            this.performingSectionQuery = true;
+
+        }
+    }
+
+    /**
+     * Sets query flag to be looking for Rooms
+     */
+    setRoomQuery() {
+        if (this.performingSectionQuery) {
+            throw new Error("query asks for both room and section information")
+
+        } else {
+            this.performingRoomQuery = true;
+
+        }
+    }
+
+    /**
+     * Resets both query flags
+     */
+    resetQuery() {
+        this.performingSectionQuery = false;
+        this.performingRoomQuery = false;
 
     }
 
@@ -473,15 +510,15 @@ export class Database {
                 // query is for a course
                 if (equality === "GT") {
                     return this.sectionCollection.filter(function (section: Section) {
-                        return section[property] > threshold;
+                        return section[property] > threshold && !isNull(section[property]);
                     })
                 } else if (equality === "LT") {
                     return this.sectionCollection.filter(function (section: Section) {
-                        return section[property] < threshold;
+                        return section[property] < threshold && !isNull(section[property]);
                     })
                 } else if (equality === "EQ") {
                     return this.sectionCollection.filter(function (section: Section) {
-                        return section[property] === threshold;
+                        return section[property] === threshold && !isNull(section[property]);
                     })
                 } else {
                     // equality did not match gt, lt, or eq; throw error
@@ -493,16 +530,19 @@ export class Database {
             case 'rooms_seats':
                 // query is for a room
                 if (equality === "GT") {
-                    return this.roomCollection.filter(function (room: Room) {
-                        return room[property] > threshold;
+                    let y = this.roomCollection.filter(function (room: Room) {
+                        let x = room[property] > threshold && !isNull(room[property]);
+                        return x;
                     })
+
+                    return y;
                 } else if (equality === "LT") {
                     return this.roomCollection.filter(function (room: Room) {
-                        return room[property] < threshold;
+                        return room[property] < threshold && !isNull(room[property]);
                     })
                 } else if (equality === "EQ") {
                     return this.roomCollection.filter(function (room: Room) {
-                        return room[property] === threshold;
+                        return room[property] === threshold && !isNull(room[property]);
                     })
                 } else {
                     // equality did not match gt, lt, or eq; throw error
@@ -542,28 +582,34 @@ export class Database {
     getOpposite(a: Array<Section|Room>): Array<Section|Room> {
         let inputContents = new Set(a);
 
-        if (a[0] instanceof Room) {
-            let diff = Array.from(
-                new Set(
-                    this.roomCollection.filter(x => !inputContents.has(x))
-                )
-            );
+        if (a.length > 0) {
+            if (a[0] instanceof Room) {
+                let diff = Array.from(
+                    new Set(
+                        this.roomCollection.filter(x => !inputContents.has(x))
+                    )
+                );
 
-            return diff;
+                return diff;
 
-        } else if (a[0] instanceof Section){
-            let diff = Array.from(
-                new Set(
-                    this.sectionCollection.filter(x => !inputContents.has(x))
-                )
-            );
+            } else if (a[0] instanceof Section){
+                let diff = Array.from(
+                    new Set(
+                        this.sectionCollection.filter(x => !inputContents.has(x))
+                    )
+                );
 
-            return diff;
-        } else{
-            if (this.sectionCollection.length > 0) {
+                return diff;
+
+            }
+        } else {
+            // getting opposite of an empty array; return all of that type
+            if (this.performingSectionQuery) {
                 return this.sectionCollection;
-            }else{
+
+            } else if (this.performingRoomQuery) {
                 return this.roomCollection;
+
             }
         }
     }
@@ -597,6 +643,6 @@ export class Database {
 }
 
 const instance = new Database;
-Object.freeze(instance);
+// Object.freeze(instance);
 
 export default instance;

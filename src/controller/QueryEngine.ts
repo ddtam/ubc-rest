@@ -52,6 +52,9 @@ export class QueryEngine {
         root = new FILTERnode(criteria);
         result = root.evaluate();
 
+        // reset the query-type
+        db.resetQuery();
+
         return result;
 
     }

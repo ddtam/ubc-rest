@@ -108,6 +108,25 @@ describe("QueryEngineSpec", function () {
         })
     });
 
+    it("Should complete a simple url query", function (done) {
+        this.timeout(5000);
+
+        let query: string = fs.readFileSync('test/testQueries/simpleQueryForURL');
+        let expectedResult: string = "{\"result\":[{\"rooms_href\":\"http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/SOWK-122\",\"rooms_name\":\"SOWK_122\"},{\"rooms_href\":\"http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/SOWK-124\",\"rooms_name\":\"SOWK_124\"},{\"rooms_href\":\"http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/SOWK-222\",\"rooms_name\":\"SOWK_222\"},{\"rooms_href\":\"http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/SOWK-223\",\"rooms_name\":\"SOWK_223\"},{\"rooms_href\":\"http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/SOWK-224\",\"rooms_name\":\"SOWK_224\"},{\"rooms_href\":\"http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/SOWK-324\",\"rooms_name\":\"SOWK_324\"},{\"rooms_href\":\"http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/SOWK-326\",\"rooms_name\":\"SOWK_326\"}]}"
+
+        inFac.performQuery(JSON.parse(query)).then(function (obj) {
+            Log.test('Return code: ' + obj.code);
+            expect(obj.code).to.equal(200);
+            let body: bodyJSON = obj.body;
+            checkResults(JSON.parse(expectedResult).result, body.result)
+
+        }).then(done, done).catch(function (err) {
+            Log.warn('Return code: ' + err.code + ' FAILED TEST');
+            expect.fail();
+            done()
+        })
+    });
+
 
 
  });

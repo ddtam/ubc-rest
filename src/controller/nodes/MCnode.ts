@@ -13,6 +13,7 @@ export class MCnode extends ANode {
 
     constructor(mc: MCompJSON, lgc: string) {
         super();
+        let db = new Database();
 
         // get the type of inequality out
         this.equality = lgc;
@@ -20,10 +21,19 @@ export class MCnode extends ANode {
         // get the m_key out of the object
         this.m_key = Object.keys(mc)[0];
 
-        if (!this.m_key.match(
-                /^(courses_avg|courses_pass|courses_fail|courses_audit|courses_year|rooms_lat|rooms_lon|rooms_seats)/
+        if (this.m_key.match(
+                /^(courses_avg|courses_pass|courses_fail|courses_audit|courses_year)/
             )) {
+            db.setSectionQuery();
+
+        } else if (this.m_key.match(
+                /^(rooms_lat|rooms_lon|rooms_seats)/
+            )) {
+            db.setRoomQuery();
+
+        } else {
             throw new Error('SYNTAXERR - some m_key is poorly formed')
+
         }
 
         this.num = mc[this.m_key];
