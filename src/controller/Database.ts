@@ -169,10 +169,10 @@ export class Database {
             // blank memory and reload remaining databases
             this.reset(dbName);
 
-        }
+            // delete from disk
+            fs.unlinkSync('./dbFiles/' + dbName)
 
-        // delete from disk
-        fs.unlinkSync('./dbFiles/' + dbName)
+        }
 
     }
 
