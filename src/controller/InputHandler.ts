@@ -129,9 +129,6 @@ export default class InputHandler {
 
                     }
 
-
-
-
                 }
 
                 // successfully added a complete course to database

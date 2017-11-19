@@ -24,7 +24,7 @@ describe("QueryEngineRoomSpec", function () {
         this.timeout(5000);
 
         Log.warn('database is being reset...');
-        db.reset();
+        db.reset("all");
 
         inFac = new InsightFacade();
 
@@ -127,6 +127,23 @@ describe("QueryEngineRoomSpec", function () {
         })
     });
 
+    it("Should throw 424 with a query for sections using room dataset", function (done) {
+        let db = new Database();
+
+        let query: string = fs.readFileSync('test/testQueries/simpleQueryForYear');
+
+        inFac.performQuery(JSON.parse(query)).then(function (obj) {
+            Log.test('Return code: ' + obj.code);
+            expect.fail();
+            done()
+
+
+        }).catch(function (err) {
+            Log.warn('Return code: ' + err.code + ' FAILED TEST');
+            expect(err.code).to.equal(424);
+
+        }).then(done, done)
+    });
 
 
  });
