@@ -62,6 +62,10 @@ export class Database {
         }
     }
 
+    addSection(section: Section) {
+        this.sectionCollection.push(section);
+    }
+
     addRoom(room: Room) {
         this.roomCollection.push(room);
     }
@@ -136,10 +140,18 @@ export class Database {
         var content = fs.readFileSync('./dbFiles/' + dbName).toString('string');
         var dbJSON: DatabaseJSON = JSON.parse(content);
 
-        for (let i = 0; i < dbJSON.content.length; i++) {
-            // TODO
-            // for each Section information, create a new Section and add it to the sectionCollection
-            // should check for duplicates probably?
+        switch (dbName) {
+            case "courses":
+                dbJSON.content.forEach(function (s) {
+                    this.addSection(s);
+                });
+                break;
+
+            case "rooms":
+                dbJSON.content.forEach(function (s) {
+                    this.addRoom(s);
+                })
+                break;
         }
     }
 
@@ -155,12 +167,8 @@ export class Database {
             this.loadedDB.splice(pos, 1);
 
             // blank memory and reload remaining databases
-            this.reset();
-            if (this.loadedDB.length !== 0) {
-                for (let db of this.loadedDB) {
-                    // this.loadDB(db); TODO: change when implemented
-                }
-            }
+            this.reset(dbName);
+
         }
 
         // delete from disk
@@ -635,10 +643,19 @@ export class Database {
     }
 
     // may be used to blank the entire database before loading a query DB or restoring the main DB
-    reset() {
-        this.sectionCollection.length = 0;
-        this.roomCollection.length = 0;
-
+    reset(db: string) {
+        switch (db) {
+            case "all":
+                this.sectionCollection.length = 0;
+                this.roomCollection.length = 0;
+                break;
+            case "courses":
+                this.sectionCollection.length = 0;
+                break;
+            case "rooms":
+                this.roomCollection.length = 0;
+                break;
+        }
     }
 }
 

@@ -16,7 +16,7 @@ describe("AddDatasetSpec", function () {
 
     beforeEach(function () {
         Log.warn('database is being reset...');
-        db.reset();
+        db.reset("all");
 
         inFac = new InsightFacade();
 

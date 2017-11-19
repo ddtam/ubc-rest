@@ -18,7 +18,7 @@ describe("DatabaseSpec", function () {
 
     beforeEach(function () {
        Log.warn('database is being reset...');
-       db.reset();
+       db.reset("all");
 
        inFac = new InsightFacade();
 
@@ -327,6 +327,33 @@ describe("DatabaseSpec", function () {
             expect(err.toString()).to.deep.equal('Error: equality query expected "GT", "LT", or "EQ"');
 
         }).then(done, done);
+    });
+
+    it("Should be able to delete a single database from those loaded", function (done) {
+        this.timeout(10000);
+
+        content = new Buffer(fs.readFileSync('./zips/courses.zip'))
+            .toString('base64');
+
+        inFac.addDataset('courses', content).then(function () {
+
+            content = new Buffer(fs.readFileSync('./zips/rooms.zip'))
+                .toString('base64');
+
+            inFac.addDataset('rooms', content).then(function () {
+
+                inFac.removeDataset('courses').then(function (obj) {
+                    expect(obj.code).to.equal(204);
+                    expect(db.countEntries()).to.equal(364);
+
+                }).then(done, done).catch(function (err) {
+                    expect.fail();
+
+                })
+
+            })
+
+        })
     });
 
     // it("Should be able to handle complex query from entire dataset", function (done) {

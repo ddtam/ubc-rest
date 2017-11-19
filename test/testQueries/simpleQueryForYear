@@ -1,0 +1,24 @@
+{
+  "WHERE": {
+    "AND": [
+      {
+        "EQ": {
+          "courses_year": 2007
+        }
+      },
+      {
+        "IS": {
+          "courses_uuid": "*150*"
+        }
+      }
+    ]
+  },
+  "OPTIONS": {
+    "COLUMNS": [
+      "courses_id",
+      "courses_year",
+      "courses_uuid"
+    ],
+    "ORDER": "courses_year"
+  }
+}
