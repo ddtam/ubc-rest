@@ -18,27 +18,11 @@ describe("DatabaseSpec", function () {
 
     beforeEach(function () {
        Log.warn('database is being reset...');
-       db.reset("all");
+        db.deleteDB("courses");
+        db.deleteDB("rooms");
 
        inFac = new InsightFacade();
 
-        // clear databases that are cached
-        Log.warn('deleting cached databases...');
-
-        let databaseList = fs.readdirSync('./dbFiles');
-        for (const file of databaseList) {
-            fs.unlinkSync('./dbFiles/' + file)
-        }
-    });
-
-    after(function () {
-        // clear databases at end
-        Log.warn('CLEAN UP: deleting cached databases...');
-
-        let databaseList = fs.readdirSync('./dbFiles/');
-        for (const file of databaseList) {
-            fs.unlinkSync('./dbFiles/' + file)
-        }
     });
 
     it("should write 9 fields correctly", function (done) {
@@ -336,22 +320,20 @@ describe("DatabaseSpec", function () {
             .toString('base64');
 
         inFac.addDataset('courses', content).then(function () {
-
             content = new Buffer(fs.readFileSync('./zips/rooms.zip'))
                 .toString('base64');
 
-            inFac.addDataset('rooms', content).then(function () {
+            return inFac.addDataset('rooms', content)
 
-                inFac.removeDataset('courses').then(function (obj) {
-                    expect(obj.code).to.equal(204);
-                    expect(db.countEntries()).to.equal(364);
+        }).then(function () {
+            return inFac.removeDataset('courses')
 
-                }).then(done, done).catch(function (err) {
-                    expect.fail();
+        }).then(function (obj) {
+            expect(obj.code).to.equal(204);
+            expect(db.countEntries()).to.equal(364);
 
-                })
-
-            })
+        }).then(done, done).catch(function (err) {
+            expect.fail();
 
         })
     });
