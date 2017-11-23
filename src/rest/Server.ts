@@ -7,6 +7,8 @@ import restify = require('restify');
 
 import Log from "../Util";
 import {InsightResponse} from "../controller/IInsightFacade";
+import InsightFacade from "../controller/InsightFacade";
+import Service from "./Service";
 
 /**
  * This configures the REST endpoints for the server.
@@ -54,6 +56,8 @@ export default class Server {
                     name: 'insightUBC'
                 });
 
+                that.rest.use(restify.bodyParser({mapParams: true, mapFiles: true}));
+
                 // support CORS
                 that.rest.use(function crossOrigin(req, res, next) {
                     res.header("Access-Control-Allow-Origin", "*");
@@ -68,9 +72,14 @@ export default class Server {
 
                 // provides the echo service
                 // curl -is  http://localhost:4321/echo/myMessage
-                that.rest.get('/echo/:msg', Server.echo);
+                that.rest.get('/echo/:msg', Service.echo);
 
                 // Other endpoints will go here
+                that.rest.put('/dataset/:id', Service.addDataset);
+
+                that.rest.del('/dataset/:id', Service.delDataset);
+
+                that.rest.post('/query', Service.postQuery);
 
                 that.rest.listen(that.port, function () {
                     Log.info('Server::start() - restify listening: ' + that.rest.url);
@@ -87,31 +96,6 @@ export default class Server {
                 reject(err);
             }
         });
-    }
-
-    // The next two methods handle the echo service.
-    // These are almost certainly not the best place to put these, but are here for your reference.
-    // By updating the Server.echo function pointer above, these methods can be easily moved.
-
-    public static echo(req: restify.Request, res: restify.Response, next: restify.Next) {
-        Log.trace('Server::echo(..) - params: ' + JSON.stringify(req.params));
-        try {
-            let result = Server.performEcho(req.params.msg);
-            Log.info('Server::echo(..) - responding ' + result.code);
-            res.json(result.code, result.body);
-        } catch (err) {
-            Log.error('Server::echo(..) - responding 400');
-            res.json(400, {error: err.message});
-        }
-        return next();
-    }
-
-    public static performEcho(msg: string): InsightResponse {
-        if (typeof msg !== 'undefined' && msg !== null) {
-            return {code: 200, body: {message: msg + '...' + msg}};
-        } else {
-            return {code: 400, body: {error: 'Message not provided'}};
-        }
     }
 
 }

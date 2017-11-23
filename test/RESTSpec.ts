@@ -11,8 +11,10 @@ import chaiHttp = require('chai-http');
 import Response = ChaiHttp.Response;
 import restify = require('restify');
 import Service from "../src/rest/Service";
+import * as fs from "fs";
+import {Database} from "../src/controller/Database";
 
-describe("EchoSpec", function () {
+describe("RESTSpec", function () {
 
 
     function sanityCheck(response: InsightResponse) {
@@ -37,12 +39,35 @@ describe("EchoSpec", function () {
         Log.test('AfterTest: ' + (<any>this).currentTest.title);
     });
 
-    it("Should be able to echo", function () {
-        let out = Service.performEcho('echo');
-        Log.test(JSON.stringify(out));
-        sanityCheck(out);
-        expect(out.code).to.equal(200);
-        expect(out.body).to.deep.equal({message: 'echo...echo'});
+    it("Should be able to add a small dataset", function () {
+        // Init
+        chai.use(chaiHttp);
+        let server = new Server(4321);
+        let URL = "http://127.0.0.1:4321";
+
+        return server.start().then(function (success: Boolean) {
+            return chai.request(URL)
+                .put('/dataset/courses')
+                .attach("body", fs.readFileSync("zips/courses_3test.zip"),
+                    "courses_3test.zip")
+
+        }).then(function (res: Response) {
+            Log.trace('then:');
+            let db = new Database();
+
+            Log.info('Response Code: ' + res.status);
+            expect(res.status).to.be.equal(201);
+
+            Log.info('Database count: ' + db.countEntries());
+            expect(db.countEntries()).to.equal(22);
+
+            return server.stop()
+
+        }).catch(function (err) {
+            Log.trace('catch:');
+            expect.fail();
+
+        });
     });
 
     it("Should be able to echo silence", function () {
