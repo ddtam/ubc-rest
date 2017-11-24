@@ -1,10 +1,11 @@
 import {Section} from "./Section";
-import {FilterJSON, QueryJSON} from "./IJSON";
+import {FilterJSON, QueryJSON, TransformJSON} from "./IJSON";
 import {FILTERnode} from "./nodes/FILTERnode";
 import {ResultSection} from "./ResultSection";
 import {Database} from "./Database";
 import {Room} from "./Room";
 import {ResultRoom} from "./ResultRoom";
+import {APPLYnode} from "./nodes/APPLYnode";
 
 export class QueryEngine {
 
@@ -13,16 +14,15 @@ export class QueryEngine {
         // check fundamental syntax structure for WHERE and OPTIONS in the root
         let objKeys: Array<string> = Object.keys(query);
 
-        if (!objKeys.includes('WHERE') || // doesn't include .WHERE
-            !objKeys.includes('OPTIONS') || // doesn't include .OPTIONS
-            !(objKeys.length === 2) // some other keys beyond .WHERE and .OPTIONS
-        ) {
-            // query does not contain WHERE and OPTIONS information
-            throw new Error('SYNTAXERR - query fundamentally malformed: no WHERE/OPTIONS information')
-        }
+        this.checkQueryStructure(objKeys);
 
         // get the results that match the query based on FILTER
         let results: Array<Section|Room> = this.getMatch(query.WHERE);
+
+        // transform the results based on TRANSFORMATIONS
+        if (objKeys.includes('TRANSFORMATIONS')){
+            results = this.transformMatch(query.TRANSFORMATIONS);
+        }
 
         // format the results based on OPTIONS
         let fResults: Array<ResultSection|ResultRoom> = this.formatMatch(query.OPTIONS, results);
@@ -30,6 +30,28 @@ export class QueryEngine {
         // return the results in the form of an InsightResponse
         return QueryEngine.encapsulate(fResults);
 
+    }
+
+    private checkQueryStructure(objKeys: Array<string>) {
+        if (objKeys.length === 3) {
+            if (!objKeys.includes('TRANSFORMATIONS') || // doesn't include .TRANSFORMATIONS
+                !objKeys.includes('WHERE') || // doesn't include .WHERE
+                !objKeys.includes('OPTIONS') // doesn't include .OPTIONS
+            ) {
+                throw new Error('SYNTAXERR - query fundamentally malformed: one of ' + objKeys + ' is invalid')
+            }
+
+        } else if (objKeys.length === 2) {
+            if (!objKeys.includes('WHERE') || // doesn't include .WHERE
+                !objKeys.includes('OPTIONS') // doesn't include .OPTIONS
+            ) {
+                throw new Error('SYNTAXERR - query fundamentally malformed: one of ' + objKeys + ' is invalid')
+            }
+
+        } else {
+            throw new Error('SYNTAXERR - query fundamentally malformed: one of ' + objKeys + ' is invalid')
+
+        }
     }
 
     /**
@@ -57,6 +79,42 @@ export class QueryEngine {
 
         return result;
 
+    }
+
+    /**
+     *
+     * @param {TransformJSON} transformation
+     * @param {Array<Section | Room>} results
+     * @returns {Array<Section | Room>}
+     */
+    private transformMatch(transformation: TransformJSON, rawResults: Array<Section|Room>): Array<Section|Room> {
+        // TODO: Implement this method
+        let groups: Array<Array<any>> = [];
+        let transformedGroups: Array<any> = [];
+
+        // evaluate groups and store them in an array
+        let groupCriteria: Array<string> = transformation.GROUP;
+        transformedGroups = this.createGroups(rawResults, groupCriteria);
+
+        // "apply" to each group and store results
+        let applyCriteria: any = transformation.APPLY;
+        let root: APPLYnode = new APPLYnode(applyCriteria);
+
+        for (let group of groups) {
+            let partialEntry: any = transformedGroups.push(root.evaluate(group));
+
+            // extract common group keys
+            for (let criteria of groupCriteria) {
+                let value: string = group[0].criteria;
+
+                partialEntry.criteria = value;
+
+            }
+
+            transformedGroups.push(partialEntry)
+        }
+
+        return transformedGroups;
     }
 
     /**
@@ -167,6 +225,14 @@ export class QueryEngine {
                 case 'courses_instructor':
                 case 'courses_uuid':
                 case 'courses_section':
+                case 'rooms_fullname':
+                case 'rooms_shortname':
+                case 'rooms_number':
+                case 'rooms_name':
+                case 'rooms_address':
+                case 'rooms_type':
+                case 'rooms_furniture':
+                case 'rooms_href':
                     hasStringOrder = true;
                     break;
 
@@ -175,6 +241,9 @@ export class QueryEngine {
                 case 'courses_fail':
                 case 'courses_audit':
                 case 'courses_year':
+                case 'rooms_lat':
+                case 'rooms_lon':
+                case 'rooms_seats':
                     hasNumberOrder = true;
                     break;
 
