@@ -54,6 +54,13 @@ export default class Service {
                 res.json(response.code, response.body);
 
                 return next();
+
+            }).catch(function (err) {
+                Log.info('Server::add(..) - responding ' + err.code);
+                Log.warn(err.body.error);
+                res.json(err.code, err.body);
+
+                return next();
             });
 
         } catch (err) {
@@ -79,6 +86,13 @@ export default class Service {
                 res.json(response.code, response.body);
 
                 return next();
+
+            }).catch(function (err) {
+                Log.warn('Server::del(..) - throwing ' + err.code);
+                Log.warn(err.body.error);
+                res.json(err.code, err.body);
+
+                return next();
             });
 
         } catch (err) {
@@ -100,8 +114,15 @@ export default class Service {
 
             // add the dataset with the facade
             let result = inFac.performQuery(query).then(function (response) {
-                Log.info('Server::del(..) - responding ' + response.code);
+                Log.info('Server::query(..) - responding ' + response.code);
                 res.json(response.code, response.body);
+
+                return next();
+
+            }).catch(function (err) {
+                Log.warn('Server::query(..) - throwing ' + err.code);
+                Log.warn(err.body.error);
+                res.json(err.code, err.body);
 
                 return next();
             });

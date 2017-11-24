@@ -70,69 +70,103 @@ describe("RESTSpec", function () {
         });
     });
 
-    it("Should be able to echo silence", function () {
-        let out = Service.performEcho('');
-        Log.test(JSON.stringify(out));
-        sanityCheck(out);
-        expect(out.code).to.equal(200);
-        expect(out.body).to.deep.equal({message: '...'});
-    });
-
-    it("Should be able to handle a missing echo message sensibly", function () {
-        let out = Service.performEcho(undefined);
-        Log.test(JSON.stringify(out));
-        sanityCheck(out);
-        expect(out.code).to.equal(400);
-        expect(out.body).to.deep.equal({error: 'Message not provided'});
-    });
-
-    it("Should be able to handle a null echo message sensibly", function () {
-        let out = Service.performEcho(null);
-        Log.test(JSON.stringify(out));
-        sanityCheck(out);
-        expect(out.code).to.equal(400);
-        expect(out.body).to.have.property('error');
-        expect(out.body).to.deep.equal({error: 'Message not provided'});
-    });
-
-    it("Test Server", function() {
-
+    it("Should be able to delete a small dataset", function () {
         // Init
         chai.use(chaiHttp);
         let server = new Server(4321);
         let URL = "http://127.0.0.1:4321";
 
-        // Test
-        expect(server).to.not.equal(undefined);
-        try{
-            Service.echo((<restify.Request>{}), null, null);
-            expect.fail()
-        } catch(err) {
-            expect(err.message).to.equal("Cannot read property 'json' of null");
-        }
+        return server.start().then(function (success: Boolean) {
+            return chai.request(URL)
+                .put('/dataset/courses')
+                .attach("body", fs.readFileSync("zips/courses_3test.zip"),
+                    "courses_3test.zip")
 
-        return server.start().then(function(success: boolean) {
-            return chai.request(URL)
-                .get("/")
-        }).catch(function(err) {
-            expect.fail()
-        }).then(function(res: Response) {
-            expect(res.status).to.be.equal(200);
-            return chai.request(URL)
-                .get("/echo/Hello")
-        }).catch(function(err) {
-            expect.fail()
-        }).then(function(res: Response) {
-            expect(res.status).to.be.equal(200);
-            return server.start()
-        }).then(function(success: boolean) {
+        }).catch(function (err) {
+            Log.trace('catch:');
+            Log.info('failed to add a dataset');
             expect.fail();
-        }).catch(function(err) {
-            expect(err.code).to.equal('EADDRINUSE');
-            return server.stop();
-        }).catch(function(err) {
+
+        }).then(function (res: Response) {
+            Log.trace('then:');
+            let db = new Database();
+
+            Log.info('Response Code: ' + res.status);
+            expect(res.status).to.be.equal(201);
+
+            Log.info('Database count: ' + db.countEntries());
+            expect(db.countEntries()).to.equal(22);
+
+            return chai.request(URL)
+                .del('/dataset/courses')
+
+        }).catch(function (err) {
+            Log.trace('catch:');
+            Log.info('failed to delete a dataset');
             expect.fail();
-        });
+
+        }).then(function (res: Response) {
+            Log.trace('then:');
+            let db = new Database();
+
+            Log.info('Response Code: ' + res.status);
+            expect(res.status).to.be.equal(200);
+
+            Log.info('Database count: ' + db.countEntries());
+            expect(db.countEntries()).to.equal(0);
+
+            return server.stop()
+        })
+    });
+
+    it("Should be able to perform a query on a small dataset", function () {
+        // Init
+        chai.use(chaiHttp);
+        let server = new Server(4321);
+        let URL = "http://127.0.0.1:4321";
+
+        let queryJSONObject = JSON.parse(fs.readFileSync("test/testQueries/simpleQuerySortUUID")
+                .toString("utf8"));
+
+        return server.start().then(function (success: Boolean) {
+            return chai.request(URL)
+                .put('/dataset/courses')
+                .attach("body", fs.readFileSync("zips/courses_3test.zip"),
+                    "courses_3test.zip")
+
+        }).catch(function (err) {
+            Log.trace('catch:');
+            Log.info('failed to add a dataset');
+            expect.fail();
+
+        }).then(function (res: Response) {
+            Log.trace('then:');
+            let db = new Database();
+
+            Log.info('Response Code: ' + res.status);
+            expect(res.status).to.be.equal(201);
+
+            Log.info('Database count: ' + db.countEntries());
+            expect(db.countEntries()).to.equal(22);
+
+            return chai.request(URL)
+                .post('/query')
+                .send(queryJSONObject)
+
+        }).catch(function (err) {
+            Log.trace('catch:');
+            Log.info('failed to perform query');
+            expect.fail();
+
+        }).then(function (res: Response) {
+            Log.trace('then:');
+            let db = new Database();
+
+            Log.info('Response Code: ' + res.status);
+            expect(res.status).to.be.equal(200);
+
+            return server.stop()
+        })
     });
 
 });
