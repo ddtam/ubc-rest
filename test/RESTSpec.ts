@@ -29,6 +29,14 @@ describe("RESTSpec", function () {
 
     beforeEach(function () {
         Log.test('BeforeTest: ' + (<any>this).currentTest.title);
+
+        let db = new Database;
+        db.reset("all");
+
+        let databaseList = fs.readdirSync('./dbFiles');
+        for (const file of databaseList) {
+            fs.unlinkSync('./dbFiles/' + file)
+        }
     });
 
     after(function () {
@@ -56,7 +64,7 @@ describe("RESTSpec", function () {
             let db = new Database();
 
             Log.info('Response Code: ' + res.status);
-            expect(res.status).to.be.equal(201);
+            expect(res.status).to.be.equal(204);
 
             Log.info('Database count: ' + db.countEntries());
             expect(db.countEntries()).to.equal(22);
@@ -92,7 +100,7 @@ describe("RESTSpec", function () {
             let db = new Database();
 
             Log.info('Response Code: ' + res.status);
-            expect(res.status).to.be.equal(201);
+            expect(res.status).to.be.equal(204);
 
             Log.info('Database count: ' + db.countEntries());
             expect(db.countEntries()).to.equal(22);
@@ -103,6 +111,7 @@ describe("RESTSpec", function () {
         }).catch(function (err) {
             Log.trace('catch:');
             Log.info('failed to delete a dataset');
+            Log.info(err.code + ": " + err.body.error);
             expect.fail();
 
         }).then(function (res: Response) {
@@ -110,7 +119,7 @@ describe("RESTSpec", function () {
             let db = new Database();
 
             Log.info('Response Code: ' + res.status);
-            expect(res.status).to.be.equal(200);
+            expect(res.status).to.be.equal(204);
 
             Log.info('Database count: ' + db.countEntries());
             expect(db.countEntries()).to.equal(0);
@@ -144,7 +153,7 @@ describe("RESTSpec", function () {
             let db = new Database();
 
             Log.info('Response Code: ' + res.status);
-            expect(res.status).to.be.equal(201);
+            expect(res.status).to.be.equal(204);
 
             Log.info('Database count: ' + db.countEntries());
             expect(db.countEntries()).to.equal(22);
