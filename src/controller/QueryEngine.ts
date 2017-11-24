@@ -21,7 +21,7 @@ export class QueryEngine {
 
         // transform the results based on TRANSFORMATIONS
         if (objKeys.includes('TRANSFORMATIONS')){
-            results = this.transformMatch(query.TRANSFORMATIONS);
+            results = this.transformMatch(query.TRANSFORMATIONS, results);
         }
 
         // format the results based on OPTIONS
@@ -94,7 +94,7 @@ export class QueryEngine {
 
         // evaluate groups and store them in an array
         let groupCriteria: Array<string> = transformation.GROUP;
-        transformedGroups = this.createGroups(rawResults, groupCriteria);
+        groups = this.createGroups(rawResults, groupCriteria);
 
         // "apply" to each group and store results
         let applyCriteria: any = transformation.APPLY;
@@ -290,5 +290,88 @@ export class QueryEngine {
         let finalBracket = withCollection.concat("}");
 
         return JSON.parse(finalBracket);
+    }
+
+    /**
+     * Creates groups based on groupCriteria
+     * @param {Array<Section | Room>} rawResults
+     * @param {Array<string>} groupCriteria
+     * @returns {Array<Array<any>>}
+     */
+    private createGroups(rawResults: Array<Section | Room>, groupCriteria: Array<string>): Array<Array<any>> {
+        // TODO: Finish this
+        //stub
+
+        let currGroups: Array<Array<any>> = [];
+        let keyGroups: Array<any> = [];
+
+        // there's definitely a better way to do this but this works for now.  This is also horribly
+        // slow
+
+        for (let r of rawResults){
+            let currKeys: Array<any> = [];
+            for (let k of groupCriteria){
+                currKeys.push(r[k]);
+            }
+            if (keyGroups.length === 0 || !this.arrayContained(keyGroups, currKeys)){ //!keyGroups.includes(currKeys)
+                keyGroups.push(currKeys);
+            }
+            for (let i=0; i<keyGroups.length; i++){
+                if (this.arraysEqual(keyGroups[i], currKeys)){
+                    if (currGroups.length === 0){
+                        currGroups.push([r]);
+                    }else {
+                        if (i === currGroups.length) {
+                            currGroups.push([r]);
+                        }
+                        if (currGroups.length > i && !currGroups[i].includes(r)){
+                            currGroups[i].push(r);
+                        }
+                    }
+                }else {
+                    if (!this.arrayContained(keyGroups, currKeys)) {
+                    keyGroups.push(currKeys);
+                    }
+                }
+            }
+        }
+
+
+        return currGroups;
+    }
+
+    /**
+     * Checks if arr1 contains arr2
+     * @param {Array<any>} arr1
+     * @param {Array<any>} arr2
+     * @returns {boolean}
+     */
+    private arrayContained(arr1: Array<any>, arr2: Array<any>):boolean {
+        let yes:boolean = true;
+        for (let arr of arr1){
+            yes = true;
+            if(arr.length !== arr2.length) {
+                yes = false;
+            }
+            for(let i = arr.length; i--;) {
+                if(arr[i] !== arr2[i])
+                    yes = false
+            }
+            if (yes){
+                return true;
+            }
+        }
+        return yes;
+    }
+
+    private arraysEqual(arr1: Array<any>, arr2: Array<any>) {
+        if(arr1.length !== arr2.length)
+            return false;
+        for(let i = arr1.length; i--;) {
+            if(arr1[i] !== arr2[i])
+                return false;
+        }
+
+        return true;
     }
 }

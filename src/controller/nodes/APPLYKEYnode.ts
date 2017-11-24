@@ -14,8 +14,9 @@ export class APPLYKEYnode {
         // extract the relevant values
         this.keyName = Object.keys(criteria)[0];
 
-        this.token = Object.keys(criteria.keyName)[0];
-        this.onKey = criteria.keyName.token[0];
+        this.token = Object.keys(criteria[this.keyName])[0];
+
+        this.onKey = criteria[this.keyName][this.token];
 
         if (isNull(this.keyName) ||
             isNull(this.token) ||
