@@ -94,7 +94,7 @@ export class QueryEngine {
 
         // evaluate groups and store them in an array
         let groupCriteria: Array<string> = transformation.GROUP;
-        groups = this.createGroups(rawResults, groupCriteria);
+        groups = QueryEngine.createGroups(rawResults, groupCriteria);
 
         // "apply" to each group and store results
         let applyCriteria: any = transformation.APPLY;
@@ -294,50 +294,47 @@ export class QueryEngine {
 
     /**
      * Creates groups based on groupCriteria
-     * @param {Array<Section | Room>} rawResults
+     * @param {Array<Section | Room>} ungroupedResults
      * @param {Array<string>} groupCriteria
      * @returns {Array<Array<any>>}
      */
-    private createGroups(rawResults: Array<Section | Room>, groupCriteria: Array<string>): Array<Array<any>> {
-        // TODO: Finish this
-        //stub
+    private static createGroups(ungroupedResults: Array<Section | Room>, groupCriteria: Array<string>): Array<Array<any>> {
+        let groupedResults: Array<any> = [];
 
-        let currGroups: Array<Array<any>> = [];
-        let keyGroups: Array<any> = [];
+        for (let u of ungroupedResults) {
+            let matchedExistingGroup = false;
 
-        // there's definitely a better way to do this but this works for now.  This is also horribly
-        // slow
+            // check if r matches a current group
+            for (let r of groupedResults) {
+                let isAMatch: boolean = true;
 
-        for (let r of rawResults){
-            let currKeys: Array<any> = [];
-            for (let k of groupCriteria){
-                currKeys.push(r[k]);
-            }
-            if (keyGroups.length === 0 || !this.arrayContained(keyGroups, currKeys)){ //!keyGroups.includes(currKeys)
-                keyGroups.push(currKeys);
-            }
-            for (let i=0; i<keyGroups.length; i++){
-                if (this.arraysEqual(keyGroups[i], currKeys)){
-                    if (currGroups.length === 0){
-                        currGroups.push([r]);
-                    }else {
-                        if (i === currGroups.length) {
-                            currGroups.push([r]);
-                        }
-                        if (currGroups.length > i && !currGroups[i].includes(r)){
-                            currGroups[i].push(r);
-                        }
-                    }
-                }else {
-                    if (!this.arrayContained(keyGroups, currKeys)) {
-                    keyGroups.push(currKeys);
+                for (let c of groupCriteria) {
+                    if (!(u[c] === r[c])) {
+                        isAMatch = false;
                     }
                 }
+
+                if (isAMatch) {
+                    r.groupContents.push(u);
+                    matchedExistingGroup = true;
+                }
+            }
+
+            // r does not fall into a current group; make a new group
+            if (!matchedExistingGroup) {
+                let newGroup: any = {};
+
+                for (let c of groupCriteria) {
+                    newGroup[c] = u[c];
+                }
+
+                newGroup.groupContents = [u];
+
+                groupedResults.push(newGroup);
             }
         }
 
-
-        return currGroups;
+        return groupedResults;
     }
 
     /**
