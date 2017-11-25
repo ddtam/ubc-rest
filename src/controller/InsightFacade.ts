@@ -62,7 +62,7 @@ export default class InsightFacade implements IInsightFacade {
 
                 .catch(function (err: Error) {
                     // if error on decoding base64 representation of zip
-                    Log.error('JSZip err - ' + err.message);
+                    Log.error('Zip err - ' + err.message);
                     reject({
                         code: 400,
                         body: {error: err.message}
