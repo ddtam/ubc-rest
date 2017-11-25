@@ -102,6 +102,11 @@ export class QueryEngine {
             throw new Error('SYNTAXERR - no APPLY defined in transformation')
         }
 
+        if (rawResults.length === 0) {
+            // there were no results; return
+            return transformedGroups;
+        }
+
         // evaluate groups and store them in an array
         groups = QueryEngine.createGroups(rawResults, groupCriteria);
 
@@ -122,7 +127,7 @@ export class QueryEngine {
      * @param {Array<Section>} results is output of getMatch helper
      * @returns {Array<ResultSection>} as an array of sections conforming to OPTIONS specifications
      */
-    private formatMatch(OPTIONS: any, results: Array<Section|Room>): Array<ResultSection|ResultRoom> {
+    private formatMatch(OPTIONS: any, results: Array<any>): Array<ResultSection|ResultRoom> {
         // TODO this big ass method needs refactoring, pronto
 
         let optKeys: Array<string>;
@@ -142,39 +147,7 @@ export class QueryEngine {
 
         // extract the columns for result output
         colKeys = OPTIONS.COLUMNS;
-
-        // check syntax for KEYS in COLUMN
-        for (let key of colKeys) {
-            switch (key) {
-                case 'courses_dept':
-                case 'courses_id':
-                case 'courses_title':
-                case 'courses_instructor':
-                case 'courses_avg':
-                case 'courses_pass':
-                case 'courses_fail':
-                case 'courses_audit':
-                case 'courses_uuid':
-                case 'courses_year':
-                case 'courses_section':
-                case 'rooms_fullname':
-                case 'rooms_shortname':
-                case 'rooms_number':
-                case 'rooms_name':
-                case 'rooms_address':
-                case 'rooms_lat':
-                case 'rooms_lon':
-                case 'rooms_seats':
-                case 'rooms_type':
-                case 'rooms_furniture':
-                case 'rooms_href':
-                    break;
-                default:
-                    throw new Error('key "' + key + '" does not exist')
-            }
-        }
-
-
+        this.checkColumnSyntax(colKeys, results);
 
         // create the results
         for (let x of results) {
@@ -202,11 +175,9 @@ export class QueryEngine {
             }
         }
 
-
-        if(
+        if (
             optKeys.length === 2 && // this is the only other key
             optKeys.includes('ORDER') // and the second key is ORDER
-
         ){
             sortOn = OPTIONS.ORDER;
 
@@ -224,7 +195,6 @@ export class QueryEngine {
                 hasNumberOrder = true;
 
             }
-
         }
 
         if (hasStringOrder) {
@@ -253,6 +223,19 @@ export class QueryEngine {
         }
 
         return fResults;
+    }
+
+    private checkColumnSyntax(colKeys: Array<string>, results: Array<any>) {
+        // check syntax for KEYS in COLUMN
+
+        let transformKeys: Array<string> = Object.keys(results[0]);
+
+        for (let key of colKeys) {
+            if (!QueryEngine.isGoodKey(key) && !transformKeys.includes(key)) {
+                // is not a transform key; throw error
+                throw new Error('SYNTAXERR - key "' + key + '" does not exist')
+            }
+        }
     }
 
     /**

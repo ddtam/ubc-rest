@@ -4,7 +4,7 @@ import Log from "../src/Util";
 import {expect} from 'chai';
 import {bodyJSON} from "../src/controller/IJSON";
 
-describe ("ApplySpec", function () {
+describe ("TransformSpec", function () {
 
     let fs = require('fs');
     let db: Database = new Database();
@@ -46,6 +46,26 @@ describe ("ApplySpec", function () {
         this.timeout(5000);
 
         let query: string = fs.readFileSync('test/testQueries/maxSeatsQuery');
+        let expectedResult: string = "{\"result\":[{\"rooms_shortname\":\"OSBO\",\"maxSeats\":442},{\"rooms_shortname\":\"HEBB\",\"maxSeats\":375},{\"rooms_shortname\":\"LSC\",\"maxSeats\":350}]}"
+
+        inFac.performQuery(JSON.parse(query)).then(function (obj) {
+            Log.test('Return code: ' + obj.code);
+            expect(obj.code).to.equal(200);
+            let body: bodyJSON = obj.body;
+            checkResults(JSON.parse(expectedResult).result, body.result)
+
+        }).then(done, done).catch(function (err) {
+            Log.warn('Return code: ' + err.code + ' FAILED TEST');
+            Log.warn(err.body.error);
+            expect.fail();
+            done()
+        })
+    });
+
+    it("Should complete a simple section query with MIN transformation", function (done) {
+        this.timeout(5000);
+
+        let query: string = fs.readFileSync('test/testQueries/simpleTransformationQuery');
         let expectedResult: string = "{\"result\":[{\"rooms_shortname\":\"OSBO\",\"maxSeats\":442},{\"rooms_shortname\":\"HEBB\",\"maxSeats\":375},{\"rooms_shortname\":\"LSC\",\"maxSeats\":350}]}"
 
         inFac.performQuery(JSON.parse(query)).then(function (obj) {
@@ -122,7 +142,7 @@ describe ("ApplySpec", function () {
     it("Should handle a bad transformation query that groups on a bad room key", function (done) {
         this.timeout(5000);
 
-        let query: string = fs.readFileSync('test/testQueries/badTransformationInvalidGroupCourseKey');
+        let query: string = fs.readFileSync('test/testQueries/badTransformationInvalidGroupRoomKey');
 
         inFac.performQuery(JSON.parse(query)).then(function (obj) {
             Log.warn('Return code: ' + obj.code + ' FAILED TEST');
@@ -130,7 +150,6 @@ describe ("ApplySpec", function () {
             done()
 
         }).catch(function (err) {
-            let db = new Database();
             Log.test('Return code: ' + err.code);
             expect(err.code).to.equal(400);
             Log.test(err.body.error);

@@ -21,7 +21,7 @@
         }
     },
     "TRANSFORMATIONS": {
-        "GROUP": ["courses_seats"],
+        "GROUP": ["courses_dept"],
         "APPLY": [{
             "minAvg": {
                 "MIN": "courses_avg"
