@@ -6,7 +6,7 @@ import {expect} from 'chai';
 import Log from "../src/Util";
 import {Database} from "../src/controller/Database";
 
-describe("QueryEngineSpec", function () {
+describe("QueryEngineCourseSpec", function () {
 
     let db: Database = new Database;
     let inFac: InsightFacade;
@@ -23,17 +23,13 @@ describe("QueryEngineSpec", function () {
         this.timeout(5000);
 
         Log.warn('database is being reset...');
-        db.reset("all");
+        db.deleteDB("courses");
+        db.deleteDB("rooms");
 
         inFac = new InsightFacade();
 
         // clear databases that are cached
         Log.warn('deleting cached databases...');
-
-        let databaseList = fs.readdirSync('./dbFiles/');
-        for (const file of databaseList) {
-            fs.unlinkSync('./dbFiles/' + file)
-        }
 
         // load default courses.zip
         let content: string = new Buffer(fs.readFileSync('./zips/courses.zip'))
@@ -352,7 +348,8 @@ describe("QueryEngineSpec", function () {
 
     it("Should throw 424 with a missing dataset", function (done) {
         let db = new Database();
-        db.reset("all");
+        db.deleteDB("courses");
+        db.deleteDB("rooms");
 
         let query: string = fs.readFileSync('test/testQueries/simpleQuery');
 

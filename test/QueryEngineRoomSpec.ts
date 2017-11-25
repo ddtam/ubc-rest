@@ -21,10 +21,11 @@ describe("QueryEngineRoomSpec", function () {
     }
 
     beforeEach(function (done) {
-        this.timeout(5000);
+        this.timeout(10000);
 
         Log.warn('database is being reset...');
-        db.reset("all");
+        db.deleteDB("rooms");
+        db.deleteDB("courses");
 
         inFac = new InsightFacade();
 
@@ -36,11 +37,12 @@ describe("QueryEngineRoomSpec", function () {
             fs.unlinkSync('./dbFiles/' + file)
         }
 
-        // load default courses.zip
+        // load default rooms.zip
         let content: string = new Buffer(fs.readFileSync('./zips/rooms.zip'))
             .toString('base64');
 
         inFac.addDataset('rooms', content).then(function () {
+            Log.warn('done set up...begin test');
             done();
 
         }).catch(function (err) {
@@ -140,10 +142,106 @@ describe("QueryEngineRoomSpec", function () {
 
         }).catch(function (err) {
             Log.warn('Return code: ' + err.code + ' FAILED TEST');
+            Log.warn('Error message: ' + err.message)
             expect(err.code).to.equal(424);
+
 
         }).then(done, done)
     });
 
+    it("Should still be able to perform a query when the removed dataset has a different id (Edison)", function (done) {
+        this.timeout(15000);
+        let query: string = fs.readFileSync('test/testQueries/simpleQuery');
+        let expectedResult: string = '{"result":[{"courses_dept":"epse","courses_avg":97.09},{"courses_dept":"math","courses_avg":97.09},{"courses_dept":"math","courses_avg":97.09},{"courses_dept":"epse","courses_avg":97.09},{"courses_dept":"math","courses_avg":97.25},{"courses_dept":"math","courses_avg":97.25},{"courses_dept":"epse","courses_avg":97.29},{"courses_dept":"epse","courses_avg":97.29},{"courses_dept":"nurs","courses_avg":97.33},{"courses_dept":"nurs","courses_avg":97.33},{"courses_dept":"epse","courses_avg":97.41},{"courses_dept":"epse","courses_avg":97.41},{"courses_dept":"cnps","courses_avg":97.47},{"courses_dept":"cnps","courses_avg":97.47},{"courses_dept":"math","courses_avg":97.48},{"courses_dept":"math","courses_avg":97.48},{"courses_dept":"educ","courses_avg":97.5},{"courses_dept":"nurs","courses_avg":97.53},{"courses_dept":"nurs","courses_avg":97.53},{"courses_dept":"epse","courses_avg":97.67},{"courses_dept":"epse","courses_avg":97.69},{"courses_dept":"epse","courses_avg":97.78},{"courses_dept":"crwr","courses_avg":98},{"courses_dept":"crwr","courses_avg":98},{"courses_dept":"epse","courses_avg":98.08},{"courses_dept":"nurs","courses_avg":98.21},{"courses_dept":"nurs","courses_avg":98.21},{"courses_dept":"epse","courses_avg":98.36},{"courses_dept":"epse","courses_avg":98.45},{"courses_dept":"epse","courses_avg":98.45},{"courses_dept":"nurs","courses_avg":98.5},{"courses_dept":"nurs","courses_avg":98.5},{"courses_dept":"epse","courses_avg":98.58},{"courses_dept":"nurs","courses_avg":98.58},{"courses_dept":"nurs","courses_avg":98.58},{"courses_dept":"epse","courses_avg":98.58},{"courses_dept":"epse","courses_avg":98.7},{"courses_dept":"nurs","courses_avg":98.71},{"courses_dept":"nurs","courses_avg":98.71},{"courses_dept":"eece","courses_avg":98.75},{"courses_dept":"eece","courses_avg":98.75},{"courses_dept":"epse","courses_avg":98.76},{"courses_dept":"epse","courses_avg":98.76},{"courses_dept":"epse","courses_avg":98.8},{"courses_dept":"spph","courses_avg":98.98},{"courses_dept":"spph","courses_avg":98.98},{"courses_dept":"cnps","courses_avg":99.19},{"courses_dept":"math","courses_avg":99.78},{"courses_dept":"math","courses_avg":99.78}]}';
+
+        let contentC: string = new Buffer(fs.readFileSync('./zips/courses.zip'))
+            .toString('base64');
+
+        inFac.addDataset("courses", contentC).then(function () {
+            expect(db.countEntries()).to.equal(64976)
+
+            return inFac.removeDataset("rooms")
+
+        }).then(function () { // preloaded ROOMS is deleted
+            expect(db.countEntries()).to.equal(64612);
+
+            return inFac.performQuery(JSON.parse(query))
+            // perform query on empty database
+
+        }).catch(function (err) {
+            Log.warn('failed to query:  ' + err.body.error);
+            expect.fail();
+
+        }).then(function (obj) {
+            Log.test('Return code: ' + obj.code);
+            expect(obj.code).to.equal(200);
+            let body: bodyJSON = obj.body;
+            checkResults(JSON.parse(expectedResult).result, body.result)
+
+        }).then(done, done).catch(function (err) {
+            Log.warn('Return code: ' + err.code + ' FAILED TEST');
+            expect.fail();
+            done()
+        })
+
+    });
+
+    it("Should be able to perform query when dataset has been added (Cesium)", function (done) {
+        this.timeout(15000);
+        let query: string = fs.readFileSync('test/testQueries/simpleQuery');
+        let expectedResult: string = '{"result":[{"courses_dept":"epse","courses_avg":97.09},{"courses_dept":"math","courses_avg":97.09},{"courses_dept":"math","courses_avg":97.09},{"courses_dept":"epse","courses_avg":97.09},{"courses_dept":"math","courses_avg":97.25},{"courses_dept":"math","courses_avg":97.25},{"courses_dept":"epse","courses_avg":97.29},{"courses_dept":"epse","courses_avg":97.29},{"courses_dept":"nurs","courses_avg":97.33},{"courses_dept":"nurs","courses_avg":97.33},{"courses_dept":"epse","courses_avg":97.41},{"courses_dept":"epse","courses_avg":97.41},{"courses_dept":"cnps","courses_avg":97.47},{"courses_dept":"cnps","courses_avg":97.47},{"courses_dept":"math","courses_avg":97.48},{"courses_dept":"math","courses_avg":97.48},{"courses_dept":"educ","courses_avg":97.5},{"courses_dept":"nurs","courses_avg":97.53},{"courses_dept":"nurs","courses_avg":97.53},{"courses_dept":"epse","courses_avg":97.67},{"courses_dept":"epse","courses_avg":97.69},{"courses_dept":"epse","courses_avg":97.78},{"courses_dept":"crwr","courses_avg":98},{"courses_dept":"crwr","courses_avg":98},{"courses_dept":"epse","courses_avg":98.08},{"courses_dept":"nurs","courses_avg":98.21},{"courses_dept":"nurs","courses_avg":98.21},{"courses_dept":"epse","courses_avg":98.36},{"courses_dept":"epse","courses_avg":98.45},{"courses_dept":"epse","courses_avg":98.45},{"courses_dept":"nurs","courses_avg":98.5},{"courses_dept":"nurs","courses_avg":98.5},{"courses_dept":"epse","courses_avg":98.58},{"courses_dept":"nurs","courses_avg":98.58},{"courses_dept":"nurs","courses_avg":98.58},{"courses_dept":"epse","courses_avg":98.58},{"courses_dept":"epse","courses_avg":98.7},{"courses_dept":"nurs","courses_avg":98.71},{"courses_dept":"nurs","courses_avg":98.71},{"courses_dept":"eece","courses_avg":98.75},{"courses_dept":"eece","courses_avg":98.75},{"courses_dept":"epse","courses_avg":98.76},{"courses_dept":"epse","courses_avg":98.76},{"courses_dept":"epse","courses_avg":98.8},{"courses_dept":"spph","courses_avg":98.98},{"courses_dept":"spph","courses_avg":98.98},{"courses_dept":"cnps","courses_avg":99.19},{"courses_dept":"math","courses_avg":99.78},{"courses_dept":"math","courses_avg":99.78}]}';
+
+        inFac.removeDataset("rooms").then(function () { // preloaded ROOMS is deleted
+            expect(db.countEntries()).to.equal(0);
+            return inFac.performQuery(JSON.parse(query))
+            // perform query on empty database
+
+        }).then(function(obj) {
+            Log.warn("Should have failed to query an empty database.")
+            expect.fail();
+
+        }).catch(function (obj) {
+            Log.test('Return code: ' + obj.code);
+            expect(obj.code).to.equal(424); // b/c empty
+
+            let contentC: string = new Buffer(fs.readFileSync('./zips/courses.zip'))
+                .toString('base64');
+
+            return inFac.addDataset("courses", contentC);
+            // add the COURSES dataset
+
+        }).catch(function (err) {
+            Log.warn('failed to add dataset:  ' + err.body.error);
+            expect.fail();
+
+        }).then(function () {
+            let contentR: string = new Buffer(fs.readFileSync('./zips/rooms.zip'))
+                .toString('base64');
+
+            return inFac.addDataset("rooms", contentR);
+            // add the ROOMS dataset
+
+        }).then(function () {
+            expect(db.countEntries()).to.equal(64976)
+            return inFac.performQuery(JSON.parse(query))
+            // perform the query on the database with COURSES and ROOMS loaded
+
+        }).catch(function (err) {
+            Log.warn('failed to query:  ' + err.body.error);
+            expect.fail();
+
+        }).then(function (obj) {
+            Log.test('Return code: ' + obj.code);
+            expect(obj.code).to.equal(200);
+            let body: bodyJSON = obj.body;
+            checkResults(JSON.parse(expectedResult).result, body.result)
+
+        }).then(done, done).catch(function (err) {
+            Log.warn('Return code: ' + err.code + ' FAILED TEST');
+            expect.fail();
+            done()
+        })
+
+    });
 
  });

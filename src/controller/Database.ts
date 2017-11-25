@@ -23,13 +23,11 @@ export class Database {
     private roomCollection: Array<Room> = [];
     private performingSectionQuery: Boolean = false;
     private performingRoomQuery: Boolean = false;
-    private loadedDB: Array<string>;
     private static instance: Database;
 
     constructor() {
         if (! Database.instance) {
             this.sectionCollection = [];
-            this.loadedDB = [];
             Database.instance = this;
         }
         return Database.instance;
@@ -123,11 +121,6 @@ export class Database {
         let cacheContents = this.pukeMemory(dbName);
         // console.log(finalBracket);
 
-        if (!isNullOrUndefined(firstTime) && firstTime) {
-            // change which databases are loaded
-            this.loadedDB.push(dbName);
-        }
-
         fs.writeFileSync("./dbFiles/" + dbName, cacheContents);
 
     }
@@ -161,18 +154,14 @@ export class Database {
      */
     deleteDB(dbName: string) {
 
-        if (this.loadedDB.includes(dbName)) {
-            // remove from list of loaded
-            let pos = this.loadedDB.indexOf(dbName);
-            this.loadedDB.splice(pos, 1);
-
+        if (this.listLoaded().includes(dbName)) {
             // blank memory and reload remaining databases
             this.reset(dbName);
 
-        }
+            // delete from disk
+            fs.unlinkSync('./dbFiles/' + dbName)
 
-        // delete from disk
-        fs.unlinkSync('./dbFiles/' + dbName)
+        }
 
     }
 
@@ -630,7 +619,7 @@ export class Database {
 
     // returns the database that is currently loaded
     listLoaded(): Array<string> {
-        return this.loadedDB;
+        return fs.readdirSync('./dbFiles/');
     }
 
     // returns a list of the databases stored in memory
@@ -639,7 +628,7 @@ export class Database {
     }
 
     hasDB(id: string): boolean {
-        return this.loadedDB.includes(id);
+        return this.listLoaded().includes(id);
     }
 
     // may be used to blank the entire database before loading a query DB or restoring the main DB

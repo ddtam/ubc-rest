@@ -8,6 +8,7 @@ import {CourseJSON} from "./IJSON";
 import {InsightResponse} from "./IInsightFacade";
 import {HtmlUtil} from "./HtmlUtil";
 import {Building} from "./Building";
+import {error, isNull} from "util";
 let parse5 = require('parse5');
 
 export default class InputHandler {
@@ -29,6 +30,22 @@ export default class InputHandler {
 
         // track existence of AT LEAST ONE valid JSON; assume false
         this.containsValidJSON = false;
+
+        try {
+            await zipContents.file('index.htm').async("text")
+                .then(function (html: string) {
+                    return parse5.parse(html)
+                });
+
+            // WILL ONLY REACH HERE IF ZIP ACTUALLY CONTAINS HTML
+            throw new Error('BADID - rooms zip loaded as id "courses"')
+
+        } catch(err) {
+            if (err.message.includes("BADID")) {
+                // failed because rooms loaded as courses
+                throw err;
+            }
+        }
 
         zipContents.forEach(function (relativePath, file) {
             if (!file.dir) { // process only files, NOT directories
@@ -165,6 +182,31 @@ export default class InputHandler {
         this.containsValidJSON = false; // RESET the flag
 
         let counter: number = 1;
+
+        let first: Boolean = true;
+
+        zipContents.forEach(function (path, file) {
+
+            if (first && !isNull(file) && !file.dir) { // process only files, NOT directories
+                first = false;
+
+                file.async('string').then(function (content) {
+                    try {
+                        JSON.parse(content);
+
+                        // should not reach here; zip contents is JSON
+                        throw new Error('BADID - courses zip loaded as id "rooms"')
+
+                    } catch (err) {
+                        if (err.message.includes("BADID")) {
+                            // failed because rooms loaded as courses
+                            throw err;
+                        }
+                    }
+                });
+
+            }
+        });
 
         let index: JSON = await zipContents.file('index.htm').async("text")
             .then(function (html: string) {
