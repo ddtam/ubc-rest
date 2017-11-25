@@ -1,46 +1,36 @@
-import {LOGICCnode} from "./LOGICCnode";
-import {MCnode} from "./MCnode";
-import {SCnode} from "./SCnode";
-import {NEGnode} from "./NEGnode";
-import {FilterJSON} from "../IJSON";
-import {error} from "util";
-import {ANode} from "./ANode";
-import {Section} from "../Section";
-import {Room} from "../Room";
 import {APPLYKEYnode} from "./APPLYKEYnode";
+import {QueryEngine} from "../QueryEngine";
 
 export class APPLYnode {
-    criteria: LOGICCnode | MCnode | SCnode | NEGnode;
-    applyKeys: Array<APPLYKEYnode>;
-    keyFields: Array<string> = [];
+    applyKeyNodes: Array<APPLYKEYnode>;
 
-    constructor(criteria: any) {
+    constructor(userDefinedCriteria: any) {
 
         // initialize all the apply keys and store them in the array
-        this.applyKeys = [];
+        this.applyKeyNodes = [];
 
-        for (let c of criteria) {
-            this.applyKeys.push(new APPLYKEYnode(c))
+        for (let c of userDefinedCriteria) {
+            this.applyKeyNodes.push(new APPLYKEYnode(c))
         }
-
     }
 
-    evaluate(group: Array<Section|Room>): any {
-
-        // need to sort out how to dynamically create new section/room object with the grouped fields AND the
-        //  keyFields from above
-
-        let tempObject: any = {};
+    evaluate(group: any): any {
+        let partialResult: any = {};
 
         // run the apply
-        for (let app of this.applyKeys) {
-            let keyName: string = app.getKeyName();
-            let keyValue: any = app.evaluate(group);
+        for (let applyKeyNode of this.applyKeyNodes) {
+            // evaluate the partial result object with the user-defined key and its calculated value
+            partialResult = applyKeyNode.evaluate(group);
 
-            tempObject.keyName = keyValue;
+            // complete the partial result with the keys that define this group
+            for (let key of Object.keys(group)) {
+                if (QueryEngine.isGoodKey(key)) {
+                    partialResult[key] = group[key];
+                }
+            }
         }
 
-        return tempObject;
+        return partialResult;
     }
 
 }

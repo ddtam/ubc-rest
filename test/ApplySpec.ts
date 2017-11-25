@@ -18,34 +18,28 @@ describe ("ApplySpec", function () {
         expect(first).to.deep.include.members(second);
     }
 
-    beforeEach(function (done) {
-        this.timeout(5000);
-
-        Log.warn('database is being reset...');
-        db.reset("all");
+    before(function(done) {
+        this.timeout(8000);
 
         inFac = new InsightFacade();
 
-        // clear databases that are cached
-        Log.warn('deleting cached databases...');
-
-        let databaseList = fs.readdirSync('./dbFiles/');
-        for (const file of databaseList) {
-            fs.unlinkSync('./dbFiles/' + file)
-        }
-
-        // load default courses.zip
-        let content: string = new Buffer(fs.readFileSync('./zips/rooms.zip'))
+        // load zips
+        let rContent: string = new Buffer(fs.readFileSync('./zips/rooms.zip'))
             .toString('base64');
 
-        inFac.addDataset('rooms', content).then(function () {
-            done();
+        let cContent: string = new Buffer(fs.readFileSync('./zips/courses.zip'))
+            .toString('base64');
 
-        }).catch(function (err) {
-            Log.warn('FAILED IN SET UP -  ' + err.body.error)
+        inFac.addDataset('rooms', rContent).then(function () {
+            return inFac.addDataset('courses', cContent)
 
         })
+        .catch(function (err) {
+            Log.warn('FAILED IN SET UP -  ' + err.body.error)
 
+        }).then(function () {
+                done();
+        })
     });
 
     it("Should complete Query A from Spec (maxSeats transformation)", function (done) {
@@ -62,9 +56,144 @@ describe ("ApplySpec", function () {
 
         }).then(done, done).catch(function (err) {
             Log.warn('Return code: ' + err.code + ' FAILED TEST');
+            Log.warn(err.body.error);
             expect.fail();
             done()
         })
+    });
+
+    it("Should handle a bad transformation query with no GROUP", function (done) {
+        this.timeout(5000);
+
+        let query: string = fs.readFileSync('test/testQueries/badTransformationNoGroup');
+
+        inFac.performQuery(JSON.parse(query)).then(function (obj) {
+            Log.warn('Return code: ' + obj.code + ' FAILED TEST');
+            expect.fail();
+            done()
+
+        }).catch(function (err) {
+            Log.test('Return code: ' + err.code);
+            expect(err.code).to.equal(400);
+            Log.test(err.body.error);
+            expect(err.body.error).to.contain("SYNTAXERR");
+
+        }).then(done, done)
+    });
+
+    it("Should handle a bad transformation query with no APPLY", function (done) {
+        this.timeout(5000);
+
+        let query: string = fs.readFileSync('test/testQueries/badTransformationNoApply');
+
+        inFac.performQuery(JSON.parse(query)).then(function (obj) {
+            Log.warn('Return code: ' + obj.code + ' FAILED TEST');
+            expect.fail();
+            done()
+
+        }).catch(function (err) {
+            Log.test('Return code: ' + err.code);
+            expect(err.code).to.equal(400);
+            Log.test(err.body.error);
+            expect(err.body.error).to.contain("SYNTAXERR");
+
+        }).then(done, done)
+    });
+
+    it("Should handle a bad transformation query that groups on a bad course key", function (done) {
+        this.timeout(5000);
+
+        let query: string = fs.readFileSync('test/testQueries/badTransformationInvalidGroupCourseKey');
+
+        inFac.performQuery(JSON.parse(query)).then(function (obj) {
+            Log.warn('Return code: ' + obj.code + ' FAILED TEST');
+            expect.fail();
+            done()
+
+        }).catch(function (err) {
+            Log.test('Return code: ' + err.code);
+            expect(err.code).to.equal(400);
+            Log.test(err.body.error);
+            expect(err.body.error).to.contain("SYNTAXERR");
+
+        }).then(done, done)
+    });
+
+    it("Should handle a bad transformation query that groups on a bad room key", function (done) {
+        this.timeout(5000);
+
+        let query: string = fs.readFileSync('test/testQueries/badTransformationInvalidGroupCourseKey');
+
+        inFac.performQuery(JSON.parse(query)).then(function (obj) {
+            Log.warn('Return code: ' + obj.code + ' FAILED TEST');
+            expect.fail();
+            done()
+
+        }).catch(function (err) {
+            let db = new Database();
+            Log.test('Return code: ' + err.code);
+            expect(err.code).to.equal(400);
+            Log.test(err.body.error);
+            expect(err.body.error).to.contain("SYNTAXERR");
+
+        }).then(done, done)
+    });
+
+    it("Should handle a bad transformation query that isn't MAX/MIN/AVG/COUNT/SUM", function (done) {
+        this.timeout(5000);
+
+        let query: string = fs.readFileSync('test/testQueries/badTransformationInvalidApply');
+
+        inFac.performQuery(JSON.parse(query)).then(function (obj) {
+            Log.warn('Return code: ' + obj.code + ' FAILED TEST');
+            expect.fail();
+            done()
+
+        }).catch(function (err) {
+            Log.test('Return code: ' + err.code);
+            expect(err.code).to.equal(400);
+            Log.test(err.body.error);
+            expect(err.body.error).to.contain("SYNTAXERR");
+
+        }).then(done, done)
+    });
+
+    it("Should handle a bad transformation query that performs MAX on a string", function (done) {
+        this.timeout(5000);
+
+        let query: string = fs.readFileSync('test/testQueries/badTransformationMaxString');
+
+        inFac.performQuery(JSON.parse(query)).then(function (obj) {
+            Log.warn('Return code: ' + obj.code + ' FAILED TEST');
+            expect.fail();
+            done()
+
+        }).catch(function (err) {
+            Log.test('Return code: ' + err.code);
+            expect(err.code).to.equal(400);
+            Log.test(err.body.error);
+            expect(err.body.error).to.contain("SYNTAXERR");
+
+        }).then(done, done)
+    });
+
+    it("Should handle a bad transformation query that performs MAX on a bad key", function (done) {
+        this.timeout(5000);
+
+        let query: string = fs.readFileSync('test/testQueries/badTransformationMaxBadKey');
+
+        inFac.performQuery(JSON.parse(query)).then(function (obj) {
+            Log.warn('Return code: ' + obj.code + ' FAILED TEST');
+            expect.fail();
+            done()
+
+        }).catch(function (err) {
+            Log.test('Return code: ' + err.code);
+            expect(err.code).to.equal(400);
+            Log.test(err.body.error);
+            expect(err.body.error).to.contain("SYNTAXERR");
+
+        }).then(done, done)
     })
 
 });

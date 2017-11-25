@@ -6,6 +6,7 @@ import {Database} from "./Database";
 import {Room} from "./Room";
 import {ResultRoom} from "./ResultRoom";
 import {APPLYnode} from "./nodes/APPLYnode";
+import {isUndefined} from "util";
 
 export class QueryEngine {
 
@@ -84,34 +85,32 @@ export class QueryEngine {
     /**
      *
      * @param {TransformJSON} transformation
-     * @param {Array<Section | Room>} results
+     * @param {Array<Section | Room>} rawResults
      * @returns {Array<Section | Room>}
      */
     private transformMatch(transformation: TransformJSON, rawResults: Array<Section|Room>): Array<Section|Room> {
-        // TODO: Implement this method
         let groups: Array<Array<any>> = [];
         let transformedGroups: Array<any> = [];
 
-        // evaluate groups and store them in an array
+        // check syntax of transformation clause
         let groupCriteria: Array<string> = transformation.GROUP;
+        let applyCriteria: any = transformation.APPLY;
+
+        if (isUndefined(groupCriteria)) {
+            throw new Error('SYNTAXERR - no GROUP defined in transformation')
+        } else if (isUndefined(applyCriteria)) {
+            throw new Error('SYNTAXERR - no APPLY defined in transformation')
+        }
+
+        // evaluate groups and store them in an array
         groups = QueryEngine.createGroups(rawResults, groupCriteria);
 
         // "apply" to each group and store results
-        let applyCriteria: any = transformation.APPLY;
         let root: APPLYnode = new APPLYnode(applyCriteria);
 
-        for (let group of groups) {
-            let partialEntry: any = transformedGroups.push(root.evaluate(group));
+        for (let g of groups) {
+            transformedGroups.push(root.evaluate(g));
 
-            // extract common group keys
-            for (let criteria of groupCriteria) {
-                let value: string = group[0].criteria;
-
-                partialEntry.criteria = value;
-
-            }
-
-            transformedGroups.push(partialEntry)
         }
 
         return transformedGroups;
@@ -218,36 +217,14 @@ export class QueryEngine {
             }
 
             // determine what type of field is being sorted on
-            switch (sortOn) {
-                case 'courses_dept':
-                case 'courses_id':
-                case 'courses_title':
-                case 'courses_instructor':
-                case 'courses_uuid':
-                case 'courses_section':
-                case 'rooms_fullname':
-                case 'rooms_shortname':
-                case 'rooms_number':
-                case 'rooms_name':
-                case 'rooms_address':
-                case 'rooms_type':
-                case 'rooms_furniture':
-                case 'rooms_href':
-                    hasStringOrder = true;
-                    break;
+            if (QueryEngine.isStringKey(sortOn)) {
+                hasStringOrder = true;
 
-                case 'courses_avg':
-                case 'courses_pass':
-                case 'courses_fail':
-                case 'courses_audit':
-                case 'courses_year':
-                case 'rooms_lat':
-                case 'rooms_lon':
-                case 'rooms_seats':
-                    hasNumberOrder = true;
-                    break;
+            } else if (QueryEngine.isNumberKey(sortOn)) {
+                hasNumberOrder = true;
 
             }
+
         }
 
         if (hasStringOrder) {
@@ -266,7 +243,7 @@ export class QueryEngine {
                 return 0;
             });
 
-        } else if(hasNumberOrder) {
+        } else if (hasNumberOrder) {
             // sort on a number
             fResults.sort(function (a, b) {
                 return Number(a[sortOn]) - Number(b[sortOn]);
@@ -298,9 +275,26 @@ export class QueryEngine {
      * @param {Array<string>} groupCriteria
      * @returns {Array<Array<any>>}
      */
-    private static createGroups(ungroupedResults: Array<Section | Room>, groupCriteria: Array<string>): Array<Array<any>> {
+    private static createGroups(ungroupedResults: Array<any>, groupCriteria: Array<string>): Array<Array<any>> {
         let groupedResults: Array<any> = [];
 
+        // check syntax
+        if (!isUndefined(ungroupedResults[0].courses_id)) {
+            for (let c of groupCriteria) {
+                if (!QueryEngine.isSectionKey(c)) {
+                    throw new Error('SYNTAXERR - "' + c + '" is not a valid course key')
+                }
+            }
+
+        } else if (!isUndefined(ungroupedResults[0].rooms_name)) {
+            for (let c of groupCriteria) {
+                if (!QueryEngine.isRoomKey(c)) {
+                    throw new Error('SYNTAXERR - "' + c + '" is not a valid room key')
+                }
+            }
+        }
+
+        // perform grouping
         for (let u of ungroupedResults) {
             let matchedExistingGroup = false;
 
@@ -337,38 +331,139 @@ export class QueryEngine {
         return groupedResults;
     }
 
-    /**
-     * Checks if arr1 contains arr2
-     * @param {Array<any>} arr1
-     * @param {Array<any>} arr2
-     * @returns {boolean}
-     */
-    private arrayContained(arr1: Array<any>, arr2: Array<any>):boolean {
-        let yes:boolean = true;
-        for (let arr of arr1){
-            yes = true;
-            if(arr.length !== arr2.length) {
-                yes = false;
-            }
-            for(let i = arr.length; i--;) {
-                if(arr[i] !== arr2[i])
-                    yes = false
-            }
-            if (yes){
-                return true;
-            }
+    // checks if a key corresponds with established keys
+    static isGoodKey(key: string): boolean {
+        let keyIsGood: boolean;
+
+        switch (key) {
+            case 'courses_dept':
+            case 'courses_id':
+            case 'courses_title':
+            case 'courses_instructor':
+            case 'courses_uuid':
+            case 'courses_section':
+            case 'courses_avg':
+            case 'courses_pass':
+            case 'courses_fail':
+            case 'courses_audit':
+            case 'courses_year':
+            case 'rooms_fullname':
+            case 'rooms_shortname':
+            case 'rooms_number':
+            case 'rooms_name':
+            case 'rooms_address':
+            case 'rooms_type':
+            case 'rooms_furniture':
+            case 'rooms_href':
+            case 'rooms_lat':
+            case 'rooms_lon':
+            case 'rooms_seats':
+                keyIsGood = true;
+                break;
+            default:
+                keyIsGood = false;
         }
-        return yes;
+
+        return keyIsGood;
     }
 
-    private arraysEqual(arr1: Array<any>, arr2: Array<any>) {
-        if(arr1.length !== arr2.length)
-            return false;
-        for(let i = arr1.length; i--;) {
-            if(arr1[i] !== arr2[i])
-                return false;
+    // checks if a key is for a section
+    static isSectionKey(key: string): boolean {
+        let keyIsGood: boolean;
+
+        switch (key) {
+            case 'courses_dept':
+            case 'courses_id':
+            case 'courses_title':
+            case 'courses_instructor':
+            case 'courses_uuid':
+            case 'courses_section':
+            case 'courses_avg':
+            case 'courses_pass':
+            case 'courses_fail':
+            case 'courses_audit':
+            case 'courses_year':
+                keyIsGood = true;
+                break;
+            default:
+                keyIsGood = false;
         }
 
-        return true;
+        return keyIsGood;
+    }
+
+    // checks if a key is for a room
+    static isRoomKey(key: string): boolean {
+        let keyIsGood: boolean;
+
+        switch (key) {
+            case 'rooms_fullname':
+            case 'rooms_shortname':
+            case 'rooms_number':
+            case 'rooms_name':
+            case 'rooms_address':
+            case 'rooms_type':
+            case 'rooms_furniture':
+            case 'rooms_href':
+            case 'rooms_lat':
+            case 'rooms_lon':
+            case 'rooms_seats':
+                keyIsGood = true;
+                break;
+            default:
+                keyIsGood = false;
+        }
+
+        return keyIsGood;
+    }
+
+    // checks if a key encodes a string
+    static isStringKey(key: string): boolean {
+        let keyIsGood: boolean;
+
+        switch (key) {
+            case 'courses_dept':
+            case 'courses_id':
+            case 'courses_title':
+            case 'courses_instructor':
+            case 'courses_uuid':
+            case 'courses_section':
+            case 'rooms_fullname':
+            case 'rooms_shortname':
+            case 'rooms_number':
+            case 'rooms_name':
+            case 'rooms_address':
+            case 'rooms_type':
+            case 'rooms_furniture':
+            case 'rooms_href':
+                keyIsGood = true;
+                break;
+            default:
+                keyIsGood = false;
+        }
+
+        return keyIsGood;
+    }
+
+    // checks if a key encodes a number
+    static isNumberKey(key: string): boolean {
+        let keyIsGood: boolean;
+
+        switch (key) {
+            case 'courses_avg':
+            case 'courses_pass':
+            case 'courses_fail':
+            case 'courses_audit':
+            case 'courses_year':
+            case 'rooms_lat':
+            case 'rooms_lon':
+            case 'rooms_seats':
+                keyIsGood = true;
+                break;
+            default:
+                keyIsGood = false;
+        }
+
+        return keyIsGood;
     }
 }
