@@ -3,10 +3,11 @@ import {MCnode} from "./MCnode";
 import {SCnode} from "./SCnode";
 import {NEGnode} from "./NEGnode";
 import {FilterJSON} from "../IJSON";
-import {error} from "util";
+import {error, isNullOrUndefined, isUndefined} from "util";
 import {ANode} from "./ANode";
 import {Section} from "../Section";
 import {Room} from "../Room";
+import {Database} from "../Database";
 
 export class FILTERnode extends ANode {
     criteria: LOGICCnode | MCnode | SCnode | NEGnode;
@@ -40,13 +41,23 @@ export class FILTERnode extends ANode {
                 break;
 
             default:
+                if (isNullOrUndefined(key)){
+                    this.criteria = null;
+                    break;
+                }
                 throw new Error('SYNTAXERR - some FILTER query is poorly formed');
 
         }
     }
 
     evaluate(): Array<Section|Room> {
-        let result: Array<Section|Room> = this.criteria.evaluate();
+        let result: Array<Section|Room>;
+        if (!isNullOrUndefined(this.criteria)){
+            result = this.criteria.evaluate();
+        }else{
+            let db = new Database();
+            result = db.query(null);
+        }
 
         return result
 

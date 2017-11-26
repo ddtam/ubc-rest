@@ -29,6 +29,9 @@ export class APPLYnode {
                 }
             }
         }
+        if (this.applyKeyNodes.length === 0){
+            return group;
+        }
 
         return partialResult;
     }

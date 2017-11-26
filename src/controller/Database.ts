@@ -6,6 +6,7 @@ let fs = require('fs');
 import {Section} from "./Section";
 import {isNull, isNullOrUndefined} from "util";
 import {Room} from "./Room";
+import ArrayUtil from "../ArrayUtil";
 
 export interface Criteria {
     [index: string]: any;
@@ -276,7 +277,10 @@ export class Database {
     query(question: Criteria): Array<Section|Room> {
         let result: Array<Section|Room>;
 
-        if (
+    if(isNullOrUndefined(question)){
+            result = ArrayUtil.union([this.roomCollection, this.sectionCollection]);
+        }
+        else if (
             question.property === "courses_dept" ||
             question.property === "courses_id" ||
             question.property === "courses_title" ||
@@ -308,7 +312,7 @@ export class Database {
             // is a numerical query with some equality comparison
             result = this.handleNumQuery(question.property, question.value, question.equality)
 
-        } else {
+        }  else {
             // query is poorly formed; throw error
             throw new Error('query is poorly formed; property "' + question.property + '" does not exist')
 

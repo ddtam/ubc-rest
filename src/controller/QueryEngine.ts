@@ -6,7 +6,7 @@ import {Database} from "./Database";
 import {Room} from "./Room";
 import {ResultRoom} from "./ResultRoom";
 import {APPLYnode} from "./nodes/APPLYnode";
-import {isUndefined} from "util";
+import {isNullOrUndefined, isUndefined} from "util";
 
 export class QueryEngine {
 
@@ -453,6 +453,13 @@ export class QueryEngine {
                 newGroup.groupContents = [u];
 
                 groupedResults.push(newGroup);
+            }
+        }
+        for (let g of groupedResults) {
+            for (let c of groupCriteria) {
+                if (isNullOrUndefined(g[c])) {
+                    groupedResults.splice(groupedResults.indexOf(g), 1);
+                }
             }
         }
 
