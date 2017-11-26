@@ -16,8 +16,7 @@ describe("RemoveDatasetSpec", function () {
 
     beforeEach(function() {
         Log.warn('database is being reset...');
-        db.deleteDB("courses");
-        db.deleteDB("rooms");
+        db.reset("all");
 
         // clear databases that are cached
         Log.warn('deleting cached databases...');

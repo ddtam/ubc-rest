@@ -23,8 +23,7 @@ describe("QueryEngineCourseSpec", function () {
         this.timeout(5000);
 
         Log.warn('database is being reset...');
-        db.deleteDB("courses");
-        db.deleteDB("rooms");
+        db.reset("all");
 
         inFac = new InsightFacade();
 
@@ -348,8 +347,7 @@ describe("QueryEngineCourseSpec", function () {
 
     it("Should throw 424 with a missing dataset", function (done) {
         let db = new Database();
-        db.deleteDB("courses");
-        db.deleteDB("rooms");
+        db.reset("all");
 
         let query: string = fs.readFileSync('test/testQueries/simpleQuery');
 

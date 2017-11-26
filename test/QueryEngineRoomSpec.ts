@@ -24,8 +24,7 @@ describe("QueryEngineRoomSpec", function () {
         this.timeout(10000);
 
         Log.warn('database is being reset...');
-        db.deleteDB("rooms");
-        db.deleteDB("courses");
+        db.reset("all");
 
         inFac = new InsightFacade();
 
