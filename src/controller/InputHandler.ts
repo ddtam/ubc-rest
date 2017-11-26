@@ -263,11 +263,11 @@ export default class InputHandler {
      * @returns {Promise<any>}
      * @constructor
      */
-    private ProcessAllFiles(coursePromiseCollection: Array<Promise<InsightResponse>>,
+    private ProcessAllFiles(promiseCollection: Array<Promise<InsightResponse>>,
                             counter: number): Promise<any> {
         let that = this;
 
-        return Promise.all(coursePromiseCollection)
+        return Promise.all(promiseCollection)
             .then(function () {
                 InputHandler.LogDatabaseStateToConsole(counter);
 

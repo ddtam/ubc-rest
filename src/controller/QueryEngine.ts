@@ -20,6 +20,11 @@ export class QueryEngine {
         // get the results that match the query based on FILTER
         let results: Array<Section|Room> = this.getMatch(query.WHERE);
 
+        if (results.length === 0) {
+            // no results were returned
+            return QueryEngine.encapsulate([]);
+        }
+
         // transform the results based on TRANSFORMATIONS
         if (objKeys.includes('TRANSFORMATIONS')){
             results = this.transformMatch(query.TRANSFORMATIONS, results);
@@ -88,7 +93,9 @@ export class QueryEngine {
      * @param {Array<Section | Room>} rawResults
      * @returns {Array<Section | Room>}
      */
-    private transformMatch(transformation: TransformJSON, rawResults: Array<Section|Room>): Array<Section|Room> {
+    private transformMatch(transformation: TransformJSON,
+                           rawResults: Array<Section|Room>
+    ): Array<Section|Room> {
         let groups: Array<Array<any>> = [];
         let transformedGroups: Array<any> = [];
 
@@ -100,11 +107,6 @@ export class QueryEngine {
             throw new Error('SYNTAXERR - no GROUP defined in transformation')
         } else if (isUndefined(applyCriteria)) {
             throw new Error('SYNTAXERR - no APPLY defined in transformation')
-        }
-
-        if (rawResults.length === 0) {
-            // there were no results; return
-            return transformedGroups;
         }
 
         // evaluate groups and store them in an array
@@ -130,12 +132,11 @@ export class QueryEngine {
     private formatMatch(OPTIONS: any, results: Array<any>): Array<ResultSection|ResultRoom> {
         // TODO this big ass method needs refactoring, pronto
 
+        let fResults: Array<ResultSection|ResultRoom> = [];
         let optKeys: Array<string>;
         let colKeys: Array<string>;
-        let fResults: Array<ResultSection|ResultRoom> = [];
-        let sortOn: string;
-        let hasStringOrder: boolean = false; // flag for if OPTIONS has alphabetical ORDER
-        let hasNumberOrder: boolean = false; // flag for if OPTIONS has numerical ORDER
+        let dataType: string;
+        let sortOn: any;
 
         // extract the keys out of OPTIONS (which should only only contain COLUMNS and ORDER)
         optKeys = Object.keys(OPTIONS);
@@ -147,85 +148,229 @@ export class QueryEngine {
 
         // extract the columns for result output
         colKeys = OPTIONS.COLUMNS;
-        this.checkColumnSyntax(colKeys, results);
+        QueryEngine.checkColumnSyntax(colKeys, results);
+        dataType = QueryEngine.extractDatatype(colKeys);
 
-        // create the results
-        for (let x of results) {
-            if (x instanceof Room) {
-                let rRoom = new ResultRoom();
+        // CREATE RESULTS WITH COLUMN INFORMATION
+        fResults = QueryEngine.buildColumns(colKeys, dataType, results);
 
-                for (let key of colKeys) {
-                    // this is terrible, we know
-                    rRoom[key] = x[key];
-                }
-
-                fResults.push(rRoom);
-
-
-            } else if (x instanceof Section) {
-                let rSec = new ResultSection();
-
-                for (let key of colKeys) {
-                    // this is terrible, we know
-                    rSec[key] = x[key];
-                }
-
-                fResults.push(rSec);
-
-            }
-        }
-
-        if (
-            optKeys.length === 2 && // this is the only other key
+        // CHECK FOR SORTING SPECIFICATION
+        if (optKeys.length === 2 && // this is the only other key
             optKeys.includes('ORDER') // and the second key is ORDER
-        ){
+        ) {
+            // there is a specification for sort order...
             sortOn = OPTIONS.ORDER;
 
-            // check if sortOn is retained by COLUMNS
-            if (!colKeys.includes(sortOn)) {
-                // sorting on a column that is not printed
-                throw new Error('SYNTAXERR - cannot order on a column that is not printed')
-            }
+            if (typeof(sortOn) === "string") {
+                // OPTIONS.ORDER does not contain complex sort information
 
-            // determine what type of field is being sorted on
-            if (QueryEngine.isStringKey(sortOn)) {
-                hasStringOrder = true;
-
-            } else if (QueryEngine.isNumberKey(sortOn)) {
-                hasNumberOrder = true;
-
-            }
-        }
-
-        if (hasStringOrder) {
-            // sort on a string
-            fResults.sort(function(a, b) {
-                var nameA = a[sortOn];
-                var nameB = b[sortOn];
-                if (nameA < nameB) {
-                    return -1;
-                }
-                if (nameA > nameB) {
-                    return 1;
+                // check if sortOn is printed in COLUMNS
+                if (!colKeys.includes(sortOn)) {
+                    // sorting on a column that is not printed; not allowed
+                    throw new Error('SYNTAXERR - cannot order on a column that is not printed')
                 }
 
-                // names must be equal
-                return 0;
-            });
+                fResults =  QueryEngine.handleSimpleSort(sortOn, fResults)
 
-        } else if (hasNumberOrder) {
-            // sort on a number
-            fResults.sort(function (a, b) {
-                return Number(a[sortOn]) - Number(b[sortOn]);
+            } else if (Object.keys(sortOn).length === 2) {
 
-            });
+                // check if keys in sortOn are printed in COLUMNS
+                for (let k of sortOn.keys) {
+                    if (!colKeys.includes(k)) {
+                        // sorting on a column that is not printed; not allowed
+                        throw new Error('SYNTAXERR - cannot order on a column that is not printed')
+                    }
+                }
 
+                fResults = QueryEngine.handleComplexSort(sortOn, fResults)
+
+            } else {
+                throw new Error('SYNTAXERR - OPTIONS is malformed: ' + sortOn)
+
+            }
+        } else if (optKeys.length !== 1) {
+            // there is a second key that is not ORDER
+            throw new Error('SYNTAXERR - one of OPTIONS specifications "' + optKeys + '" are invalid')
         }
 
         return fResults;
     }
 
-    private checkColumnSyntax(colKeys: Array<string>, results: Array<any>) {
+
+    private static buildColumns(colKeys: Array<string>,
+                                dataType: string,
+                                results: Array<any>
+    ): Array<ResultSection|ResultRoom> {
+
+        let cutResults: Array<ResultSection|ResultRoom> = [];
+
+        for (let x of results) {
+            if (dataType === 'courses') {
+                // building rooms
+                let rRoom = new ResultRoom();
+
+                for (let key of colKeys) {
+                    // this is terrible, we know
+                    rRoom[key] = x[key];
+
+                }
+                cutResults.push(rRoom);
+
+            } else if (dataType === 'rooms') {
+                // building sections
+                let rSec = new ResultSection();
+
+                for (let key of colKeys) {
+                    // this is terrible, we know
+                    rSec[key] = x[key];
+
+                }
+                cutResults.push(rSec);
+
+            }
+        }
+        return cutResults;
+
+    }
+
+    private static handleSimpleSort(sortOn: any,
+                                    unsortedResults: Array<ResultSection|ResultRoom>
+    ): Array<ResultSection|ResultRoom> {
+
+        let sortedResults: Array<ResultSection|ResultRoom>;
+        let hasStringOrder: boolean = false; // flag for if OPTIONS has alphabetical ORDER
+        let hasNumberOrder: boolean = false; // flag for if OPTIONS has numerical ORDER
+
+        // determine what type of field is being sorted on
+        if (QueryEngine.isStringKey(sortOn)) {
+            hasStringOrder = true;
+        } else if (QueryEngine.isNumberKey(sortOn)) {
+            hasNumberOrder = true;
+        }
+
+        if (hasStringOrder) {
+            // sort on a string
+            sortedResults = QueryEngine.sortStringAscending(unsortedResults, sortOn);
+        } else if (hasNumberOrder) {
+            // sort on a number
+            sortedResults = QueryEngine.sortNumericalAscending(unsortedResults, sortOn);
+        }
+
+        return sortedResults;
+    }
+
+    private static handleComplexSort(sortOn: any,
+                                     unsortedResults: Array<ResultSection|ResultRoom>
+    ): Array<ResultSection|ResultRoom> {
+
+        let direction: string = sortOn.dir;
+        let sortedResults: Array<ResultSection|ResultRoom> = unsortedResults;
+
+        if (direction === 'UP') {
+            // sort ASCENDING
+            for (let k = (sortOn.keys.length - 1); k >= 0; k--) {
+                let currKey = sortOn.keys[k];
+                let sortType: string = this.determineSortType(unsortedResults, currKey);
+
+                if (sortType === "string") {
+                    // sort string, descending
+                    sortedResults = QueryEngine.sortStringAscending(sortedResults, currKey);
+                } else if (sortType === "number") {
+                    // sort number, descending
+                    sortedResults = QueryEngine.sortNumericalAscending(sortedResults, currKey);
+                }
+            }
+
+        } else if (direction === 'DOWN') {
+            // sort DESCENDING
+            for (let k = (sortOn.keys.length - 1); k >= 0; k--) {
+                let currKey = sortOn.keys[k];
+                let sortType: string = this.determineSortType(unsortedResults, currKey);
+
+                if (sortType === "string") {
+                    // sort string, descending
+                    sortedResults = QueryEngine.sortStringDescending(sortedResults, currKey);
+                } else if (sortType === "number") {
+                    // sort number, descending
+                    sortedResults = QueryEngine.sortNumericalDescending(sortedResults, currKey);
+                }
+            }
+
+        } else {
+            throw new Error('SYNTAXERR - sort direction "' + direction +
+                '" is invalid; must either be "UP" or "DOWN"')
+        }
+
+        return sortedResults;
+    }
+
+    private static determineSortType(unsortedResults: Array<ResultSection | ResultRoom>, currKey: any) {
+        let sortType: string;
+
+        if (typeof(unsortedResults[0][currKey]) === "string") {
+            sortType = "string";
+        } else if (typeof(unsortedResults[0][currKey]) === "number") {
+            sortType = "number";
+        }
+
+        return sortType;
+    }
+
+    private static sortNumericalDescending(fResults: Array<ResultSection|ResultRoom>,
+                                           sortOn: string
+    ): Array<ResultSection|ResultRoom> {
+        return fResults.sort(function (a, b) {
+            return Number(b[sortOn]) - Number(a[sortOn]);
+
+        });
+    }
+
+    private static sortNumericalAscending(fResults: Array<ResultSection|ResultRoom>,
+                                          sortOn: string
+    ): Array<ResultSection|ResultRoom> {
+        return fResults.sort(function (a, b) {
+            return Number(a[sortOn]) - Number(b[sortOn]);
+
+        });
+    }
+
+    private static sortStringDescending(fResults: Array<ResultSection|ResultRoom>,
+                                        sortOn: string
+    ): Array<ResultSection|ResultRoom> {
+        return fResults.sort(function (a, b) {
+            var nameA = a[sortOn];
+            var nameB = b[sortOn];
+            if (nameA < nameB) {
+                return 1;
+            }
+            if (nameA > nameB) {
+                return -1;
+            }
+
+            // names must be equal
+            return 0;
+        });
+    }
+
+    private static sortStringAscending(fResults: Array<ResultSection|ResultRoom>,
+                                       sortOn: string
+    ): Array<ResultSection|ResultRoom> {
+        return fResults.sort(function (a, b) {
+            var nameA = a[sortOn];
+            var nameB = b[sortOn];
+            if (nameA < nameB) {
+                return -1;
+            }
+            if (nameA > nameB) {
+                return 1;
+            }
+
+            // names must be equal
+            return 0;
+        });
+    }
+
+    private static checkColumnSyntax(colKeys: Array<string>, results: Array<any>) {
         // check syntax for KEYS in COLUMN
 
         let transformKeys: Array<string> = Object.keys(results[0]);
@@ -399,7 +544,6 @@ export class QueryEngine {
 
         return keyIsGood;
     }
-
     // checks if a key encodes a string
     static isStringKey(key: string): boolean {
         let keyIsGood: boolean;
@@ -448,5 +592,13 @@ export class QueryEngine {
         }
 
         return keyIsGood;
+    }
+
+    private static extractDatatype(colKeys: Array<string>): string {
+        if (colKeys[0].includes('courses')) {
+            return 'courses';
+        } else if (colKeys[0].includes('rooms')) {
+            return 'rooms';
+        }
     }
 }
