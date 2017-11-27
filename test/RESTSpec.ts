@@ -50,8 +50,8 @@ describe("RESTSpec", function () {
     it("Should be able to add a small dataset", function () {
         // Init
         chai.use(chaiHttp);
-        let server = new Server(4321);
-        let URL = "http://127.0.0.1:4321";
+        let server = new Server(2468);
+        let URL = "http://127.0.0.1:2468";
 
         return server.start().then(function (success: Boolean) {
             return chai.request(URL)
@@ -81,8 +81,8 @@ describe("RESTSpec", function () {
     it("Should return 201 if dataset has already been added", function () {
         // Init
         chai.use(chaiHttp);
-        let server = new Server(4321);
-        let URL = "http://127.0.0.1:4321";
+        let server = new Server(2468);
+        let URL = "http://127.0.0.1:2468";
 
         return server.start().then(function (success: Boolean) {
             return chai.request(URL)
@@ -131,8 +131,8 @@ describe("RESTSpec", function () {
     it("Should be able to delete a small dataset", function () {
         // Init
         chai.use(chaiHttp);
-        let server = new Server(4321);
-        let URL = "http://127.0.0.1:4321";
+        let server = new Server(2468);
+        let URL = "http://127.0.0.1:2468";
 
         return server.start().then(function (success: Boolean) {
             return chai.request(URL)
@@ -181,8 +181,8 @@ describe("RESTSpec", function () {
     it("Should be able to perform a query on a small dataset", function () {
         // Init
         chai.use(chaiHttp);
-        let server = new Server(4321);
-        let URL = "http://127.0.0.1:4321";
+        let server = new Server(2468);
+        let URL = "http://127.0.0.1:2468";
 
         let queryJSONObject = JSON.parse(fs.readFileSync("test/testQueries/simpleQuerySortUUID")
                 .toString("utf8"));
@@ -236,8 +236,8 @@ describe("RESTSpec", function () {
     it("Should give error when bad request goes out for put", function () {
         // Init
         chai.use(chaiHttp);
-        let server = new Server(4321);
-        let URL = "http://127.0.0.1:4321";
+        let server = new Server(2468);
+        let URL = "http://127.0.0.1:2468";
 
         let queryJSONObject = JSON.parse(fs.readFileSync("test/testQueries/simpleQuerySortUUID")
             .toString("utf8"));
@@ -267,8 +267,8 @@ describe("RESTSpec", function () {
     it("Should fail when trying to delete a file that doesn't exist", function () {
         // Init
         chai.use(chaiHttp);
-        let server = new Server(4321);
-        let URL = "http://127.0.0.1:4321";
+        let server = new Server(2468);
+        let URL = "http://127.0.0.1:2468";
 
         return server.start().then(function (success: Boolean) {
             return chai.request(URL)
@@ -306,8 +306,8 @@ describe("RESTSpec", function () {
     it("Should fail when trying to use post with nonexistent thing", function () {
         // Init
         chai.use(chaiHttp);
-        let server = new Server(4321);
-        let URL = "http://127.0.0.1:4321";
+        let server = new Server(2468);
+        let URL = "http://127.0.0.1:2468";
 
         let queryJSONObject = JSON.parse(fs.readFileSync("test/testQueries/simpleQuerySortUUID")
             .toString("utf8"));
