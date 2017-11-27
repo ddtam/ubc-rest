@@ -1,0 +1,16 @@
+{
+  "WHERE": {
+  },
+  "OPTIONS": {
+    "COLUMNS": [
+      "courses_dept"
+    ],
+    "ORDER": "courses_dept"
+  },
+  "TRANSFORMATIONS": {
+    "GROUP": [
+      "courses_dept"
+    ],
+    "APPLY": []
+  }
+}

@@ -18,8 +18,7 @@ describe("DatabaseSpec", function () {
 
     beforeEach(function () {
        Log.warn('database is being reset...');
-        db.deleteDB("courses");
-        db.deleteDB("rooms");
+        db.reset("all");
 
        inFac = new InsightFacade();
 

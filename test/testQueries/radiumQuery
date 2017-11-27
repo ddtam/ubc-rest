@@ -1,0 +1,13 @@
+{
+    "WHERE": {
+        "LT": {
+            "rooms_seats": 10000
+        }
+    },
+    "OPTIONS": {
+        "COLUMNS": [
+            "rooms_name"
+        ],
+        "ORDER": "rooms_name"
+    }
+}

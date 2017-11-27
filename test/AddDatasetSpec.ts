@@ -16,8 +16,7 @@ describe("AddDatasetSpec", function () {
 
     beforeEach(function () {
         Log.warn('database is being reset...');
-        db.deleteDB("courses");
-        db.deleteDB("rooms");
+        db.reset("all");
 
         inFac = new InsightFacade();
 
@@ -224,7 +223,7 @@ describe("AddDatasetSpec", function () {
     });
 
     it("Should give 204 response when adding a Room database", function (done) {
-        this.timeout(5000);
+        this.timeout(90000);
 
         content = new Buffer(fs.readFileSync('./zips/rooms.zip'))
             .toString('base64');

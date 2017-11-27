@@ -1,0 +1,32 @@
+{
+    "WHERE": {
+        "AND": [{
+            "IS": {
+                "courses_dept": "cpsc"
+            }
+        }, {
+            "GT": {
+                "courses_audit": -1
+            }
+        }]
+    },
+    "OPTIONS": {
+        "COLUMNS": [
+            "courses_id",
+            "courses_dept",
+            "avgAvg"
+        ],
+        "ORDER": {
+            "dir": "DOWN",
+            "keys": ["avgAvg"]
+        }
+    },
+    "TRANSFORMATIONS": {
+        "GROUP": ["courses_id"],
+        "APPLY": [{
+            "avgAvg": {
+                "AVG": "courses_avg"
+            }
+        }]
+    }
+}

@@ -4,8 +4,10 @@
 import {CourseJSON, DatabaseJSON, SectionJSON} from "./IJSON";
 let fs = require('fs');
 import {Section} from "./Section";
-import {isNull, isNullOrUndefined} from "util";
+import {isNull, isUndefined} from "util";
 import {Room} from "./Room";
+import ArrayUtil from "../ArrayUtil";
+import {QueryEngine} from "./QueryEngine";
 
 export interface Criteria {
     [index: string]: any;
@@ -60,11 +62,11 @@ export class Database {
         }
     }
 
-    addSection(section: Section) {
+    addSection(section: any) {
         this.sectionCollection.push(section);
     }
 
-    addRoom(room: Room) {
+    addRoom(room: any) {
         this.roomCollection.push(room);
     }
 
@@ -130,21 +132,32 @@ export class Database {
      * @param {string} dbName is the name of the database to be loaded into memory
      */
     loadDB(dbName: string) {
-        var content = fs.readFileSync('./dbFiles/' + dbName).toString('string');
-        var dbJSON: DatabaseJSON = JSON.parse(content);
+        try {
+            var content = fs.readFileSync('./dbFiles/' + dbName).toString('utf8');
+            var dbJSON: DatabaseJSON = JSON.parse(content);
 
-        switch (dbName) {
-            case "courses":
-                dbJSON.content.forEach(function (s) {
-                    this.addSection(s);
-                });
-                break;
+            let that = this;
 
-            case "rooms":
-                dbJSON.content.forEach(function (s) {
-                    this.addRoom(s);
-                })
-                break;
+            switch (dbName) {
+                case "courses":
+                    dbJSON.content.forEach(function (s) {
+                        that.addSection(s);
+                    });
+                    break;
+
+                case "rooms":
+                    dbJSON.content.forEach(function (r) {
+                        that.addRoom(r)
+                    });
+                    break;
+            }
+
+        } catch (err) {
+            if (err.message.includes('ENOENT')) {
+                throw new Error('DATASETERR - database "' + dbName + '" has not been loaded/cached')
+            } else {
+                throw err;
+            }
         }
     }
 
@@ -276,46 +289,25 @@ export class Database {
     query(question: Criteria): Array<Section|Room> {
         let result: Array<Section|Room>;
 
-        if (
-            question.property === "courses_dept" ||
-            question.property === "courses_id" ||
-            question.property === "courses_title" ||
-            question.property === "courses_instructor" ||
-            question.property === "courses_uuid"||
-            question.property === "courses_section"||
-            question.property === "rooms_fullname"||
-            question.property === "rooms_shortname"||
-            question.property === "rooms_number"||
-            question.property === "rooms_name"||
-            question.property === "rooms_address"||
-            question.property === "rooms_type"||
-            question.property === "rooms_furniture"||
-            question.property === "rooms_href"
-        ) {
-            // is a string query
-            result = this.handleStrQuery(question.property, question.value)
+    if (isNull(question)) {
+            result = ArrayUtil.union([this.sectionCollection, this.roomCollection]);
 
-        } else if (
-            question.property === "courses_avg" ||
-            question.property === "courses_pass" ||
-            question.property === "courses_fail" ||
-            question.property === "courses_audit"||
-            question.property === "courses_year"||
-            question.property === "rooms_lat"||
-            question.property === "rooms_lon"||
-            question.property === "rooms_seats"
-        ) {
-            // is a numerical query with some equality comparison
-            result = this.handleNumQuery(question.property, question.value, question.equality)
+    } else if (QueryEngine.isStringKey(question.property)) {
+        // is a string query
+        result = this.handleStrQuery(question.property, question.value)
 
-        } else {
-            // query is poorly formed; throw error
-            throw new Error('query is poorly formed; property "' + question.property + '" does not exist')
+    } else if (QueryEngine.isNumberKey(question.property)) {
+        // is a numerical query with some equality comparison
+        result = this.handleNumQuery(question.property, question.value, question.equality)
 
-        }
+    }  else {
+        // query is poorly formed; throw error
+        throw new Error('query is poorly formed; property "' + question.property + '" does not exist')
 
-        // return query results
-        return result;
+    }
+
+    // return query results
+    return result;
 
     }
 
@@ -567,7 +559,7 @@ export class Database {
                 withCollection = asJSON.concat(JSON.stringify(this.sectionCollection));
                 break;
             case 'rooms':
-                withCollection = asJSON.concat(JSON.stringify(this.sectionCollection));
+                withCollection = asJSON.concat(JSON.stringify(this.roomCollection));
                 break;
         }
 
@@ -576,11 +568,11 @@ export class Database {
         return finalBracket;
     }
 
-    getOpposite(a: Array<Section|Room>): Array<Section|Room> {
+    getOpposite(a: Array<any>): Array<Section|Room> {
         let inputContents = new Set(a);
 
         if (a.length > 0) {
-            if (a[0] instanceof Room) {
+            if (!isUndefined(a[0].rooms_seats)) {
                 let diff = Array.from(
                     new Set(
                         this.roomCollection.filter(x => !inputContents.has(x))
@@ -589,7 +581,7 @@ export class Database {
 
                 return diff;
 
-            } else if (a[0] instanceof Section){
+            } else if (!isUndefined(a[0].courses_id)){
                 let diff = Array.from(
                     new Set(
                         this.sectionCollection.filter(x => !inputContents.has(x))
@@ -599,6 +591,7 @@ export class Database {
                 return diff;
 
             }
+
         } else {
             // getting opposite of an empty array; return all of that type
             if (this.performingSectionQuery) {

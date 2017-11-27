@@ -1,0 +1,14 @@
+{
+    "WHERE": {},
+    "OPTIONS": {
+        "COLUMNS": [
+            "seatsInType",
+            "rooms_type"
+        ],
+        "ORDER": "seatsInType"
+    },
+    "TRANSFORMATIONS": {
+        "GROUP": ["rooms_type"],
+        "APPLY": [{"seatsInType": {"COUNT": "rooms_seats"}}]
+    }
+}
