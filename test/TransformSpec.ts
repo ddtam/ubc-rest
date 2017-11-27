@@ -172,8 +172,8 @@ describe ("TransformSpec", function () {
 
         }).catch(function (err) {
             Log.test('Return code: ' + err.code);
-            expect(err.code).to.equal(400);
             Log.test(err.body.error);
+            expect(err.code).to.equal(400);
             expect(err.body.error).to.contain("SYNTAXERR");
 
         }).then(done, done)
@@ -191,8 +191,8 @@ describe ("TransformSpec", function () {
 
         }).catch(function (err) {
             Log.test('Return code: ' + err.code);
-            expect(err.code).to.equal(400);
             Log.test(err.body.error);
+            expect(err.code).to.equal(400);
             expect(err.body.error).to.contain("SYNTAXERR");
 
         }).then(done, done)
@@ -210,8 +210,8 @@ describe ("TransformSpec", function () {
 
         }).catch(function (err) {
             Log.test('Return code: ' + err.code);
-            expect(err.code).to.equal(400);
             Log.test(err.body.error);
+            expect(err.code).to.equal(400);
             expect(err.body.error).to.contain("SYNTAXERR");
 
         }).then(done, done)
@@ -229,8 +229,8 @@ describe ("TransformSpec", function () {
 
         }).catch(function (err) {
             Log.test('Return code: ' + err.code);
-            expect(err.code).to.equal(400);
             Log.test(err.body.error);
+            expect(err.code).to.equal(400);
             expect(err.body.error).to.contain("SYNTAXERR");
 
         }).then(done, done)
@@ -248,8 +248,8 @@ describe ("TransformSpec", function () {
 
         }).catch(function (err) {
             Log.test('Return code: ' + err.code);
-            expect(err.code).to.equal(400);
             Log.test(err.body.error);
+            expect(err.code).to.equal(400);
             expect(err.body.error).to.contain("SYNTAXERR");
 
         }).then(done, done)

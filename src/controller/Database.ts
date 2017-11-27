@@ -4,7 +4,7 @@
 import {CourseJSON, DatabaseJSON, SectionJSON} from "./IJSON";
 let fs = require('fs');
 import {Section} from "./Section";
-import {isNull} from "util";
+import {isNull, isUndefined} from "util";
 import {Room} from "./Room";
 import ArrayUtil from "../ArrayUtil";
 import {QueryEngine} from "./QueryEngine";
@@ -153,7 +153,7 @@ export class Database {
             }
 
         } catch (err) {
-            if (err.message.contains('ENOENT')) {
+            if (err.message.includes('ENOENT')) {
                 throw new Error('DATASETERR - database "' + dbName + '" has not been loaded/cached')
             } else {
                 throw err;
@@ -568,11 +568,11 @@ export class Database {
         return finalBracket;
     }
 
-    getOpposite(a: Array<Section|Room>): Array<Section|Room> {
+    getOpposite(a: Array<any>): Array<Section|Room> {
         let inputContents = new Set(a);
 
         if (a.length > 0) {
-            if (a[0] instanceof Room) {
+            if (!isUndefined(a[0].rooms_seats)) {
                 let diff = Array.from(
                     new Set(
                         this.roomCollection.filter(x => !inputContents.has(x))
@@ -581,7 +581,7 @@ export class Database {
 
                 return diff;
 
-            } else if (a[0] instanceof Section){
+            } else if (!isUndefined(a[0].courses_id)){
                 let diff = Array.from(
                     new Set(
                         this.sectionCollection.filter(x => !inputContents.has(x))
@@ -591,6 +591,7 @@ export class Database {
                 return diff;
 
             }
+
         } else {
             // getting opposite of an empty array; return all of that type
             if (this.performingSectionQuery) {

@@ -30,6 +30,11 @@ describe("QueryEngineCourseSpec", function () {
         // clear databases that are cached
         Log.warn('deleting cached databases...');
 
+        let databaseList = fs.readdirSync('./dbFiles/');
+        for (const file of databaseList) {
+            fs.unlinkSync('./dbFiles/' + file)
+        }
+
         // load default courses.zip
         let content: string = new Buffer(fs.readFileSync('./zips/courses.zip'))
             .toString('base64');
@@ -348,6 +353,12 @@ describe("QueryEngineCourseSpec", function () {
     it("Should throw 424 with a missing dataset", function (done) {
         let db = new Database();
         db.reset("all");
+
+        // delete the cached courses dataset
+        let databaseList = fs.readdirSync('./dbFiles/');
+        for (const file of databaseList) {
+            fs.unlinkSync('./dbFiles/' + file)
+        }
 
         let query: string = fs.readFileSync('test/testQueries/simpleQuery');
 
