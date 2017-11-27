@@ -160,6 +160,25 @@ describe ("TransformSpec", function () {
         }).then(done, done)
     });
 
+    it("Should handle a transformation query with duplicate APPLY keys", function (done) {
+        this.timeout(5000);
+
+        let query: string = fs.readFileSync('test/testQueries/badTransformationDupeApply');
+
+        inFac.performQuery(JSON.parse(query)).then(function (obj) {
+            Log.warn('Return code: ' + obj.code + ' FAILED TEST');
+            expect.fail();
+            done()
+
+        }).catch(function (err) {
+            Log.test('Return code: ' + err.code);
+            expect(err.code).to.equal(400);
+            Log.test(err.body.error);
+            expect(err.body.error).to.contain("SYNTAXERR");
+
+        }).then(done, done)
+    });
+
     it("Should handle a bad transformation query that groups on a bad course key", function (done) {
         this.timeout(5000);
 

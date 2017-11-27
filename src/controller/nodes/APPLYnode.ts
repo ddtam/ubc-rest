@@ -12,6 +12,18 @@ export class APPLYnode {
         for (let c of userDefinedCriteria) {
             this.applyKeyNodes.push(new APPLYKEYnode(c))
         }
+
+        // check if the user-defined apply keys are unique
+        let userDefinedKeys: Array<string> = [];
+
+        for (let applyKey of this.applyKeyNodes) {
+            if (userDefinedKeys.includes(applyKey.userDefinedKey)) {
+                throw new Error('SYNTAXERR - user defined key "' + applyKey.userDefinedKey +
+                    '" is not unique')
+            } else {
+                userDefinedKeys.push(applyKey.userDefinedKey);
+            }
+        }
     }
 
     evaluate(group: any): any {
