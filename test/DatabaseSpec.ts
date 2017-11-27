@@ -20,6 +20,11 @@ describe("DatabaseSpec", function () {
        Log.warn('database is being reset...');
         db.reset("all");
 
+        let databaseList = fs.readdirSync('./dbFiles');
+        for (const file of databaseList) {
+            fs.unlinkSync('./dbFiles/' + file)
+        }
+
        inFac = new InsightFacade();
 
     });
@@ -335,6 +340,28 @@ describe("DatabaseSpec", function () {
             expect.fail();
 
         })
+    });
+
+    it("Should not double load the database with a 201", function (done) {
+        this.timeout(10000);
+
+        content = new Buffer(fs.readFileSync('./zips/courses.zip'))
+            .toString('base64');
+
+        inFac.addDataset('courses', content).then(function (obj) {
+            expect(obj.code).to.equal(204);
+            expect(db.countEntries()).to.equal(64612);
+
+            return inFac.addDataset('courses', content)
+
+        }).then(function (obj) {
+            let db = new Database;
+
+            expect(obj.code).to.equal(201);
+            expect(db.countEntries()).to.equal(64612)
+
+        }).then(done, done)
+
     });
 
     // it("Should be able to handle complex query from entire dataset", function (done) {

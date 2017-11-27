@@ -2,7 +2,7 @@
     "WHERE": {
         "AND": [{
             "IS": {
-                "rooms_furniture": "*Tables*"
+                "rooms_furniture": "*e*"
             }
         }, {
             "GT": {
@@ -20,8 +20,8 @@
             "countSeats"
         ],
         "ORDER": {
-            "dir": "DOWN",
-            "keys": ["maxSeats"]
+            "dir": "UP",
+            "keys": ["maxSeats", "sumSeats"]
         }
     },
     "TRANSFORMATIONS": {
