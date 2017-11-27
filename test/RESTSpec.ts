@@ -78,6 +78,56 @@ describe("RESTSpec", function () {
         });
     });
 
+    it("Should return 201 if dataset has already been added", function () {
+        // Init
+        chai.use(chaiHttp);
+        let server = new Server(4321);
+        let URL = "http://127.0.0.1:4321";
+
+        return server.start().then(function (success: Boolean) {
+            return chai.request(URL)
+                .put('/dataset/courses')
+                .attach("body", fs.readFileSync("zips/courses_3test.zip"),
+                    "courses_3test.zip")
+
+        }).then(function (res: Response) {
+            Log.trace('then:');
+            let db = new Database();
+
+            Log.info('Response Code: ' + res.status);
+            expect(res.status).to.be.equal(204);
+
+            Log.info('Database count: ' + db.countEntries());
+            expect(db.countEntries()).to.equal(22);
+
+            return chai.request(URL)
+                .put('/dataset/courses')
+                .attach("body", fs.readFileSync("zips/courses_3test.zip"),
+                    "courses_3test.zip")
+
+        }).catch(function (err) {
+            Log.trace('catch:');
+            expect.fail();
+
+        }).then(function (res: Response) {
+            Log.trace('then:');
+            let db = new Database();
+
+            Log.info('Response Code: ' + res.status);
+            expect(res.status).to.be.equal(201);
+
+            Log.info('Database count: ' + db.countEntries());
+            expect(db.countEntries()).to.equal(22);
+
+            return server.stop()
+
+        }).catch(function (err) {
+            Log.trace('catch:');
+            expect.fail();
+
+        });
+    });
+
     it("Should be able to delete a small dataset", function () {
         // Init
         chai.use(chaiHttp);
