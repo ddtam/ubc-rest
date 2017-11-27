@@ -315,7 +315,6 @@ describe ("TransformSpec", function () {
         })
     });
 
-    // PIAZZA AVG code but other than that it's right, just off because of rounding
     it("Should be able to use AVG in a transformation (Sahara)", function (done) {
         this.timeout(5000);
 
@@ -360,7 +359,7 @@ describe ("TransformSpec", function () {
         this.timeout(5000);
 
         let query: string = fs.readFileSync('test/testQueries/taurusQuery');
-        let expectedResult: string = '';
+        let expectedResult: string = '{"result":[{"courses_id":"449","avgAvg":90.38},{"courses_id":"490","avgAvg":89.77},{"courses_id":"501","avgAvg":89.77},{"courses_id":"547","avgAvg":88.58},{"courses_id":"503","avgAvg":88.08},{"courses_id":"527","avgAvg":87.48},{"courses_id":"507","avgAvg":87.44},{"courses_id":"509","avgAvg":86.02},{"courses_id":"540","avgAvg":85.87},{"courses_id":"543","avgAvg":85.78},{"courses_id":"589","avgAvg":85.75},{"courses_id":"522","avgAvg":85.16},{"courses_id":"521","avgAvg":85.06},{"courses_id":"319","avgAvg":84.52},{"courses_id":"544","avgAvg":84.31},{"courses_id":"500","avgAvg":83.96},{"courses_id":"502","avgAvg":82.96},{"courses_id":"513","avgAvg":82.7},{"courses_id":"301","avgAvg":81.84},{"courses_id":"515","avgAvg":81.8},{"courses_id":"445","avgAvg":80.86},{"courses_id":"312","avgAvg":80.71},{"courses_id":"418","avgAvg":80.51},{"courses_id":"411","avgAvg":80.18},{"courses_id":"444","avgAvg":78.84},{"courses_id":"344","avgAvg":78.47},{"courses_id":"310","avgAvg":78.25},{"courses_id":"430","avgAvg":77.39},{"courses_id":"311","avgAvg":77.25},{"courses_id":"410","avgAvg":77.11},{"courses_id":"314","avgAvg":76.78},{"courses_id":"304","avgAvg":76.3},{"courses_id":"340","avgAvg":75.69},{"courses_id":"121","avgAvg":75.54},{"courses_id":"302","avgAvg":75.51},{"courses_id":"421","avgAvg":74.91},{"courses_id":"416","avgAvg":74.9},{"courses_id":"221","avgAvg":74.49},{"courses_id":"259","avgAvg":74.46},{"courses_id":"110","avgAvg":74.41},{"courses_id":"404","avgAvg":74.32},{"courses_id":"213","avgAvg":74.04},{"courses_id":"210","avgAvg":73.99},{"courses_id":"313","avgAvg":73.98},{"courses_id":"425","avgAvg":73.93},{"courses_id":"322","avgAvg":73.11},{"courses_id":"422","avgAvg":73.01},{"courses_id":"303","avgAvg":72.76},{"courses_id":"317","avgAvg":72.57},{"courses_id":"420","avgAvg":72.24},{"courses_id":"415","avgAvg":70.93},{"courses_id":"320","avgAvg":70.09},{"courses_id":"261","avgAvg":69.17}]}';
 
         inFac.performQuery(JSON.parse(query)).then(function (obj) {
             Log.test('Return code: ' + obj.code);
@@ -374,6 +373,25 @@ describe ("TransformSpec", function () {
             expect.fail();
             done()
         })
+    });
+
+    it("Should throw 400 when trying to use a column not used in group entries", function (done) {
+        this.timeout(5000);
+
+        let query: string = fs.readFileSync('test/testQueries/badTransformQueryBadColumns');
+
+        inFac.performQuery(JSON.parse(query)).then(function (err: any) {
+            Log.warn('Return code: ' + err.code + ' FAILED TEST');
+            Log.warn(err.body.error);
+            expect.fail();
+            done()
+
+        }).catch(function (obj: any) {
+            Log.test('Return code: ' + obj.code);
+            expect(obj.code).to.equal(400);
+            expect(obj.body.error).to.contain("SYNTAXERR");
+
+        }).then(done, done)
     });
 
     // all looking good until it goes to format the results... there's a bug in formatMatch
@@ -425,9 +443,7 @@ describe ("TransformSpec", function () {
     });
 
     // No tests yet for Sky, Sodium, Tomacco
-    // Test for Taurus doesn't work, don't know what's wrong with the query (invalid on website, empy results on ours)
     // Test for Tin doesn't work because of a bug in formatMatch
-    // Test for Sahara doesn't work because of rounding when calculating average; piazza posts
     // Tests for Tungsten, Turing, Vanadium, Voyager, Vulcan, Watson and Xenon should be tested by other tests
 
     //template for tests

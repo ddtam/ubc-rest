@@ -1,6 +1,7 @@
 import {Section} from "./Section";
 import {Room} from "./Room";
 import {isNull} from "util";
+let Decimal = require('decimal.js');
 
 export class ApplyUtil {
     static max(entries: Array<Section|Room>, onKey: string): number {
@@ -38,15 +39,17 @@ export class ApplyUtil {
     }
 
     static avg(entries: Array<Section|Room>, onKey: string): number {
-        let sum: number = 0;
-        let count: number = 0;
+        let numsToAvg: Array<number> = [];
 
         for (let e of entries) {
-            sum += e[onKey];
-            count++;
+            numsToAvg.push(e[onKey]);
         }
 
-        return (sum / count);
+        let avg: number = Number(
+            (numsToAvg.map(val => <any>new Decimal(val)).reduce((a,b) => a.plus(b)).toNumber()/
+            numsToAvg.length).toFixed(2));
+
+        return avg;
     }
 
     static count(entries: Array<Section|Room>, onKey: string): number {
@@ -62,11 +65,14 @@ export class ApplyUtil {
     }
 
     static sum(entries: Array<Section|Room>, onKey: string): number {
-        let sum: number = 0;
+        let numsToSum: Array<number> = [];
 
         for (let e of entries) {
-            sum += e[onKey];
+            numsToSum.push(e[onKey]);
         }
+
+        let sum = Number(numsToSum.map(val =>
+            new Decimal(val)).reduce((a,b) => a.plus(b)).toNumber().toFixed(2));
 
         return sum;
     }

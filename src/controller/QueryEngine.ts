@@ -202,6 +202,14 @@ export class QueryEngine {
                                 results: Array<any>
     ): Array<ResultSection|ResultRoom> {
 
+        let incomingKeys = Object.keys(results[0]);
+
+        for (let colKey of colKeys) {
+            if (!incomingKeys.includes(colKey)) {
+                throw new Error('SYNTAXERR - cannot print a key in columns that was not used to group entries');
+            }
+        }
+
         let cutResults: Array<ResultSection|ResultRoom> = [];
 
         for (let x of results) {
