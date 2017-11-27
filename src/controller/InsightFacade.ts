@@ -41,8 +41,9 @@ export default class InsightFacade implements IInsightFacade {
             // load serialized zip into JSZip object
             zip.loadAsync(content, {base64: true})
                 .then(function (zipContents: JSZip) {
+
                     if (dbList.includes(id)) {
-                        return new Promise(function (fulfill) {fulfill()});
+                        db.reset(id);
                     }
 
                     // process the zip based on id

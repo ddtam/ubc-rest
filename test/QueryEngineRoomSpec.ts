@@ -243,4 +243,23 @@ describe("QueryEngineRoomSpec", function () {
 
     });
 
+    it("Should complete a room query with EQ", function (done) {
+        this.timeout(5000);
+
+        let query: string = fs.readFileSync('test/testQueries/simpleQueryRoomWithEQ');
+        let expectedResult: string = "{\"result\":[{\"rooms_name\":\"AERL_120\"}]}"
+
+        inFac.performQuery(JSON.parse(query)).then(function (obj) {
+            Log.test('Return code: ' + obj.code);
+            expect(obj.code).to.equal(200);
+            let body: bodyJSON = obj.body;
+            checkResults(JSON.parse(expectedResult).result, body.result)
+
+        }).then(done, done).catch(function (err) {
+            Log.warn('Return code: ' + err.code + ' FAILED TEST');
+            expect.fail();
+            done()
+        })
+    });
+
  });
