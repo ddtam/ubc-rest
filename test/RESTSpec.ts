@@ -228,4 +228,121 @@ describe("RESTSpec", function () {
         })
     });
 
+
+
+
+
+
+    it("Should give error when bad request goes out for put", function () {
+        // Init
+        chai.use(chaiHttp);
+        let server = new Server(4321);
+        let URL = "http://127.0.0.1:4321";
+
+        let queryJSONObject = JSON.parse(fs.readFileSync("test/testQueries/simpleQuerySortUUID")
+            .toString("utf8"));
+
+        return server.start().then(function (success: Boolean) {
+            return chai.request(URL)
+                .put('/dataset/ourses')
+                .attach("body", fs.readFileSync("zips/courses_3test.zip"),
+                    "courses_3test.zip")
+
+        }).catch(function (err) {
+            Log.trace('catch: ' + err.toString());
+            //Log.info('failed to add a dataset');
+            expect(err.toString() === "Error: Bad Request");
+
+        }).then(function (res: Response) {
+            expect.fail;
+
+        }).catch(function (err) {
+            //Log.trace('catch:');
+            //Log.info('failed to perform query');
+            expect(err.toString() === "Error: Bad Request");
+
+        })
+    });
+
+    it("Should fail when trying to delete a file that doesn't exist", function () {
+        // Init
+        chai.use(chaiHttp);
+        let server = new Server(4321);
+        let URL = "http://127.0.0.1:4321";
+
+        return server.start().then(function (success: Boolean) {
+            return chai.request(URL)
+                .put('/dataset/courses')
+                .attach("body", fs.readFileSync("zips/courses_3test.zip"),
+                    "courses_3test.zip")
+
+        }).catch(function (err) {
+            Log.trace('catch:');
+            //Log.info('failed to add a dataset');
+            expect.fail();
+
+        }).then(function (res: Response) {
+            //Log.trace('then:');
+            let db = new Database();
+
+            //Log.info('Response Code: ' + res.status);
+            expect(res.status).to.be.equal(204);
+
+            //Log.info('Database count: ' + db.countEntries());
+            expect(db.countEntries()).to.equal(22);
+
+            return chai.request(URL)
+                .del('/dataset/rses')
+
+        }).catch(function (err) {
+            //Log.trace('catch:');
+            //Log.info('failed to delete a dataset');
+            Log.info(err.toString());
+            expect(err.toString() === "Error: Not Found");
+
+        })
+    });
+
+    it("Should fail when trying to use post with nonexistent thing", function () {
+        // Init
+        chai.use(chaiHttp);
+        let server = new Server(4321);
+        let URL = "http://127.0.0.1:4321";
+
+        let queryJSONObject = JSON.parse(fs.readFileSync("test/testQueries/simpleQuerySortUUID")
+            .toString("utf8"));
+
+        return server.start().then(function (success: Boolean) {
+            return chai.request(URL)
+                .put('/dataset/courses')
+                .attach("body", fs.readFileSync("zips/courses_3test.zip"),
+                    "courses_3test.zip")
+
+        }).catch(function (err) {
+            //Log.trace('catch:');
+            //Log.info('failed to add a dataset');
+            expect.fail();
+
+        }).then(function (res: Response) {
+            //Log.trace('then:');
+            let db = new Database();
+
+            //Log.info('Response Code: ' + res.status);
+            expect(res.status).to.be.equal(204);
+
+            //Log.info('Database count: ' + db.countEntries());
+            expect(db.countEntries()).to.equal(22);
+
+            return chai.request(URL)
+                .post('/query')
+                .send('')
+
+        }).catch(function (err) {
+            //Log.trace('catch:');
+            Log.info('failed to perform query' + err.toString());
+            expect(err.toString() === "Error: Not Found");
+
+        })
+    });
+
 });

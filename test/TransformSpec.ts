@@ -395,6 +395,26 @@ describe ("TransformSpec", function () {
         })
     });
 
+    it("Should be able to perform many applies", function (done) {
+        this.timeout(5000);
+
+        let query: string = fs.readFileSync('test/testQueries/complexQueryMultipleApply');
+        let expectedResult: string = '{"result":[{"rooms_shortname":"OSBO","maxSeats":442,"avgSeats":442,"minSeats":442,"sumSeats":442,"countSeats":1},{"rooms_shortname":"HEBB","maxSeats":375,"avgSeats":375,"minSeats":375,"sumSeats":375,"countSeats":1},{"rooms_shortname":"LSC","maxSeats":350,"avgSeats":350,"minSeats":350,"sumSeats":700,"countSeats":1}]}';
+
+        inFac.performQuery(JSON.parse(query)).then(function (obj) {
+            Log.test('Return code: ' + obj.code);
+            expect(obj.code).to.equal(200);
+            let body: bodyJSON = obj.body;
+            checkResults(JSON.parse(expectedResult).result, body.result)
+
+        }).then(done, done).catch(function (err) {
+            Log.warn('Return code: ' + err.code + ' FAILED TEST');
+            Log.warn(err.body.error);
+            expect.fail();
+            done()
+        })
+    });
+
     it("Should throw 400 when trying to use a column not used in group entries", function (done) {
         this.timeout(5000);
 
@@ -456,11 +476,6 @@ describe ("TransformSpec", function () {
         })
     });
 
-    // The failure of this and a few others is because of the implementation of createGroups; we need to either pass in
-    // only courses or only rooms on an empty WHERE by cutting these out in getMatch (in order to do this we would have to
-    // pass something into getMatch so it would be able to know the kind of query; or change the implementation of createGroups
-    // to know which inputs are valid and which should be ignored (it's failing because it tries to read rooms_name on results[0],
-    // in this case a section)
     it("Should be able to find and sort unique offerings for each course (Titanium)", function (done) {
         this.timeout(5000);
 
@@ -482,28 +497,8 @@ describe ("TransformSpec", function () {
     });
 
     // No tests yet for Sky, Sodium, Tomacco
-    // Test for Tin doesn't work because of a bug in formatMatch
     // Tests for Tungsten, Turing, Vanadium, Voyager, Vulcan, Watson and Xenon should be tested by other tests
 
-    //template for tests
-    it("NEW", function (done) {
-        this.timeout(5000);
-
-        let query: string = fs.readFileSync('test/testQueries/radiumQuery');
-
-        inFac.performQuery(JSON.parse(query)).then(function (obj) {
-            Log.test('Return code: ' + obj.code);
-            expect(obj.code).to.equal(200);
-            let body: bodyJSON = obj.body;
-            expect (body.result.length === 364);
-
-        }).then(done, done).catch(function (err) {
-            Log.warn('Return code: ' + err.code + ' FAILED TEST');
-            Log.warn(err.body.error);
-            expect.fail();
-            done()
-        })
-    });
 
 
 });

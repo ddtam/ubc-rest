@@ -1,0 +1,13 @@
+{
+    "WHERE": {
+        "EQ": {
+            "rooms_seats": 144
+        }
+    },
+    "OPTIONS": {
+        "COLUMNS": [
+            "rooms_name"
+        ],
+        "ORDER": "rooms_name"
+    }
+}
