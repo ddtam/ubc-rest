@@ -19,7 +19,7 @@ export default class Server {
     private rest: restify.Server;
 
     constructor(port: number) {
-        Log.info("Server::<init>( " + port + " )");
+        // Log.info("Server::<init>( " + port + " )");
         this.port = port;
     }
 
@@ -30,7 +30,7 @@ export default class Server {
      * @returns {Promise<boolean>}
      */
     public stop(): Promise<boolean> {
-        Log.info('Server::close()');
+        // Log.info('Server::close()');
         let that = this;
         return new Promise(function (fulfill) {
             that.rest.close(function () {
@@ -50,7 +50,7 @@ export default class Server {
         let that = this;
         return new Promise(function (fulfill, reject) {
             try {
-                Log.info('Server::start() - start');
+                // Log.info('Server::start() - start');
 
                 that.rest = restify.createServer({
                     name: 'insightUBC'
@@ -82,17 +82,17 @@ export default class Server {
                 that.rest.post('/query', Service.postQuery);
 
                 that.rest.listen(that.port, function () {
-                    Log.info('Server::start() - restify listening: ' + that.rest.url);
+                    // Log.info('Server::start() - restify listening: ' + that.rest.url);
                     fulfill(true);
                 });
 
                 that.rest.on('error', function (err: string) {
                     // catches errors in restify start; unusual syntax due to internal node not using normal exceptions here
-                    Log.info('Server::start() - restify ERROR: ' + err);
+                    // Log.info('Server::start() - restify ERROR: ' + err);
                     reject(err);
                 });
             } catch (err) {
-                Log.error('Server::start() - ERROR: ' + err);
+                // Log.error('Server::start() - ERROR: ' + err);
                 reject(err);
             }
         });

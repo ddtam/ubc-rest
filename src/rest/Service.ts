@@ -17,13 +17,13 @@ export default class Service {
     // The next two methods handle the echo service.
 
     public static echo(req: restify.Request, res: restify.Response, next: restify.Next) {
-        Log.trace('Server::echo(..) - params: ' + JSON.stringify(req.params));
+        // Log.trace('Server::echo(..) - params: ' + JSON.stringify(req.params));
         try {
             let result = Service.performEcho(req.params.msg);
-            Log.info('Server::echo(..) - responding ' + result.code);
+            // Log.info('Server::echo(..) - responding ' + result.code);
             res.json(result.code, result.body);
         } catch (err) {
-            Log.error('Server::echo(..) - responding 400');
+            // Log.error('Server::echo(..) - responding 400');
             res.json(400, {error: err.message});
         }
         return next();
@@ -40,7 +40,7 @@ export default class Service {
     // Handles service for adding datasets in raw buffer format by ID
 
     static addDataset(req: restify.Request, res: restify.Response, next: restify.Next) {
-        Log.trace('Server::add(..) - params: ' + JSON.stringify(req.params));
+        // Log.trace('Server::add(..) - params: ' + JSON.stringify(req.params));
         try {
             let inFac = new InsightFacade();
 
@@ -50,21 +50,21 @@ export default class Service {
 
             // add the dataset with the facade
             let result = inFac.addDataset(id, b64Zip).then(function (response) {
-                Log.info('Server::add(..) - responding ' + response.code);
+                // Log.info('Server::add(..) - responding ' + response.code);
                 res.json(response.code, response.body);
 
                 return next();
 
             }).catch(function (err) {
-                Log.info('Server::add(..) - responding ' + err.code);
-                Log.warn(err.body.error);
+                // Log.info('Server::add(..) - responding ' + err.code);
+                // Log.warn(err.body.error);
                 res.json(err.code, err.body);
 
                 return next();
             });
 
         } catch (err) {
-            Log.error('Server::add(..) - responding ' + err.code);
+            // Log.error('Server::add(..) - responding ' + err.code);
             res.json(400, {error: err.message});
         }
 
@@ -73,7 +73,7 @@ export default class Service {
     // Handles service for deleting datasets by ID
 
     static delDataset(req: restify.Request, res: restify.Response, next: restify.Next) {
-        Log.trace('Server::del(..) - params: ' + JSON.stringify(req.params));
+        // Log.trace('Server::del(..) - params: ' + JSON.stringify(req.params));
         try {
             let inFac = new InsightFacade();
 
@@ -82,21 +82,21 @@ export default class Service {
 
             // add the dataset with the facade
             let result = inFac.removeDataset(id).then(function (response) {
-                Log.info('Server::del(..) - responding ' + response.code);
+                // Log.info('Server::del(..) - responding ' + response.code);
                 res.json(response.code, response.body);
 
                 return next();
 
             }).catch(function (err) {
-                Log.warn('Server::del(..) - throwing ' + err.code);
-                Log.warn(err.body.error);
+                // Log.warn('Server::del(..) - throwing ' + err.code);
+                // Log.warn(err.body.error);
                 res.json(err.code, err.body);
 
                 return next();
             });
 
         } catch (err) {
-            Log.error('Server::del(..) - responding ' + err.code);
+            // Log.error('Server::del(..) - responding ' + err.code);
             res.json(400, {error: err.message});
         }
     }
@@ -104,7 +104,7 @@ export default class Service {
     // Handles service for performing a query
 
     static postQuery(req: restify.Request, res: restify.Response, next: restify.Next) {
-        Log.trace('Server::query(..) - params: ' + JSON.stringify(req.params));
+        // Log.trace('Server::query(..) - params: ' + JSON.stringify(req.params));
 
         try {
             let inFac = new InsightFacade();
@@ -114,21 +114,21 @@ export default class Service {
 
             // add the dataset with the facade
             let result = inFac.performQuery(query).then(function (response) {
-                Log.info('Server::query(..) - responding ' + response.code);
+                // Log.info('Server::query(..) - responding ' + response.code);
                 res.json(response.code, response.body);
 
                 return next();
 
             }).catch(function (err) {
-                Log.warn('Server::query(..) - throwing ' + err.code);
-                Log.warn(err.body.error);
+                // Log.warn('Server::query(..) - throwing ' + err.code);
+                // Log.warn(err.body.error);
                 res.json(err.code, err.body);
 
                 return next();
             });
 
         } catch (err) {
-            Log.error('Server::del(..) - responding ' + err.code);
+            // Log.error('Server::del(..) - responding ' + err.code);
             res.json(400, {error: err.message});
         }
     }

@@ -24,11 +24,11 @@ describe("RESTSpec", function () {
     }
 
     before(function () {
-        Log.test('Before: ' + (<any>this).test.parent.title);
+        // Log.test('Before: ' + (<any>this).test.parent.title);
     });
 
     beforeEach(function () {
-        Log.test('BeforeTest: ' + (<any>this).currentTest.title);
+        // Log.test('BeforeTest: ' + (<any>this).currentTest.title);
 
         let db = new Database;
         db.reset("all");
@@ -40,11 +40,11 @@ describe("RESTSpec", function () {
     });
 
     after(function () {
-        Log.test('After: ' + (<any>this).test.parent.title);
+        // Log.test('After: ' + (<any>this).test.parent.title);
     });
 
     afterEach(function () {
-        Log.test('AfterTest: ' + (<any>this).currentTest.title);
+        // Log.test('AfterTest: ' + (<any>this).currentTest.title);
     });
 
     it("Should be able to add a small dataset", function () {
