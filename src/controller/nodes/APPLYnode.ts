@@ -15,20 +15,29 @@ export class APPLYnode {
     }
 
     evaluate(group: any): any {
+        let applyResults: Array<any> = [];
         let partialResult: any = {};
 
         // run the apply
         for (let applyKeyNode of this.applyKeyNodes) {
             // evaluate the partial result object with the user-defined key and its calculated value
-            partialResult = applyKeyNode.evaluate(group);
+            applyResults.push(applyKeyNode.evaluate(group));
+        }
 
-            // complete the partial result with the keys that define this group
-            for (let key of Object.keys(group)) {
-                if (QueryEngine.isGoodKey(key)) {
-                    partialResult[key] = group[key];
-                }
+        // build each apply result into the group
+        for (let aResult of applyResults) {
+            let applyKey = Object.keys(aResult)[0];
+            let applyVal = aResult[applyKey];
+            partialResult[applyKey] = applyVal;
+        }
+
+        // complete the partial result with the keys that define this group
+        for (let key of Object.keys(group)) {
+            if (QueryEngine.isGoodKey(key)) {
+                partialResult[key] = group[key];
             }
         }
+
         if (this.applyKeyNodes.length === 0){
             return group;
         }

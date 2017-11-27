@@ -17,6 +17,11 @@ export class QueryEngine {
 
         this.checkQueryStructure(objKeys);
 
+        // prepare the database for the query
+        let queryType: string = QueryEngine.extractDatatype(query);
+
+        this.prepareDatabase(queryType, query);
+
         // get the results that match the query based on FILTER
         let results: Array<Section|Room> = this.getMatch(query.WHERE);
 
@@ -31,13 +36,14 @@ export class QueryEngine {
         }
 
         // format the results based on OPTIONS
-        let fResults: Array<ResultSection|ResultRoom> = this.formatMatch(query.OPTIONS, results);
+        let fResults: Array<ResultSection|ResultRoom> = this.formatMatch(query.OPTIONS, queryType, results);
 
         // return the results in the form of an InsightResponse
         return QueryEngine.encapsulate(fResults);
 
     }
 
+    // confirm the correct fundamental sections of the query are intact
     private checkQueryStructure(objKeys: Array<string>) {
         if (objKeys.length === 3) {
             if (!objKeys.includes('TRANSFORMATIONS') || // doesn't include .TRANSFORMATIONS
@@ -57,6 +63,23 @@ export class QueryEngine {
         } else {
             throw new Error('SYNTAXERR - query fundamentally malformed: one of ' + objKeys + ' is invalid')
 
+        }
+    }
+
+    // clear the database and restore the relevant dataset from cache
+    private prepareDatabase(queryType: string, query: any) {
+        let db = new Database();
+        db.reset('all');
+
+        // COLUMNS will always indicate what datatype is being queried; extract from here
+        let colKeys: Array<string> = query.OPTIONS.COLUMNS;
+
+        if (isNullOrUndefined(colKeys)) {
+            throw new Error('SYNTAXERR - COLUMNS is not defined')
+        } else if (queryType === 'courses') {
+            db.loadDB('courses')
+        } else if (queryType === 'rooms') {
+            db.loadDB('rooms')
         }
     }
 
@@ -129,7 +152,7 @@ export class QueryEngine {
      * @param {Array<Section>} results is output of getMatch helper
      * @returns {Array<ResultSection>} as an array of sections conforming to OPTIONS specifications
      */
-    private formatMatch(OPTIONS: any, results: Array<any>): Array<ResultSection|ResultRoom> {
+    private formatMatch(OPTIONS: any, queryType: string, results: Array<any>): Array<ResultSection|ResultRoom> {
         // TODO this big ass method needs refactoring, pronto
 
         let fResults: Array<ResultSection|ResultRoom> = [];
@@ -149,10 +172,9 @@ export class QueryEngine {
         // extract the columns for result output
         colKeys = OPTIONS.COLUMNS;
         QueryEngine.checkColumnSyntax(colKeys, results);
-        dataType = QueryEngine.extractDatatype(colKeys);
 
         // CREATE RESULTS WITH COLUMN INFORMATION
-        fResults = QueryEngine.buildColumns(colKeys, dataType, results);
+        fResults = QueryEngine.buildColumns(colKeys, queryType, results);
 
         // CHECK FOR SORTING SPECIFICATION
         if (optKeys.length === 2 && // this is the only other key
@@ -250,9 +272,9 @@ export class QueryEngine {
         let hasNumberOrder: boolean = false; // flag for if OPTIONS has numerical ORDER
 
         // determine what type of field is being sorted on
-        if (QueryEngine.isStringKey(sortOn)) {
+        if (typeof(unsortedResults[0][sortOn]) === "string") {
             hasStringOrder = true;
-        } else if (QueryEngine.isNumberKey(sortOn)) {
+        } else if (typeof(unsortedResults[0][sortOn]) === "number") {
             hasNumberOrder = true;
         }
 
@@ -463,13 +485,14 @@ export class QueryEngine {
                 groupedResults.push(newGroup);
             }
         }
-        for (let g of groupedResults) {
-            for (let c of groupCriteria) {
-                if (isNullOrUndefined(g[c])) {
-                    groupedResults.splice(groupedResults.indexOf(g), 1);
-                }
-            }
-        }
+
+        // for (let g of groupedResults) {
+        //     for (let c of groupCriteria) {
+        //         if (isNullOrUndefined(g[c])) {
+        //             groupedResults.splice(groupedResults.indexOf(g), 1);
+        //         }
+        //     }
+        // }
 
         return groupedResults;
     }
@@ -609,11 +632,38 @@ export class QueryEngine {
         return keyIsGood;
     }
 
-    private static extractDatatype(colKeys: Array<string>): string {
-        if (colKeys[0].includes('courses')) {
-            return 'courses';
-        } else if (colKeys[0].includes('rooms')) {
-            return 'rooms';
+    private static extractDatatype(query: any): string {
+        let dataType: string = null;
+        let sampleKey: string = query.OPTIONS.COLUMNS[0];
+
+        if (QueryEngine.isSectionKey(sampleKey)) {
+            dataType = 'courses';
+        } else if (QueryEngine.isRoomKey(sampleKey)) {
+            dataType =  'rooms';
+        } else {
+            // the first key is user-defined
+            if (isUndefined(query.TRANSFORMATIONS)) {
+                throw new Error('SYNTAXERR - "' + sampleKey +
+                    '" is invalid')
+            }
+
+            let firstApply: any = query.TRANSFORMATIONS.APPLY[0];
+            let userDefinedKey: string = Object.keys(firstApply)[0];
+            let applyFn: any = firstApply[userDefinedKey];
+            let applyField: string = Object.keys(applyFn)[0];
+            let targetField: string = applyFn[applyField];
+
+            if (QueryEngine.isRoomKey(targetField)) {
+                dataType = "rooms"
+            } else if (QueryEngine.isSectionKey(targetField)) {
+                dataType = "courses"
+            } else {
+                throw new Error('SYNTAXERR - apply function on key "' + dataType +
+                '" is invalid')
+            }
         }
+
+        return dataType;
     }
+
 }

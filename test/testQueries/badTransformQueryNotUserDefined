@@ -12,21 +12,12 @@
     },
     "OPTIONS": {
         "COLUMNS": [
-            "courses_id",
-            "courses_dept",
-            "avgAvg"
+            "courses_name",
+            "courses_dept"
         ],
         "ORDER": {
             "dir": "DOWN",
-            "keys": ["avgAvg"]
+            "keys": ["courses_dept"]
         }
-    },
-    "TRANSFORMATIONS": {
-        "GROUP": ["courses_id"],
-        "APPLY": [{
-            "avgAvg": {
-                "AVG": "courses_avg"
-            }
-        }]
     }
 }

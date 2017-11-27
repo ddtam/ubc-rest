@@ -3,7 +3,7 @@ import {MCnode} from "./MCnode";
 import {SCnode} from "./SCnode";
 import {NEGnode} from "./NEGnode";
 import {FilterJSON} from "../IJSON";
-import {error, isNullOrUndefined, isUndefined} from "util";
+import {isNull, isUndefined} from "util";
 import {ANode} from "./ANode";
 import {Section} from "../Section";
 import {Room} from "../Room";
@@ -41,7 +41,8 @@ export class FILTERnode extends ANode {
                 break;
 
             default:
-                if (isNullOrUndefined(key)){
+                if (isUndefined(key)){
+                    // query is empty; will return all
                     this.criteria = null;
                     break;
                 }
@@ -52,9 +53,12 @@ export class FILTERnode extends ANode {
 
     evaluate(): Array<Section|Room> {
         let result: Array<Section|Room>;
-        if (!isNullOrUndefined(this.criteria)){
+        if (!isNull(this.criteria)){
+            // tree was constructed and query exists; evaluate
             result = this.criteria.evaluate();
-        }else{
+
+        } else {
+            // query was empty; return ALL
             let db = new Database();
             result = db.query(null);
         }
