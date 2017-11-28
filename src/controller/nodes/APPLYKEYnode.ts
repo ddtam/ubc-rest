@@ -26,8 +26,6 @@ export class APPLYKEYnode {
             throw new Error('SYNTAXERR - APPLYKEY malformed: ' + criteria)
         }
 
-
-
         switch (this.applyFn) {
             case "MAX":
             case "MIN":
