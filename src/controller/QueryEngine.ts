@@ -434,6 +434,7 @@ export class QueryEngine {
      * @returns {Array<Array<any>>}
      */
     private static createGroups(ungroupedResults: Array<any>, groupCriteria: Array<string>): Array<Array<any>> {
+        let groupDict: any = {};
         let groupedResults: Array<any> = [];
 
         // check syntax
@@ -454,45 +455,32 @@ export class QueryEngine {
 
         // perform grouping
         for (let u of ungroupedResults) {
-            let matchedExistingGroup = false;
-
-            // check if r matches a current group
-            for (let r of groupedResults) {
-                let isAMatch: boolean = true;
-
-                for (let c of groupCriteria) {
-                    if (!(u[c] === r[c])) {
-                        isAMatch = false;
-                    }
-                }
-
-                if (isAMatch) {
-                    r.groupContents.push(u);
-                    matchedExistingGroup = true;
-                }
+            // create the group's hash
+            let hash: string = "";
+            for (let c of groupCriteria) {
+                hash = hash + u[c] + "_";
             }
 
-            // r does not fall into a current group; make a new group
-            if (!matchedExistingGroup) {
-                let newGroup: any = {};
+            // check if the hash exists in the dictionary
+            if (!isUndefined(groupDict[hash])) {
+                // there is a match; add to the group
+                groupDict[hash].groupContents.push(u)
 
+            } else {
+                // there is no match; add to dictionary
+                let newGroup: any = {};
                 for (let c of groupCriteria) {
                     newGroup[c] = u[c];
                 }
-
                 newGroup.groupContents = [u];
 
-                groupedResults.push(newGroup);
+                groupDict[hash] = newGroup;
             }
         }
 
-        // for (let g of groupedResults) {
-        //     for (let c of groupCriteria) {
-        //         if (isNullOrUndefined(g[c])) {
-        //             groupedResults.splice(groupedResults.indexOf(g), 1);
-        //         }
-        //     }
-        // }
+        for (let k of Object.keys(groupDict)) {
+            groupedResults.push(groupDict[k]);
+        }
 
         return groupedResults;
     }
