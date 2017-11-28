@@ -10,6 +10,7 @@ import chai = require('chai');
 import chaiHttp = require('chai-http');
 import Response = ChaiHttp.Response;
 import restify = require('restify');
+import Service from "../src/rest/Service";
 
 describe("EchoSpec", function () {
 
@@ -37,7 +38,7 @@ describe("EchoSpec", function () {
     });
 
     it("Should be able to echo", function () {
-        let out = Server.performEcho('echo');
+        let out = Service.performEcho('echo');
         Log.test(JSON.stringify(out));
         sanityCheck(out);
         expect(out.code).to.equal(200);
@@ -45,7 +46,7 @@ describe("EchoSpec", function () {
     });
 
     it("Should be able to echo silence", function () {
-        let out = Server.performEcho('');
+        let out = Service.performEcho('');
         Log.test(JSON.stringify(out));
         sanityCheck(out);
         expect(out.code).to.equal(200);
@@ -53,7 +54,7 @@ describe("EchoSpec", function () {
     });
 
     it("Should be able to handle a missing echo message sensibly", function () {
-        let out = Server.performEcho(undefined);
+        let out = Service.performEcho(undefined);
         Log.test(JSON.stringify(out));
         sanityCheck(out);
         expect(out.code).to.equal(400);
@@ -61,7 +62,7 @@ describe("EchoSpec", function () {
     });
 
     it("Should be able to handle a null echo message sensibly", function () {
-        let out = Server.performEcho(null);
+        let out = Service.performEcho(null);
         Log.test(JSON.stringify(out));
         sanityCheck(out);
         expect(out.code).to.equal(400);
@@ -79,7 +80,7 @@ describe("EchoSpec", function () {
         // Test
         expect(server).to.not.equal(undefined);
         try{
-            Server.echo((<restify.Request>{}), null, null);
+            Service.echo((<restify.Request>{}), null, null);
             expect.fail()
         } catch(err) {
             expect(err.message).to.equal("Cannot read property 'json' of null");

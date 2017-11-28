@@ -6,7 +6,7 @@ import {expect} from 'chai';
 import Log from "../src/Util";
 import {Database} from "../src/controller/Database";
 
-describe("QueryEngineSpec", function () {
+describe("QueryEngineCourseSpec", function () {
 
     let db: Database = new Database;
     let inFac: InsightFacade;
@@ -353,6 +353,12 @@ describe("QueryEngineSpec", function () {
     it("Should throw 424 with a missing dataset", function (done) {
         let db = new Database();
         db.reset("all");
+
+        // delete the cached courses dataset
+        let databaseList = fs.readdirSync('./dbFiles/');
+        for (const file of databaseList) {
+            fs.unlinkSync('./dbFiles/' + file)
+        }
 
         let query: string = fs.readFileSync('test/testQueries/simpleQuery');
 

@@ -34,6 +34,7 @@ export interface bodyJSON {
 export interface QueryJSON {
     WHERE: FilterJSON;
     OPTIONS: OptionsJSON;
+    TRANSFORMATIONS?: TransformJSON;
 }
 
 export interface FilterJSON{
@@ -51,6 +52,11 @@ export interface OptionsJSON {
     ORDER?: KeyJSON
 }
 
+export interface TransformJSON {
+    GROUP: any;
+    APPLY: any;
+}
+
 export interface SCompJSON {
     [index: string]: string;
     courses_dept?: string;
@@ -59,6 +65,14 @@ export interface SCompJSON {
     courses_title?: string;
     courses_uuid?: string;
     courses_section?: string;
+    rooms_fullname?: string;
+    rooms_shortname?: string;
+    rooms_number?: string;
+    rooms_name?: string;
+    rooms_address?: string;
+    rooms_type?: string;
+    rooms_furniture?: string;
+    rooms_href?: string;
 }
 
 export interface MCompJSON {
@@ -68,6 +82,9 @@ export interface MCompJSON {
     courses_fail?: number;
     courses_audit?: number;
     courses_year?: number;
+    rooms_lat?: number;
+    rooms_lon?: number;
+    rooms_seats?:number;
 }
 
 export interface KeyJSON {
@@ -83,4 +100,15 @@ export interface KeyJSON {
     courses_audit?: number;
     courses_year?: number;
     courses_section?: string;
+    rooms_fullname?: string;
+    rooms_shortname?: string;
+    rooms_number?: string;
+    rooms_name?: string;
+    rooms_address?: string;
+    rooms_type?: string;
+    rooms_furniture?: string;
+    rooms_href?: string;
+    rooms_lat?: number;
+    rooms_lon?: number;
+    rooms_seats?:number;
 }

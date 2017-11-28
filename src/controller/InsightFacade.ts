@@ -41,6 +41,11 @@ export default class InsightFacade implements IInsightFacade {
             // load serialized zip into JSZip object
             zip.loadAsync(content, {base64: true})
                 .then(function (zipContents: JSZip) {
+
+                    if (dbList.includes(id)) {
+                        db.reset(id);
+                    }
+
                     // process the zip based on id
                     switch (id) {
                         case "courses":
@@ -62,7 +67,7 @@ export default class InsightFacade implements IInsightFacade {
 
                 .catch(function (err: Error) {
                     // if error on decoding base64 representation of zip
-                    Log.error('JSZip err - ' + err.message);
+                    Log.error('Zip err - ' + err.message);
                     reject({
                         code: 400,
                         body: {error: err.message}

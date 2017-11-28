@@ -1,0 +1,31 @@
+{
+    "WHERE": {
+        "AND": [{
+            "IS": {
+                "courses_dept": "a*"
+            }
+        }, {
+            "LT": {
+                "courses_audit": 10
+            }
+        }]
+    },
+    "OPTIONS": {
+        "COLUMNS": [
+            "courses_dept",
+            "avgAvg"
+        ],
+        "ORDER": {
+            "dir": "DOWN",
+            "keys": ["avgAvg", "courses_dept"]
+        }
+    },
+    "TRANSFORMATIONS": {
+        "GROUP": ["courses_dept"],
+        "APPLY": [{
+            "avgAvg": {
+                "AVG": "courses_avg"
+            }
+        }]
+    }
+}

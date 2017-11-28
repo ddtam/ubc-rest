@@ -30,15 +30,6 @@ describe("AddDatasetSpec", function () {
 
     });
 
-    after(function () {
-        // clear databases at end
-        Log.warn('CLEAN UP: deleting cached databases...');
-
-        let databaseList = fs.readdirSync('./dbFiles/');
-        for (const file of databaseList) {
-            fs.unlinkSync('./dbFiles/' + file)
-        }
-    });
 
     it("Should iterate through the 3 files in the test zip", function (done) {
         content = new Buffer(fs.readFileSync('./zips/courses_3test.zip'))
@@ -232,7 +223,7 @@ describe("AddDatasetSpec", function () {
     });
 
     it("Should give 204 response when adding a Room database", function (done) {
-        this.timeout(5000);
+        this.timeout(90000);
 
         content = new Buffer(fs.readFileSync('./zips/rooms.zip'))
             .toString('base64');
@@ -269,7 +260,7 @@ describe("AddDatasetSpec", function () {
         }).then(done, done);
     })
 
-    it("Should give 400 response when adding Room dataset with Courses ID", function (done) {
+    it("Should give 400 response when adding Room dataset with Courses ID (Irongate)", function (done) {
         this.timeout(5000);
 
         content = new Buffer(fs.readFileSync('./zips/rooms.zip'))
@@ -288,7 +279,7 @@ describe("AddDatasetSpec", function () {
         }).then(done, done);
     })
 
-    it("Should give 400 response when adding Courses dataset with Room ID", function (done) {
+    it("Should give 400 response when adding Courses dataset with Room ID (Irongate)", function (done) {
         this.timeout(5000);
 
         content = new Buffer(fs.readFileSync('./zips/courses.zip'))

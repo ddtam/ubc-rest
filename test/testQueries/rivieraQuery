@@ -1,0 +1,31 @@
+{
+    "WHERE": {
+        "AND": [{
+            "IS": {
+                "courses_dept": "*a*"
+            }
+        }, {
+            "LT": {
+                "courses_audit": 10
+            }
+        }]
+    },
+    "OPTIONS": {
+        "COLUMNS": [
+            "courses_dept",
+            "minPass"
+        ],
+        "ORDER": {
+            "dir": "DOWN",
+            "keys": ["minPass", "courses_dept"]
+        }
+    },
+    "TRANSFORMATIONS": {
+        "GROUP": ["courses_dept"],
+        "APPLY": [{
+            "minPass": {
+                "MIN": "courses_pass"
+            }
+        }]
+    }
+}

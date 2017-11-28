@@ -1,0 +1,15 @@
+{
+    "WHERE": {},
+    "OPTIONS": {
+        "COLUMNS": [
+            "courses_dept",
+            "courses_id",
+            "numUniqueOfferings"
+        ],
+        "ORDER": "numUniqueOfferings"
+    },
+    "TRANSFORMATIONS": {
+        "GROUP": ["courses_id", "courses_dept"],
+        "APPLY": [{"numUniqueOfferings": {"COUNT": "courses_uuid"}}]
+    }
+}

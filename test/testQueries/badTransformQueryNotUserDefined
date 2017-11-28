@@ -1,0 +1,23 @@
+{
+    "WHERE": {
+        "AND": [{
+            "IS": {
+                "courses_dept": "cpsc"
+            }
+        }, {
+            "GT": {
+                "courses_audit": -1
+            }
+        }]
+    },
+    "OPTIONS": {
+        "COLUMNS": [
+            "courses_name",
+            "courses_dept"
+        ],
+        "ORDER": {
+            "dir": "DOWN",
+            "keys": ["courses_dept"]
+        }
+    }
+}
